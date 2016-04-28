@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Lime.Protocol;
 
@@ -14,9 +15,9 @@ namespace MTC2016
             _distributionListRecipientsList = distributionListRecipientsList;
         }
 
-        public async Task<bool> AddAsync(Identity recipient)
+        public async Task<bool> AddAsync(Identity recipient, CancellationToken cancellationToken)
         {
-            if (await ContainsAsync(recipient))
+            if (await ContainsAsync(recipient, cancellationToken))
                 return true;
 
             try
@@ -30,17 +31,17 @@ namespace MTC2016
             }
         }
 
-        public async Task<IEnumerable<Identity>> GetRecipientsAsync()
+        public async Task<IEnumerable<Identity>> GetRecipientsAsync(CancellationToken cancellationToken)
         {
             return await _distributionListRecipientsList.AsEnumerableAsync();
         }
 
-        public async Task<bool> ContainsAsync(Identity recipient)
+        public async Task<bool> ContainsAsync(Identity recipient, CancellationToken cancellationToken)
         {
             return await _distributionListRecipientsList.ContainsAsync(recipient);
         }
 
-        public async Task<bool> RemoveAsync(Identity recipient)
+        public async Task<bool> RemoveAsync(Identity recipient, CancellationToken cancellationToken)
         {
             return await _distributionListRecipientsList.TryRemoveAsync(recipient);
         }
