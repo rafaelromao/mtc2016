@@ -7,18 +7,21 @@ namespace MTC2016
 {
     internal class DistributionListExtension : IDistributionListExtension
     {
-        private readonly IDistributionListRecipientsSet _distributionListRecipientsSet;
+        private readonly IDistributionListRecipientsList _distributionListRecipientsList;
 
-        public DistributionListExtension(IDistributionListRecipientsSet distributionListRecipientsSet)
+        public DistributionListExtension(IDistributionListRecipientsList distributionListRecipientsList)
         {
-            _distributionListRecipientsSet = distributionListRecipientsSet;
+            _distributionListRecipientsList = distributionListRecipientsList;
         }
 
         public async Task<bool> AddAsync(Identity recipient)
         {
+            if (await ContainsAsync(recipient))
+                return true;
+
             try
             {
-                await _distributionListRecipientsSet.AddAsync(recipient);
+                await _distributionListRecipientsList.AddAsync(recipient);
                 return true;
             }
             catch (Exception)
@@ -27,9 +30,19 @@ namespace MTC2016
             }
         }
 
-        public async Task<IEnumerable<Identity>> GetAllAsync()
+        public async Task<IEnumerable<Identity>> GetRecipientsAsync()
         {
-            return await _distributionListRecipientsSet.AsEnumerableAsync();
+            return await _distributionListRecipientsList.AsEnumerableAsync();
+        }
+
+        public async Task<bool> ContainsAsync(Identity recipient)
+        {
+            return await _distributionListRecipientsList.ContainsAsync(recipient);
+        }
+
+        public async Task<bool> RemoveAsync(Identity recipient)
+        {
+            return await _distributionListRecipientsList.TryRemoveAsync(recipient);
         }
     }
 }

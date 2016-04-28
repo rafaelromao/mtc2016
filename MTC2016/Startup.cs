@@ -1,41 +1,29 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Takenet.MessagingHub.Client.Listener;
 
 namespace MTC2016
 {
-    public class Startup : IStartable
+    public sealed class Startup : IStartable, IDisposable
     {
-        private readonly Settings _settings;
-        private readonly IDistributionListExtension _distributionListExtension;
-        private readonly ISchedulerExtension _schedulerExtension;
+        private readonly ConsoleTraceListener _listener;
 
-        public Startup(Settings settings, IDistributionListExtension distributionListExtension, ISchedulerExtension schedulerExtension)
+        public Startup()
         {
-            _settings = settings;
-            _distributionListExtension = distributionListExtension;
-            _schedulerExtension = schedulerExtension;
+            _listener = new ConsoleTraceListener(false);
+            Trace.Listeners.Add(_listener);
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            try
-            {
-                await ScheduleEventReminderAsync();
-            }
-            catch (Exception e)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(e);
-            }
+            return Task.CompletedTask;
         }
 
-        private async Task ScheduleEventReminderAsync()
+        public void Dispose()
         {
-            var reminderTime = _settings.ReminderTime;
-            var recipients = await _distributionListExtension.GetAllAsync();
-            await _schedulerExtension.ScheduleAsync(_settings.Reminder, recipients, reminderTime);
+            _listener.Dispose();
         }
     }
 }

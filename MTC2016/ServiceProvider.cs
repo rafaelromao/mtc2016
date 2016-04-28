@@ -17,7 +17,7 @@ namespace MTC2016
         {
             Container.RegisterSingleton<ISchedulerExtension, SchedulerExtension>();
             Container.RegisterSingleton<IDistributionListExtension, DistributionListExtension>();
-            Container.RegisterSingleton<IDistributionListRecipientsSet, DistributionListRecipientsSet>();
+            Container.RegisterSingleton<IDistributionListRecipientsList, DistributionListRecipientsList>();
         }
 
         public object GetService(Type serviceType)

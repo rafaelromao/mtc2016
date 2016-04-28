@@ -1,10 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
+using System.Runtime.Caching;
+using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
+using Lime.Messaging.Contents;
 using Lime.Protocol;
 using Takenet.MessagingHub.Client;
+using Takenet.MessagingHub.Client.Messages;
 using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016
@@ -13,9 +18,11 @@ namespace MTC2016
     {
         private readonly IMessagingHubSender _sender;
         private readonly BackgroundJobServer _server;
+        private readonly ObjectCache _cache;
 
         public SchedulerExtension(IServiceProvider serviceProvider, IMessagingHubSender sender, Settings settings)
         {
+            _cache = new MemoryCache(nameof(MTC2016));
             _sender = sender;
 
             GlobalConfiguration.Configuration
@@ -25,24 +32,39 @@ namespace MTC2016
             _server = new BackgroundJobServer();
         }
 
-        public Task ScheduleAsync(string message, IEnumerable<Identity> recipients, DateTimeOffset reminderTime)
+        public Task ScheduleAsync(DateTimeOffset reminderTime, string message, CancellationToken cancellationToken, params Identity[] recipients)
         {
-            BackgroundJob.Schedule(() => SendEventReminder(message, recipients.Select(i => i.ToString())), reminderTime);
+            BackgroundJob.Schedule(() => SendMessage(message, cancellationToken, recipients), reminderTime);
             return Task.CompletedTask;
         }
 
         // ReSharper disable once MemberCanBePrivate.Global - This method MUST be public to be seen by HangFire
-        public void SendEventReminder(string message, IEnumerable<string> recipients)
+        public void SendMessage(string message, CancellationToken cancellationToken, IEnumerable<Identity> recipients)
         {
-            SendEventReminderAsync(message, recipients.Select(Identity.Parse)).Wait();
+            SendMessageAsync(message, cancellationToken, recipients).Wait(cancellationToken);
         }
 
-        private async Task SendEventReminderAsync(string message, IEnumerable<Identity> recipients)
+        private async Task SendMessageAsync(string text, CancellationToken cancellationToken, IEnumerable<Identity> recipients)
         {
             foreach (var recipient in recipients)
             {
-                Console.WriteLine($"{message} -> {recipient}");
-                await _sender.SendMessageAsync(message, recipient.ToNode());
+                var message = new Message
+                {
+                    Id = Guid.NewGuid(),
+                    Content = new PlainText
+                    {
+                        Text = text
+                    },
+                    To = recipient.ToNode()
+                };
+
+                // Avoid sending the same message twice within the same minute
+                if (!_cache.Contains(message.ToKey()))
+                {
+                    Console.WriteLine($"{message} -> {recipient}");
+                    await _sender.SendMessageAsync(message, cancellationToken);
+                    _cache.Add(message.ToKey(), message, DateTimeOffset.Now.AddMinutes(1));
+                }
             }
         }
 
