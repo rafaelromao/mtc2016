@@ -1,19 +1,21 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Shouldly;
-using Takenet.MessagingHub.Client;
+using MTC2016.Configuration;
+using NUnit.Framework;
+using Takenet.MessagingHub.Client.Tester;
 
 namespace MTC2016.Tests
 {
-    [TestClass]
-    public class Mtc2016Tests : Mtc2016TestsBase
+    [TestFixture]
+    public class Mtc2016Tests : MessagingHubClientTester<Settings>
     {
-        [TestMethod]
+        protected override string TesterIdentifier => Settings.TesterIdentifier;
+        protected override string TesterAccessKey => Settings.TesterAccessKey;
+
+        [Test]
         public async Task SubscribeWithSuccess()
         {
             await SendMessageAsync("Entrar");
-            var response = await WaitForResponseAsync();
-            response.ShouldBe(Settings.Messages.ConfirmSubscription);
+            await AssertResponseAsync(Settings.Messages.ConfirmSubscription);
         }
     }
 }

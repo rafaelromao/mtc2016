@@ -6,6 +6,9 @@ namespace MTC2016.Configuration
     {
         public string ConnectionString { get; set; }
 
+        public string TesterIdentifier { get; set; }
+        public string TesterAccessKey { get; set; }
+
         public Messages Messages { get; set; }
         public ScheduledMessage[] ScheduledMessages { get; set; }
     }

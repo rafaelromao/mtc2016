@@ -1,50 +1,57 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Lime.Protocol;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MTC2016.Configuration;
 using Newtonsoft.Json;
-using Takenet.MessagingHub.Client;
+using NUnit.Framework;
+using Shouldly;
 using Takenet.MessagingHub.Client.Host;
 
-namespace MTC2016.Tests
+namespace Takenet.MessagingHub.Client.Tester
 {
-    [TestClass]
-    public class Mtc2016TestsBase
+    [TestFixture]
+    public abstract class MessagingHubClientTester<TSettingsType>
     {
         private static CancellationTokenSource NewTimeoutCancellationTokenSource() => new CancellationTokenSource(Timeout);
         private static CancellationToken NewTimeoutCancellationToken() => NewTimeoutCancellationTokenSource().Token;
         private static TimeSpan Timeout => TimeSpan.FromSeconds(20);
 
-        private const string SmartContact = "mtc2016";
-        private const string SmartContactTester = "PacienteDoDrBot";
-        private const string SmartContactTesterAccessKey = "MXVWeVJD";
-
         private IMessagingHubClient Client { get; set; }
         private Process SmartContactProcess { get; set; }
 
-        private volatile Message _lastMessage;
+        private readonly ConcurrentQueue<Message> _lattestMessages = new ConcurrentQueue<Message>();
 
-        protected Settings Settings { get; private set; }
+        protected abstract string TesterIdentifier { get; }
+        protected abstract string TesterAccessKey { get; }
 
-        [TestInitialize]
-        public void TestInitialize()
+        protected Application Application { get; private set; }
+        protected TSettingsType Settings { get; private set; }
+
+        [SetUp]
+        public void SetUp()
         {
             SmartContactProcess = StartSmartContact();
+            LoadSettings();
             InstantiateSmartContact();
             RegisterMessageReceiver();
             Client.StartAsync(NewTimeoutCancellationToken()).Wait();
         }
 
-        [TestCleanup]
-        public void Cleanup()
+        [TearDown]
+        public void TearDown()
         {
             Client.StopAsync(NewTimeoutCancellationToken()).Wait();
             SmartContactProcess?.Dispose();
+        }
+
+        private void LoadSettings()
+        {
+            var settingsJsonContent = JsonConvert.SerializeObject(Application.Settings);
+            Settings = JsonConvert.DeserializeObject<TSettingsType>(settingsJsonContent);
         }
 
         private Process StartSmartContact()
@@ -55,7 +62,8 @@ namespace MTC2016.Tests
             var mhh = $"{assemblyDir}\\mhh.exe";
             var appJson = $"{assemblyDir}\\application.json";
 
-            LoadSettings(appJson);
+            var appJsonContent = File.ReadAllText(appJson);
+            Application = JsonConvert.DeserializeObject<Application>(appJsonContent);
 
             var process = Process.Start(new ProcessStartInfo
             {
@@ -69,48 +77,56 @@ namespace MTC2016.Tests
             return process;
         }
 
-        private void LoadSettings(string appJson)
-        {
-            var appJsonContent = File.ReadAllText(appJson);
-            var application = JsonConvert.DeserializeObject<Application>(appJsonContent);
-            var settingsJsonContent = JsonConvert.SerializeObject(application.Settings);
-            Settings = JsonConvert.DeserializeObject<Settings>(settingsJsonContent);
-        }
 
         private void InstantiateSmartContact()
         {
             Client = new MessagingHubClientBuilder()
                 .UsingEncryption(SessionEncryption.None)
-                .UsingAccessKey(SmartContactTester, SmartContactTesterAccessKey)
+                .UsingAccessKey(TesterIdentifier, TesterAccessKey)
                 .WithSendTimeout(Timeout)
                 .Build();
         }
 
         protected async Task SendMessageAsync(string message)
         {
-            await Client.SendMessageAsync(message, SmartContact);
+            await Client.SendMessageAsync(message, Application.Identifier);
         }
 
         private void RegisterMessageReceiver()
         {
             Client.AddMessageReceiver((m, c) =>
             {
-                _lastMessage = m;
+                _lattestMessages.Enqueue(m);
                 return Task.CompletedTask;
             });
         }
 
-        protected async Task<string> WaitForResponseAsync()
+        protected async Task<Message> DequeueResponseAsync()
         {
             using (var cts = NewTimeoutCancellationTokenSource())
             {
                 while (!cts.IsCancellationRequested)
                 {
-                    if (_lastMessage != null)
-                        return _lastMessage?.Content.ToString();
+                    Message lastMessage;
+                    if (_lattestMessages.TryDequeue(out lastMessage))
+                        return lastMessage;
                     await Task.Delay(10, cts.Token);
                 }
                 return null;
+            }
+        }
+
+        protected async Task AssertResponseAsync(string expected, bool isRegex = false, int formatPlaceholderCount = 10)
+        {
+            var response = await DequeueResponseAsync();
+            var content = response.Content.ToString();
+            if (isRegex)
+            {
+                content.ShouldMatch(expected.ToStringFormatRegex(formatPlaceholderCount));
+            }
+            else
+            {
+                content.ShouldBe(expected);
             }
         }
     }
