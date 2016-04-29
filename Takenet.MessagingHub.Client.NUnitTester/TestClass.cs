@@ -3,12 +3,12 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Lime.Protocol;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Shouldly;
 using Takenet.MessagingHub.Client.Host;
 
 namespace Takenet.MessagingHub.Client.NUnitTester
@@ -20,7 +20,7 @@ namespace Takenet.MessagingHub.Client.NUnitTester
         private static CancellationToken NewTimeoutCancellationToken() => NewTimeoutCancellationTokenSource().Token;
         private static TimeSpan Timeout => TimeSpan.FromSeconds(20);
 
-        private IMessagingHubClient Client { get; set; }
+        private IMessagingHubClient TestClient { get; set; }
         private Process SmartContactProcess { get; set; }
 
         private readonly ConcurrentQueue<Message> _lattestMessages = new ConcurrentQueue<Message>();
@@ -31,25 +31,35 @@ namespace Takenet.MessagingHub.Client.NUnitTester
 
         protected Application Application { get; private set; }
 
-        [SetUp]
-        public void BaseSetUp()
+        [OneTimeSetUp]
+        public virtual async Task OneTimeSetUp()
         {
             SmartContactProcess = StartSmartContact();
-            InstantiateSmartContact();
+            InstantiateTestClient();
             RegisterMessageReceiver();
-            var cancellationToken = NewTimeoutCancellationToken();
-            Client.StartAsync(cancellationToken).Wait(cancellationToken);
+            await StartTestClientAsync();
         }
 
-        [TearDown]
-        public void BaseTearDown()
+        [OneTimeTearDown]
+        public virtual async Task OneTimeTearDown()
         {
-            Client.StopAsync(NewTimeoutCancellationToken()).Wait();
             SmartContactProcess?.Dispose();
+            await StopTestClientAsync();
             _listener?.Dispose();
         }
 
-        protected static void EnableConsoleTraceListener(bool useErrorStream = false)
+        private async Task StartTestClientAsync()
+        {
+            var cancellationToken = NewTimeoutCancellationToken();
+            await TestClient.StartAsync(cancellationToken);
+        }
+
+        private async Task StopTestClientAsync()
+        {
+            await TestClient.StopAsync(NewTimeoutCancellationToken());
+        }
+
+        protected void EnableConsoleTraceListener(bool useErrorStream = false)
         {
             _listener = new ConsoleTraceListener(useErrorStream);
             Trace.Listeners.Add(_listener);
@@ -84,23 +94,27 @@ namespace Takenet.MessagingHub.Client.NUnitTester
         }
 
 
-        private void InstantiateSmartContact()
+        private void InstantiateTestClient()
         {
-            Client = new MessagingHubClientBuilder()
-                //.UsingEncryption(SessionEncryption.None)
+            TestClient = new MessagingHubClientBuilder()
+                .UsingEncryption(Application.SessionEncryption.GetValueOrDefault())
+                .UsingCompression(Application.SessionCompression.GetValueOrDefault())
+                .UsingHostName(Application.HostName ?? "msging.net")
+                .UsingDomain(Application.Domain ?? "msging.net")
                 .UsingAccessKey(TesterIdentifier, TesterAccessKey)
                 .WithSendTimeout(Timeout)
+                .WithMaxConnectionRetries(1)
                 .Build();
         }
 
         protected async Task SendMessageAsync(string message)
         {
-            await Client.SendMessageAsync(message, Application.Identifier);
+            await TestClient.SendMessageAsync(message, Application.Identifier);
         }
 
         private void RegisterMessageReceiver()
         {
-            Client.AddMessageReceiver((m, c) =>
+            TestClient.AddMessageReceiver((m, c) =>
             {
                 _lattestMessages.Enqueue(m);
                 return Task.CompletedTask;
@@ -128,11 +142,11 @@ namespace Takenet.MessagingHub.Client.NUnitTester
             var content = response.Content.ToString();
             if (isRegex)
             {
-                content.ShouldMatch(expected.ToStringFormatRegex(formatPlaceholderCount));
+                Assert.True(Regex.IsMatch(content, expected.ToStringFormatRegex(formatPlaceholderCount)));
             }
             else
             {
-                content.ShouldBe(expected);
+                Assert.AreEqual(expected, content);
             }
         }
     }

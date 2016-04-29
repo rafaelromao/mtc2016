@@ -10,10 +10,10 @@ namespace MTC2016.Tests
         protected override string TesterIdentifier => Settings.TesterIdentifier;
         protected override string TesterAccessKey => Settings.TesterAccessKey;
 
-        [SetUp]
-        public void SetUp()
+        public override Task OneTimeSetUp()
         {
-            EnableConsoleTraceListener();
+            EnableConsoleTraceListener(true);
+            return base.OneTimeSetUp();
         }
 
         [Test]
