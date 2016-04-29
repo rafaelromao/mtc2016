@@ -48,7 +48,7 @@ namespace Takenet.MessagingHub.Client.NUnitTester
             IgnoreAllReceivedMessages();
             StartSmartContactAsync().Wait();
             InstantiateTestClient();
-            RegisterMessageReceiver();
+            RegisterTestClientMessageReceivers();
             StartTestClientAsync().Wait();
             Delay().Wait();
         }
@@ -71,10 +71,12 @@ namespace Takenet.MessagingHub.Client.NUnitTester
             _listener?.Dispose();
         }
 
-        protected void IgnoreReceivedMessage()
+        protected async Task ResetAsync()
         {
-            Message message;
-            _lattestMessages.TryDequeue(out message);
+            await StopSmartContactAsync();
+            await StopTestClientAsync();
+            await StartSmartContactAsync();
+            await StartTestClientAsync();
         }
 
         private async Task StopSmartContactAsync()
@@ -180,7 +182,7 @@ namespace Takenet.MessagingHub.Client.NUnitTester
             }
         }
 
-        private void RegisterMessageReceiver()
+        private void RegisterTestClientMessageReceivers()
         {
             if (HasCustomTesterIdentifier)
             {
@@ -199,18 +201,45 @@ namespace Takenet.MessagingHub.Client.NUnitTester
             }
         }
 
-        protected async Task<Message> DequeueReceivedMessageAsync()
+        protected async Task<Message> DequeueReceivedMessageAsync(TimeSpan timeout = default(TimeSpan))
         {
-            using (var cts = NewTimeoutCancellationTokenSource())
+            try
+            {
+                timeout = timeout == default(TimeSpan) ? Timeout : timeout;
+                using (var cts = new CancellationTokenSource(timeout))
+                {
+                    while (!cts.IsCancellationRequested)
+                    {
+                        Message lastMessage;
+                        if (LattestMessages.TryDequeue(out lastMessage))
+                            return lastMessage;
+                        await Task.Delay(10, cts.Token);
+                    }
+                    return null;
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                return null;
+            }
+        }
+
+        protected async Task IgnoreReceivedMessageAsync(TimeSpan timeout = default(TimeSpan))
+        {
+            try { 
+            timeout = timeout == default(TimeSpan) ? Timeout : timeout;
+            using (var cts = new CancellationTokenSource(timeout))
             {
                 while (!cts.IsCancellationRequested)
                 {
                     Message lastMessage;
-                    if (LattestMessages.TryDequeue(out lastMessage))
-                        return lastMessage;
+                    LattestMessages.TryDequeue(out lastMessage);
                     await Task.Delay(10, cts.Token);
                 }
-                return null;
+            }
+            }
+            catch (TaskCanceledException)
+            {
             }
         }
 

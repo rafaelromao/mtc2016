@@ -11,8 +11,7 @@ namespace MTC2016.Tests
         private async Task EnsureNotSubscribedAsync()
         {
             await SendMessageForReceiverAsync<UnsubscribeMessageReceiver>();
-            await Delay(10);
-            IgnoreAllReceivedMessages();
+            await ResetAsync();
         }
 
         [Test]
@@ -30,7 +29,7 @@ namespace MTC2016.Tests
             await EnsureNotSubscribedAsync();
 
             await SendMessageForReceiverAsync<SubscribeMessageReceiver>();
-            IgnoreReceivedMessage();
+            await IgnoreReceivedMessageAsync();
             await SendMessageForReceiverAsync<SubscribeMessageReceiver>();
             await AssertLastReceivedMessageAsync(Settings.Messages.SubscriptionFailed);
         }
@@ -41,7 +40,7 @@ namespace MTC2016.Tests
             await EnsureNotSubscribedAsync();
 
             await SendMessageForReceiverAsync<SubscribeMessageReceiver>();
-            IgnoreReceivedMessage();
+            await IgnoreReceivedMessageAsync();
             await SendMessageForReceiverAsync<UnsubscribeMessageReceiver>();
             await AssertLastReceivedMessageAsync(Settings.Messages.ConfirmSubscriptionCancellation);
         }
