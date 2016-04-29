@@ -151,7 +151,6 @@ namespace Takenet.MessagingHub.Client.NUnitTester
         }
     }
 
-
     public abstract class TestClass<TSettingsType> : TestClass
     {
         private void LoadSettings()
