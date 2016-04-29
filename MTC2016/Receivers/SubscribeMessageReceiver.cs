@@ -24,7 +24,11 @@ namespace MTC2016.Receivers
 
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
         {
-            if (await _distributionListExtension.AddAsync(message.From, cancellationToken))
+            if (await _distributionListExtension.ContainsAsync(message.From, cancellationToken))
+            {
+                await _sender.SendMessageAsync(_settings.Messages.AlreadySubscribed, message.From, cancellationToken);
+            }
+            else if (await _distributionListExtension.AddAsync(message.From, cancellationToken))
             {
                 await _sender.SendMessageAsync(_settings.Messages.ConfirmSubscription, message.From, cancellationToken);
             }

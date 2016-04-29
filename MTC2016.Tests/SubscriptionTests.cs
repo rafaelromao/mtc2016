@@ -31,7 +31,7 @@ namespace MTC2016.Tests
             await SendMessageForReceiverAsync<SubscribeMessageReceiver>();
             await IgnoreReceivedMessageAsync();
             await SendMessageForReceiverAsync<SubscribeMessageReceiver>();
-            await AssertLastReceivedMessageAsync(Settings.Messages.SubscriptionFailed);
+            await AssertLastReceivedMessageAsync(Settings.Messages.AlreadySubscribed);
         }
 
         [Test]

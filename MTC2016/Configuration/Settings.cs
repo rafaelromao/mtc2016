@@ -22,5 +22,6 @@ namespace MTC2016.Configuration
         public string NotSubscribed { get; set; }
 
         public string ConfirmSubscriptionCancellation { get; set; }
+        public string AlreadySubscribed { get; set; }
     }
 }

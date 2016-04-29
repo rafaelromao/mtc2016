@@ -8,15 +8,11 @@ namespace MTC2016.Configuration
 {
     class ServiceProvider : IServiceContainer
     {
-        private static Container Container { get; }
-
-        static ServiceProvider()
-        {
-            Container = new Container();
-        }
+        private Container Container { get; }
 
         public ServiceProvider()
         {
+            Container = new Container();
             Container.RegisterSingleton<ISchedulerExtension, SchedulerExtension>();
             Container.RegisterSingleton<IDistributionListExtension, DistributionListExtension>();
             Container.RegisterSingleton<IDistributionListRecipientsList, DistributionListRecipientsList>();

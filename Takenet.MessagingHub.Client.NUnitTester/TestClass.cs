@@ -75,6 +75,7 @@ namespace Takenet.MessagingHub.Client.NUnitTester
         {
             await StopSmartContactAsync();
             await StopTestClientAsync();
+            IgnoreAllReceivedMessages();
             await StartSmartContactAsync();
             await StartTestClientAsync();
         }
@@ -86,21 +87,13 @@ namespace Takenet.MessagingHub.Client.NUnitTester
 
         private async Task StartTestClientAsync()
         {
-            var cancellationToken = NewTimeoutCancellationToken();
-            await TestClient.StartAsync(cancellationToken);
+            await TestClient.StartAsync();
         }
 
         private async Task StopTestClientAsync()
         {
-            await TestClient.StopAsync(NewTimeoutCancellationToken());
+            await TestClient.StopAsync();
         }
-
-        protected void EnableConsoleTraceListener(bool useErrorStream = false)
-        {
-            _listener = new ConsoleTraceListener(useErrorStream);
-            Trace.Listeners.Add(_listener);
-        }
-
         private async Task StartSmartContactAsync()
         {
             var assemblyFile = Assembly.GetExecutingAssembly().Location;
@@ -131,6 +124,12 @@ namespace Takenet.MessagingHub.Client.NUnitTester
                 var filePath = Path.Combine(path, $"{assemblyName.Name}.dll");
                 return File.Exists(filePath) ? Assembly.LoadFile(filePath) : null;
             };
+        }
+
+        protected void EnableConsoleTraceListener(bool useErrorStream = false)
+        {
+            _listener = new ConsoleTraceListener(useErrorStream);
+            Trace.Listeners.Add(_listener);
         }
 
         protected virtual void LoadApplicationJson(string appJson)
