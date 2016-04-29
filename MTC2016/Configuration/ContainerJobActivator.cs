@@ -1,11 +1,11 @@
 using System;
 using Hangfire;
 
-namespace MTC2016
+namespace MTC2016.Configuration
 {
     public class ContainerJobActivator : JobActivator
     {
-        private IServiceProvider _container;
+        private readonly IServiceProvider _container;
 
         public ContainerJobActivator(IServiceProvider container)
         {

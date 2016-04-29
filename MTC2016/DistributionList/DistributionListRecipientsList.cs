@@ -1,9 +1,9 @@
-using System.Threading.Tasks;
 using Lime.Protocol;
+using MTC2016.Configuration;
 using Takenet.Elephant.Sql;
 using Takenet.Elephant.Sql.Mapping;
 
-namespace MTC2016
+namespace MTC2016.DistributionList
 {
     public class DistributionListRecipientsList : SqlSet<Identity>, IDistributionListRecipientsList
     {

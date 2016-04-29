@@ -97,19 +97,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ContainerJobActivator.cs" />
-    <Compile Include="DistributionListExtension.cs" />
-    <Compile Include="DistributionListRecipientsList.cs" />
-    <Compile Include="IDistributionListExtension.cs" />
-    <Compile Include="IDistributionListRecipientsList.cs" />
-    <Compile Include="ISchedulerExtension.cs" />
-    <Compile Include="MessageExtensions.cs" />
-    <Compile Include="SchedulerExtension.cs" />
-    <Compile Include="Settings.cs" />
-    <Compile Include="UnsubscribeMessageReceiver.cs" />
-    <Compile Include="SubscribeMessageReceiver.cs" />
+    <Compile Include="Scheduler\ScheduledMessage.cs" />
+    <Compile Include="Configuration\ContainerJobActivator.cs" />
+    <Compile Include="DistributionList\DistributionListExtension.cs" />
+    <Compile Include="DistributionList\DistributionListRecipientsList.cs" />
+    <Compile Include="DistributionList\IDistributionListExtension.cs" />
+    <Compile Include="DistributionList\IDistributionListRecipientsList.cs" />
+    <Compile Include="Scheduler\ISchedulerExtension.cs" />
+    <Compile Include="Scheduler\MessageExtensions.cs" />
+    <Compile Include="Scheduler\SchedulerExtension.cs" />
+    <Compile Include="Configuration\Settings.cs" />
+    <Compile Include="Receivers\UnsubscribeMessageReceiver.cs" />
+    <Compile Include="Receivers\SubscribeMessageReceiver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServiceProvider.cs" />
+    <Compile Include="Configuration\ServiceProvider.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -118,9 +119,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

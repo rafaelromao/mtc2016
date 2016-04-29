@@ -1,9 +1,8 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Lime.Protocol;
 using Takenet.Elephant;
 
-namespace MTC2016
+namespace MTC2016.DistributionList
 {
     internal interface IDistributionListRecipientsList
     {

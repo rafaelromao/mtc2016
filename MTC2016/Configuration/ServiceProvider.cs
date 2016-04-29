@@ -1,8 +1,10 @@
 using System;
+using MTC2016.DistributionList;
+using MTC2016.Scheduler;
 using SimpleInjector;
 using Takenet.MessagingHub.Client.Host;
 
-namespace MTC2016
+namespace MTC2016.Configuration
 {
     class ServiceProvider : IServiceContainer
     {

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Lime.Protocol;
 
-namespace MTC2016
+namespace MTC2016.DistributionList
 {
     public interface IDistributionListExtension
     {

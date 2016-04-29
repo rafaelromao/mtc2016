@@ -1,19 +1,21 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Lime.Protocol;
+using MTC2016.Configuration;
+using MTC2016.DistributionList;
 using Takenet.MessagingHub.Client;
 using Takenet.MessagingHub.Client.Listener;
 using Takenet.MessagingHub.Client.Sender;
 
-namespace MTC2016
+namespace MTC2016.Receivers
 {
-    public class SubscribeMessageReceiver : IMessageReceiver
+    public class UnsubscribeMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
         private readonly IDistributionListExtension _distributionListExtension;
         private readonly Settings _settings;
 
-        public SubscribeMessageReceiver(IMessagingHubSender sender, IDistributionListExtension distributionListExtension, Settings settings)
+        public UnsubscribeMessageReceiver(IMessagingHubSender sender, IDistributionListExtension distributionListExtension, Settings settings)
         {
             _sender = sender;
             _distributionListExtension = distributionListExtension;
@@ -22,9 +24,13 @@ namespace MTC2016
 
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
         {
-            if (await _distributionListExtension.AddAsync(message.From, cancellationToken))
+            if (!await _distributionListExtension.ContainsAsync(message.From, cancellationToken))
             {
-                await _sender.SendMessageAsync(_settings.Messages.ConfirmSubscription, message.From, cancellationToken);
+                await _sender.SendMessageAsync(_settings.Messages.NotSubscribed, message.From, cancellationToken);
+            }
+            else if (await _distributionListExtension.RemoveAsync(message.From, cancellationToken))
+            {
+                await _sender.SendMessageAsync(_settings.Messages.ConfirmSubscriptionCancellation, message.From, cancellationToken);
             }
             else
             {

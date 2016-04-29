@@ -1,6 +1,6 @@
 using Lime.Protocol;
 
-namespace MTC2016
+namespace MTC2016.Scheduler
 {
     public static class MessageExtensions
     {

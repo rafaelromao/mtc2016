@@ -1,15 +1,13 @@
-﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using MTC2016.Scheduler;
 
-namespace MTC2016
+namespace MTC2016.Configuration
 {
     public class Settings
     {
         public string ConnectionString { get; set; }
 
         public Messages Messages { get; set; }
-        public Reminder[] Reminders { get; set; }
+        public ScheduledMessage[] ScheduledMessages { get; set; }
     }
 
     public class Messages
@@ -21,12 +19,5 @@ namespace MTC2016
         public string NotSubscribed { get; set; }
 
         public string ConfirmSubscriptionCancellation { get; set; }
-    }
-
-    public class Reminder
-    {
-        [JsonConverter(typeof(IsoDateTimeConverter))]
-        public DateTimeOffset Time { get; set; }
-        public string Message { get; set; }
     }
 }
