@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using MTC2016.Configuration;
+using MTC2016.Receivers;
 using NUnit.Framework;
 using Takenet.MessagingHub.Client.NUnitTester;
 
@@ -19,7 +20,7 @@ namespace MTC2016.Tests
         [Test]
         public async Task SubscribeWithSuccess()
         {
-            await SendMessageAsync("Entrar");
+            await SendMessageForReceiverAsync<SubscribeMessageReceiver>();
             await AssertResponseAsync(Settings.Messages.ConfirmSubscription);
         }
     }

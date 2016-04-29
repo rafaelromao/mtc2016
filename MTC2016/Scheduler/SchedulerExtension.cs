@@ -48,8 +48,10 @@ namespace MTC2016.Scheduler
 
         private async Task SendScheduledMessagesAsync(IEnumerable<ScheduledMessage> scheduledMessages, Func<Task<IEnumerable<Identity>>> getRecipientsAsync, CancellationToken cancellationToken)
         {
-            var recipients = await getRecipientsAsync();
+            var recipients = (getRecipientsAsync != null ? await getRecipientsAsync.Invoke() : null) ?? new Identity[0];
+
             scheduledMessages = scheduledMessages as ScheduledMessage[] ?? scheduledMessages.ToArray();
+
             foreach (var recipient in recipients)
             {
                 foreach (var scheduledMessage in scheduledMessages)

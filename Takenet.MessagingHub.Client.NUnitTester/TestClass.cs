@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -93,7 +94,6 @@ namespace Takenet.MessagingHub.Client.NUnitTester
             Application = JsonConvert.DeserializeObject<Application>(appJsonContent);
         }
 
-
         private void InstantiateTestClient()
         {
             TestClient = new MessagingHubClientBuilder()
@@ -110,6 +110,18 @@ namespace Takenet.MessagingHub.Client.NUnitTester
         protected async Task SendMessageAsync(string message)
         {
             await TestClient.SendMessageAsync(message, Application.Identifier);
+        }
+
+        protected async Task SendMessageForReceiverAsync<TReceiverType>()
+        {
+            var receiverContentFilter = Application.MessageReceivers.Single(r => r.Type == nameof(TReceiverType)).Content;
+            var randomReceiverMessage = GenerateRandomRegexMatch(receiverContentFilter);
+            await SendMessageAsync(randomReceiverMessage);
+        }
+
+        private string GenerateRandomRegexMatch(string receiverContentFilter)
+        {
+            throw new NotImplementedException();
         }
 
         private void RegisterMessageReceiver()
