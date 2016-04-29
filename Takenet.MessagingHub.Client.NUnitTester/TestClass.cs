@@ -45,20 +45,20 @@ namespace Takenet.MessagingHub.Client.NUnitTester
         [SetUp]
         public void BaseSetUp()
         {
-            IgnoreAllReceivedMessages();
+            DiscardReceivedMessages();
             StartSmartContactAsync().Wait();
             InstantiateTestClient();
             RegisterTestClientMessageReceivers();
             StartTestClientAsync().Wait();
-            Delay().Wait();
+            SleepAsync().Wait();
         }
 
-        protected void IgnoreAllReceivedMessages()
+        private void DiscardReceivedMessages()
         {
             _lattestMessages = new ConcurrentQueue<Message>();
         }
 
-        protected static async Task Delay(int seconds = 1)
+        protected static async Task SleepAsync(int seconds = 1)
         {
             await Task.Delay(TimeSpan.FromSeconds(seconds));
         }
@@ -75,7 +75,7 @@ namespace Takenet.MessagingHub.Client.NUnitTester
         {
             await StopSmartContactAsync();
             await StopTestClientAsync();
-            IgnoreAllReceivedMessages();
+            DiscardReceivedMessages();
             await StartSmartContactAsync();
             await StartTestClientAsync();
         }
@@ -98,10 +98,15 @@ namespace Takenet.MessagingHub.Client.NUnitTester
         {
             var assemblyFile = Assembly.GetExecutingAssembly().Location;
             var assemblyDir = new FileInfo(assemblyFile).DirectoryName;
-            var appJson = $"{assemblyDir}\\application.json";
 
-            LoadApplicationJson(appJson);
-            ConfigureWorkingDirectory(appJson); // TODO: Change client and request Bootstrapper to do this by itself
+            var appJsonFullName = $"{assemblyDir}\\application.test.json";
+            if (!File.Exists(appJsonFullName))
+            {
+                appJsonFullName = $"{assemblyDir}\\application.json";
+            }
+
+            LoadApplicationJson(appJsonFullName);
+            ConfigureWorkingDirectory(appJsonFullName); // TODO: Change client and request Bootstrapper to do this by itself
 
             SmartContact = await Bootstrapper.StartAsync(Application);
         }
@@ -156,7 +161,7 @@ namespace Takenet.MessagingHub.Client.NUnitTester
             await TestClient.SendMessageAsync(message, Application.Identifier);
         }
 
-        protected async Task SendMessageForReceiverAsync<TReceiverType>()
+        protected async Task SendMessageAsync<TReceiverType>()
         {
             var receiverName = typeof(TReceiverType).Name;
             var receiverContentFilter = Application.MessageReceivers.SingleOrDefault(r => r.Type == receiverName)?.Content;
@@ -185,6 +190,11 @@ namespace Takenet.MessagingHub.Client.NUnitTester
         {
             if (HasCustomTesterIdentifier)
             {
+                // Enqueue messages sent to the TestClient
+                TestClient.AddMessageReceiver((m, c) => { LattestMessages.Enqueue(m); return Task.CompletedTask; });
+            }
+            else
+            {
                 // Ignore messages sent to the SmartContent
                 TestClient.AddMessageReceiver(
                     new LambdaMessageReceiver((m, c) => Task.CompletedTask), m => m.MatchReceiverFilters(Application));
@@ -192,11 +202,6 @@ namespace Takenet.MessagingHub.Client.NUnitTester
                 // Enqueue messages sent to the TestClient
                 TestClient.AddMessageReceiver(
                     new LambdaMessageReceiver((m, c) => { LattestMessages.Enqueue(m); return Task.CompletedTask; }), m => !m.MatchReceiverFilters(Application));
-            }
-            else
-            {
-                // Enqueue messages sent to the TestClient
-                TestClient.AddMessageReceiver((m, c) => { LattestMessages.Enqueue(m); return Task.CompletedTask; });
             }
         }
 
@@ -233,6 +238,8 @@ namespace Takenet.MessagingHub.Client.NUnitTester
                 {
                     Message lastMessage;
                     LattestMessages.TryDequeue(out lastMessage);
+                    if (lastMessage != null)
+                        break;
                     await Task.Delay(10, cts.Token);
                 }
             }
@@ -241,8 +248,27 @@ namespace Takenet.MessagingHub.Client.NUnitTester
             {
             }
         }
+        protected async Task IgnoreAllReceivedMessagesAsync(TimeSpan timeout = default(TimeSpan))
+        {
+            try
+            {
+                timeout = timeout == default(TimeSpan) ? Timeout : timeout;
+                using (var cts = new CancellationTokenSource(timeout))
+                {
+                    while (!cts.IsCancellationRequested)
+                    {
+                        Message lastMessage;
+                        LattestMessages.TryDequeue(out lastMessage);
+                        await Task.Delay(10, cts.Token);
+                    }
+                }
+            }
+            catch (TaskCanceledException)
+            {
+            }
+        }
 
-        protected async Task AssertLastReceivedMessageAsync(string expected, bool isRegex = false, int formatPlaceholderCount = 10)
+        protected async Task AssertLastMessageAsync(string expected, bool isRegex = false, int formatPlaceholderCount = 10)
         {
             var message = await DequeueReceivedMessageAsync();
             var content = message?.Content?.ToString();
