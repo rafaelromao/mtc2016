@@ -11,10 +11,10 @@ using NUnit.Framework;
 using Shouldly;
 using Takenet.MessagingHub.Client.Host;
 
-namespace Takenet.MessagingHub.Client.Tester
+namespace Takenet.MessagingHub.Client.NUnitTester
 {
     [TestFixture]
-    public abstract class MessagingHubClientTester<TSettingsType>
+    public abstract class TestClass
     {
         private static CancellationTokenSource NewTimeoutCancellationTokenSource() => new CancellationTokenSource(Timeout);
         private static CancellationToken NewTimeoutCancellationToken() => NewTimeoutCancellationTokenSource().Token;
@@ -24,34 +24,35 @@ namespace Takenet.MessagingHub.Client.Tester
         private Process SmartContactProcess { get; set; }
 
         private readonly ConcurrentQueue<Message> _lattestMessages = new ConcurrentQueue<Message>();
+        private static ConsoleTraceListener _listener;
 
         protected abstract string TesterIdentifier { get; }
         protected abstract string TesterAccessKey { get; }
 
         protected Application Application { get; private set; }
-        protected TSettingsType Settings { get; private set; }
 
         [SetUp]
-        public void SetUp()
+        public void BaseSetUp()
         {
             SmartContactProcess = StartSmartContact();
-            LoadSettings();
             InstantiateSmartContact();
             RegisterMessageReceiver();
-            Client.StartAsync(NewTimeoutCancellationToken()).Wait();
+            var cancellationToken = NewTimeoutCancellationToken();
+            Client.StartAsync(cancellationToken).Wait(cancellationToken);
         }
 
         [TearDown]
-        public void TearDown()
+        public void BaseTearDown()
         {
             Client.StopAsync(NewTimeoutCancellationToken()).Wait();
             SmartContactProcess?.Dispose();
+            _listener?.Dispose();
         }
 
-        private void LoadSettings()
+        protected static void EnableConsoleTraceListener(bool useErrorStream = false)
         {
-            var settingsJsonContent = JsonConvert.SerializeObject(Application.Settings);
-            Settings = JsonConvert.DeserializeObject<TSettingsType>(settingsJsonContent);
+            _listener = new ConsoleTraceListener(useErrorStream);
+            Trace.Listeners.Add(_listener);
         }
 
         private Process StartSmartContact()
@@ -62,8 +63,7 @@ namespace Takenet.MessagingHub.Client.Tester
             var mhh = $"{assemblyDir}\\mhh.exe";
             var appJson = $"{assemblyDir}\\application.json";
 
-            var appJsonContent = File.ReadAllText(appJson);
-            Application = JsonConvert.DeserializeObject<Application>(appJsonContent);
+            LoadApplicationJson(appJson);
 
             var process = Process.Start(new ProcessStartInfo
             {
@@ -77,11 +77,17 @@ namespace Takenet.MessagingHub.Client.Tester
             return process;
         }
 
+        protected virtual void LoadApplicationJson(string appJson)
+        {
+            var appJsonContent = File.ReadAllText(appJson);
+            Application = JsonConvert.DeserializeObject<Application>(appJsonContent);
+        }
+
 
         private void InstantiateSmartContact()
         {
             Client = new MessagingHubClientBuilder()
-                .UsingEncryption(SessionEncryption.None)
+                //.UsingEncryption(SessionEncryption.None)
                 .UsingAccessKey(TesterIdentifier, TesterAccessKey)
                 .WithSendTimeout(Timeout)
                 .Build();
@@ -128,6 +134,24 @@ namespace Takenet.MessagingHub.Client.Tester
             {
                 content.ShouldBe(expected);
             }
+        }
+    }
+
+
+    public abstract class TestClass<TSettingsType> : TestClass
+    {
+        private void LoadSettings()
+        {
+            var settingsJsonContent = JsonConvert.SerializeObject(Application.Settings);
+            Settings = JsonConvert.DeserializeObject<TSettingsType>(settingsJsonContent);
+        }
+
+        protected TSettingsType Settings { get; private set; }
+
+        protected override void LoadApplicationJson(string appJson)
+        {
+            base.LoadApplicationJson(appJson);
+            LoadSettings();
         }
     }
 

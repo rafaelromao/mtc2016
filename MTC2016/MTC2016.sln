@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTC2016", "MTC2016.csproj",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTC2016.Tests", "..\MTC2016.Tests\MTC2016.Tests.csproj", "{4E6F0D44-B56E-49B9-9C8E-BAFB83164F04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Takenet.MessagingHub.Client.Tester", "..\Takenet.MessagingHub.Client.Tester\Takenet.MessagingHub.Client.Tester.csproj", "{F62D83C4-B65A-4961-8054-342A1F1DB9C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Takenet.MessagingHub.Client.NUnitTester", "..\Takenet.MessagingHub.Client.NUnitTester\Takenet.MessagingHub.Client.NUnitTester.csproj", "{F62D83C4-B65A-4961-8054-342A1F1DB9C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

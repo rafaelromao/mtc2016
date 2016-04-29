@@ -51,8 +51,8 @@
       <HintPath>..\MTC2016\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\MTC2016\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.0.5813.39031, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\MTC2016\packages\NUnit.3.0.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Shouldly, Version=2.7.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
@@ -87,12 +87,12 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MTC2016\MTC2016.csproj">
-      <Project>{AE4E3778-1AB5-4E79-8268-E1C0E7996554}</Project>
+      <Project>{ae4e3778-1ab5-4e79-8268-e1c0e7996554}</Project>
       <Name>MTC2016</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Takenet.MessagingHub.Client.Tester\Takenet.MessagingHub.Client.Tester.csproj">
+    <ProjectReference Include="..\Takenet.MessagingHub.Client.NUnitTester\Takenet.MessagingHub.Client.NUnitTester.csproj">
       <Project>{F62D83C4-B65A-4961-8054-342A1F1DB9C2}</Project>
-      <Name>Takenet.MessagingHub.Client.Tester</Name>
+      <Name>Takenet.MessagingHub.Client.NUnitTester</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
