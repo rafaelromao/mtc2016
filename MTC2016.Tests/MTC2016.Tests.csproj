@@ -68,6 +68,7 @@
       <HintPath>..\MTC2016\packages\Microsoft.Tpl.Dataflow.4.5.24\lib\portable-net45+win8+wpa81\System.Threading.Tasks.Dataflow.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Transactions" />
     <Reference Include="Takenet.MessagingHub.Client, Version=0.3.59.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\MTC2016\packages\Takenet.MessagingHub.Client.0.3.59\lib\net461\Takenet.MessagingHub.Client.dll</HintPath>
       <Private>True</Private>
@@ -82,7 +83,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Mtc2016Tests.cs" />
+    <Compile Include="SubscriptionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

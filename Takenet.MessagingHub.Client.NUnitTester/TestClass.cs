@@ -7,10 +7,12 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using EntroBuilder;
 using Lime.Protocol;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Takenet.MessagingHub.Client.Host;
+using Takenet.MessagingHub.Client.Listener;
 
 namespace Takenet.MessagingHub.Client.NUnitTester
 {
@@ -22,31 +24,62 @@ namespace Takenet.MessagingHub.Client.NUnitTester
         private static TimeSpan Timeout => TimeSpan.FromSeconds(20);
 
         private IMessagingHubClient TestClient { get; set; }
-        private Process SmartContactProcess { get; set; }
+        private IStoppable SmartContact { get; set; }
 
-        private readonly ConcurrentQueue<Message> _lattestMessages = new ConcurrentQueue<Message>();
+        private ConcurrentQueue<Message> _lattestMessages;
+
         private static ConsoleTraceListener _listener;
 
-        protected abstract string TesterIdentifier { get; }
-        protected abstract string TesterAccessKey { get; }
+        protected virtual string TesterIdentifier => Application.Identifier;
+        protected virtual string TesterAccessKey => Application.AccessKey;
+        protected bool HasCustomTesterIdentifier => TesterIdentifier != Application.Identifier;
 
         protected Application Application { get; private set; }
 
-        [OneTimeSetUp]
-        public virtual async Task OneTimeSetUp()
+        private ConcurrentQueue<Message> LattestMessages
         {
-            SmartContactProcess = StartSmartContact();
-            InstantiateTestClient();
-            RegisterMessageReceiver();
-            await StartTestClientAsync();
+            get { return _lattestMessages; }
+            set { _lattestMessages = value; }
         }
 
-        [OneTimeTearDown]
-        public virtual async Task OneTimeTearDown()
+        [SetUp]
+        public void BaseSetUp()
         {
-            SmartContactProcess?.Dispose();
-            await StopTestClientAsync();
+            IgnoreAllReceivedMessages();
+            StartSmartContactAsync().Wait();
+            InstantiateTestClient();
+            RegisterMessageReceiver();
+            StartTestClientAsync().Wait();
+            Delay().Wait();
+        }
+
+        protected void IgnoreAllReceivedMessages()
+        {
+            _lattestMessages = new ConcurrentQueue<Message>();
+        }
+
+        protected static async Task Delay(int seconds = 1)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(seconds));
+        }
+
+        [TearDown]
+        public void BaseTearDown()
+        {
+            StopSmartContactAsync().Wait();
+            StopTestClientAsync().Wait();
             _listener?.Dispose();
+        }
+
+        protected void IgnoreReceivedMessage()
+        {
+            Message message;
+            _lattestMessages.TryDequeue(out message);
+        }
+
+        private async Task StopSmartContactAsync()
+        {
+            await SmartContact.StopAsync();
         }
 
         private async Task StartTestClientAsync()
@@ -66,26 +99,36 @@ namespace Takenet.MessagingHub.Client.NUnitTester
             Trace.Listeners.Add(_listener);
         }
 
-        private Process StartSmartContact()
+        private async Task StartSmartContactAsync()
         {
             var assemblyFile = Assembly.GetExecutingAssembly().Location;
             var assemblyDir = new FileInfo(assemblyFile).DirectoryName;
-
-            var mhh = $"{assemblyDir}\\mhh.exe";
             var appJson = $"{assemblyDir}\\application.json";
 
             LoadApplicationJson(appJson);
+            ConfigureWorkingDirectory(appJson); // TODO: Change client and request Bootstrapper to do this by itself
 
-            var process = Process.Start(new ProcessStartInfo
+            SmartContact = await Bootstrapper.StartAsync(Application);
+        }
+
+        private static void ConfigureWorkingDirectory(string applicationFileName)
+        {
+            var path = Path.GetDirectoryName(applicationFileName);
+            if (!string.IsNullOrWhiteSpace(path))
             {
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                FileName = mhh,
-                Arguments = appJson,
-                RedirectStandardOutput = true
-            });
-            Thread.Sleep(TimeSpan.FromSeconds(2));
-            return process;
+                Directory.SetCurrentDirectory(path);
+            }
+            else
+            {
+                path = Environment.CurrentDirectory;
+            }
+
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, eventArgs) =>
+            {
+                var assemblyName = new AssemblyName(eventArgs.Name);
+                var filePath = Path.Combine(path, $"{assemblyName.Name}.dll");
+                return File.Exists(filePath) ? Assembly.LoadFile(filePath) : null;
+            };
         }
 
         protected virtual void LoadApplicationJson(string appJson)
@@ -114,33 +157,56 @@ namespace Takenet.MessagingHub.Client.NUnitTester
 
         protected async Task SendMessageForReceiverAsync<TReceiverType>()
         {
-            var receiverContentFilter = Application.MessageReceivers.Single(r => r.Type == nameof(TReceiverType)).Content;
+            var receiverName = typeof(TReceiverType).Name;
+            var receiverContentFilter = Application.MessageReceivers.SingleOrDefault(r => r.Type == receiverName)?.Content;
+            if (string.IsNullOrWhiteSpace(receiverContentFilter))
+                throw new ArgumentException($"Could not find a content filter expression for a receiver named {receiverName}!");
+
             var randomReceiverMessage = GenerateRandomRegexMatch(receiverContentFilter);
             await SendMessageAsync(randomReceiverMessage);
         }
 
-        private string GenerateRandomRegexMatch(string receiverContentFilter)
+        private static string GenerateRandomRegexMatch(string pattern)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var builder = Builder.Create<string>();
+                builder = builder.For(Any.ValueLike(pattern));
+                return builder.Build();
+            }
+            catch (Exception)
+            {
+                throw new ArgumentException($"Invalid regex pattern: {pattern}");
+            }
         }
 
         private void RegisterMessageReceiver()
         {
-            TestClient.AddMessageReceiver((m, c) =>
+            if (HasCustomTesterIdentifier)
             {
-                _lattestMessages.Enqueue(m);
-                return Task.CompletedTask;
-            });
+                // Ignore messages sent to the SmartContent
+                TestClient.AddMessageReceiver(
+                    new LambdaMessageReceiver((m, c) => Task.CompletedTask), m => m.MatchReceiverFilters(Application));
+
+                // Enqueue messages sent to the TestClient
+                TestClient.AddMessageReceiver(
+                    new LambdaMessageReceiver((m, c) => { LattestMessages.Enqueue(m); return Task.CompletedTask; }), m => !m.MatchReceiverFilters(Application));
+            }
+            else
+            {
+                // Enqueue messages sent to the TestClient
+                TestClient.AddMessageReceiver((m, c) => { LattestMessages.Enqueue(m); return Task.CompletedTask; });
+            }
         }
 
-        protected async Task<Message> DequeueResponseAsync()
+        protected async Task<Message> DequeueReceivedMessageAsync()
         {
             using (var cts = NewTimeoutCancellationTokenSource())
             {
                 while (!cts.IsCancellationRequested)
                 {
                     Message lastMessage;
-                    if (_lattestMessages.TryDequeue(out lastMessage))
+                    if (LattestMessages.TryDequeue(out lastMessage))
                         return lastMessage;
                     await Task.Delay(10, cts.Token);
                 }
@@ -148,10 +214,10 @@ namespace Takenet.MessagingHub.Client.NUnitTester
             }
         }
 
-        protected async Task AssertResponseAsync(string expected, bool isRegex = false, int formatPlaceholderCount = 10)
+        protected async Task AssertLastReceivedMessageAsync(string expected, bool isRegex = false, int formatPlaceholderCount = 10)
         {
-            var response = await DequeueResponseAsync();
-            var content = response.Content.ToString();
+            var message = await DequeueReceivedMessageAsync();
+            var content = message?.Content?.ToString();
             if (isRegex)
             {
                 Assert.True(Regex.IsMatch(content, expected.ToStringFormatRegex(formatPlaceholderCount)));
@@ -193,4 +259,16 @@ namespace Takenet.MessagingHub.Client.NUnitTester
             return text;
         }
     }
+
+    public static class MessageExtensions
+    {
+        public static bool MatchReceiverFilters(this Message message, Application application)
+        {
+            var filters = application.MessageReceivers.Select(r => r.Content);
+            var content = message?.Content?.ToString();
+            var result = !string.IsNullOrWhiteSpace(content) && filters.Any(f => Regex.IsMatch(content, f, RegexOptions.Compiled | RegexOptions.IgnoreCase));
+            return result;
+        }
+    }
+
 }
