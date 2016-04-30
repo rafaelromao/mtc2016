@@ -36,7 +36,6 @@ namespace Takenet.MessagingHub.Client.Tester
         public string TesterIdentifier { get; private set; }
         public string TesterAccessKey { get; private set; }
         public Application Application { get; private set; }
-        public bool HasCustomTesterIdentifier => TesterIdentifier != Application.Identifier;
 
 
         public ApplicationTester(ApplicationTesterOptions options)
@@ -46,7 +45,7 @@ namespace Takenet.MessagingHub.Client.Tester
             if (options.EnableConsoleListener)
                 EnableConsoleTraceListener(options.UseErrorStream);
 
-            PatchApplicationTestSettings(options);
+            ApplyOptions(options);
 
             DiscardReceivedMessages();
             StartSmartContactAsync().Wait();
@@ -57,8 +56,20 @@ namespace Takenet.MessagingHub.Client.Tester
         }
 
 
-        private void PatchApplicationTestSettings(ApplicationTesterOptions options)
+        private void ApplyOptions(ApplicationTesterOptions options)
         {
+            TesterIdentifier = options.TesterIdentifier;
+            TesterAccessKey = options.TesterAccesskey;
+
+            if (TesterIdentifier == null || TesterAccessKey == null || TesterIdentifier == Application.Identifier)
+            {
+                throw new InvalidOperationException(
+                    "You need a tester identifier different from the application identifier " +
+                    "in order to interact with you application during the tests! " +
+                    "Go to http://messaginghub.io, create another application and use its identifier " +
+                    "and access key as tester identifier and tester access key.");
+            }
+
             DefaultTimeout = options.DefaultTimeout == default(TimeSpan) ? TimeSpan.FromSeconds(20) : options.DefaultTimeout;
 
             if (Application.ServiceProviderType != null)
@@ -74,9 +85,6 @@ namespace Takenet.MessagingHub.Client.Tester
                 ValidateTestServiceProviderType(options.TestServiceProviderType);
                 Application.ServiceProviderType = options.TestServiceProviderType.Name;
             }
-
-            TesterIdentifier = options.TesterIdentifier ?? Application.Identifier;
-            TesterAccessKey = options.TesterAccesskey ?? Application.AccessKey;
         }
 
         private static void ValidateApplicationServiceProviderType(string applicationServiceProviderTypeName)
@@ -90,7 +98,7 @@ namespace Takenet.MessagingHub.Client.Tester
 
         private static void ValidateTestServiceProviderType(Type testServiceProviderType)
         {
-            var baseTestServiceProviderType = typeof (ApplicationTesterServiceProvider);
+            var baseTestServiceProviderType = typeof(ApplicationTesterServiceProvider);
             if (!baseTestServiceProviderType.IsAssignableFrom(testServiceProviderType))
                 throw new ArgumentException(
                     $"{testServiceProviderType.Name} must be a subtype of {baseTestServiceProviderType.FullName}");
@@ -184,7 +192,7 @@ namespace Takenet.MessagingHub.Client.Tester
 
             if (!string.IsNullOrWhiteSpace(Application.Domain))
                 builder = builder.UsingDomain(Application.Domain);
-                
+
             TestClient = builder.Build();
         }
 
@@ -204,34 +212,11 @@ namespace Takenet.MessagingHub.Client.Tester
 
         private void RegisterTestClientMessageReceivers()
         {
-            if (HasCustomTesterIdentifier)
+            TestClient.AddMessageReceiver((m, c) =>
             {
-                // Enqueue messages sent to the TestClient
-                TestClient.AddMessageReceiver((m, c) =>
-                {
-                    LattestMessages.Enqueue(m);
-                    return Task.CompletedTask;
-                });
-            }
-            else
-            {
-                // Ignore messages sent to the SmartContent
-                TestClient.AddMessageReceiver(
-                    new LambdaMessageReceiver((m, c) =>
-                    {
-                        Console.WriteLine("COMSUMED BY LambdaMessageReceiver AND IGNORED!");
-                        return Task.CompletedTask;
-                    }), m => m.MatchReceiverFilters(Application));
-
-                // Enqueue messages sent to the TestClient
-                TestClient.AddMessageReceiver(
-                    new LambdaMessageReceiver((m, c) =>
-                    {
-                        Console.WriteLine("COMSUMED BY LambdaMessageReceiver AND ENQUEUED!");
-                        LattestMessages.Enqueue(m);
-                        return Task.CompletedTask;
-                    }), m => !m.MatchReceiverFilters(Application));
-            }
+                LattestMessages.Enqueue(m);
+                return Task.CompletedTask;
+            });
         }
 
 

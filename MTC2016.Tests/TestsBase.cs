@@ -1,8 +1,13 @@
-﻿using MTC2016.Configuration;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using MTC2016.Configuration;
 using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 using Takenet.MessagingHub.Client.Tester;
 using Lime.Protocol;
+using Newtonsoft.Json;
 using Shouldly;
 
 namespace MTC2016.Tests
@@ -14,8 +19,12 @@ namespace MTC2016.Tests
         [SetUp]
         public void SetUp()
         {
+            var testerSettingsFileName = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\tester.json";
+            var testerSettings = JsonConvert.DeserializeObject<IDictionary<string, string>>(File.ReadAllText(testerSettingsFileName));
             Tester = new ApplicationTester<Settings>(new ApplicationTesterOptions
             {
+                TesterIdentifier = testerSettings["identifier"],
+                TesterAccesskey = testerSettings["accessKey"],
                 TestServiceProviderType = typeof(TestServiceProvider)
             });
         }
