@@ -17,11 +17,18 @@ namespace Takenet.MessagingHub.Client.Tester
 
         public void RegisterService(Type serviceType, object instance)
         {
-            var applicationServiceContainer = ClientTester.ApplicationServiceProvider as IServiceContainer;
-            if (applicationServiceContainer != null)
-                applicationServiceContainer.RegisterService(serviceType, instance);
-            else
-                _testServiceTypes[serviceType] = instance;
+            try
+            {
+                var applicationServiceContainer = ClientTester.ApplicationServiceProvider as IServiceContainer;
+                if (applicationServiceContainer != null)
+                    applicationServiceContainer.RegisterService(serviceType, instance);
+                else
+                    _testServiceTypes[serviceType] = instance;
+            }
+            catch (Exception)
+            {
+                // Ignore registration errors
+            }
         }
     }
 }
