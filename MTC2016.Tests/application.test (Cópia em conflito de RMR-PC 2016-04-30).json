@@ -1,0 +1,43 @@
+﻿{
+  /* Retrieve your application's identifier and access key at http://messaginghub.io */
+  "identifier": "mtc2016test",
+  "accessKey": "MVZWVFhI",
+  "messageReceivers": [
+    {
+      "type": "TestSubscribeMessageReceiver",
+      "mediaType": "text/plain",
+      "content": "^(inscrever|inscrever-se|inscrição|inscricao|entrar|participar)$"
+    },
+    {
+      "type": "TestUnsubscribeMessageReceiver",
+      "mediaType": "text/plain",
+      "content": "^(cancelar|sair|desistir)$"
+    }
+  ],
+  "sessionEncryption": "none",
+  "settingsType": "Settings",
+  "settings": {
+    "connectionString": "Server=RMR-PC\\SQLEXPRESS;Database=MTC2016;Integrated Security=true",
+    "connectionString": "Server=(localdb)\\MSSQLLocalDB;Database=MTC2016;Integrated Security=true",
+    "messages": {
+      "confirmSubscription": "Obrigado por se inscrever para receber as atualizações sobre o MTC 2016. Para cancelar envie 'sair' a qualquer momento.",
+      "confirmSubscriptionCancellation": "Pronto! A partir de agora você não irá mais receber notificações do MTC 2016. Para se inscrever novamente envie 'entrar' a qualquer momento.",
+      "subscriptionFailed": "Houve um problema ao realizar sua inscrição.",
+      "notSubscribed": "Você não está inscrito ainda.",
+      "alreadySubscribed": "Você já está inscrito."
+    },
+    "scheduledMessages": [
+      {
+        "time": "2016-04-28T18:44:00-03:00",
+        "text": "Olá. Amanhã é o grande dia. Minas Testing Conference 2016! \\o/"
+      },
+      {
+        "time": "2016-04-28T18:44:00-03:00",
+        "text": "Começa em 5 minutos a palestra XXXXXXX sobre YYYYYY com ZZZZZZZ!"
+      }
+    ]
+  },
+  "startupType": "Startup",
+  "serviceProviderType": "ServiceProvider",
+  "schemaVersion": 2
+}

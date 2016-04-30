@@ -6,13 +6,16 @@ using Takenet.MessagingHub.Client.Host;
 
 namespace MTC2016.Configuration
 {
-    class ServiceProvider : IServiceContainer
+    internal class ServiceProvider : IServiceContainer
     {
         private Container Container { get; }
 
         public ServiceProvider()
         {
             Container = new Container();
+
+            Container.Options.AllowOverridingRegistrations = true;
+
             Container.RegisterSingleton<ISchedulerExtension, SchedulerExtension>();
             Container.RegisterSingleton<IDistributionListExtension, DistributionListExtension>();
             Container.RegisterSingleton<IDistributionListRecipientsList, DistributionListRecipientsList>();

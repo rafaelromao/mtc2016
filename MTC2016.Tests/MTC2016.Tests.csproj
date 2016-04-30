@@ -51,6 +51,10 @@
       <HintPath>..\MTC2016\packages\Lime.Transport.Tcp.0.4.77\lib\net461\Lime.Transport.Tcp.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="mhh, Version=0.3.59.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\MTC2016\packages\Takenet.MessagingHub.Client.Host.0.3.59\lib\net461\mhh.exe</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\MTC2016\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -84,10 +88,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Mocks\TestDistributionListExtension.cs" />
-    <Compile Include="Mocks\TestSubscribeMessageReceiver.cs" />
+    <Compile Include="Mocks\TestServiceProvider.cs" />
     <Compile Include="SubscriptionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Mocks\TestUnsubscribeMessageReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -101,9 +104,9 @@
       <Project>{ae4e3778-1ab5-4e79-8268-e1c0e7996554}</Project>
       <Name>MTC2016</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Takenet.MessagingHub.Client.NUnitTester\Takenet.MessagingHub.Client.NUnitTester.csproj">
-      <Project>{F62D83C4-B65A-4961-8054-342A1F1DB9C2}</Project>
-      <Name>Takenet.MessagingHub.Client.NUnitTester</Name>
+    <ProjectReference Include="..\Takenet.MessagingHub.Client.Tester\Takenet.MessagingHub.Client.Tester.csproj">
+      <Project>{f62d83c4-b65a-4961-8054-342a1f1db9c2}</Project>
+      <Name>Takenet.MessagingHub.Client.Tester</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
