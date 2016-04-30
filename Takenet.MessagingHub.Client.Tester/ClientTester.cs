@@ -18,7 +18,7 @@ namespace Takenet.MessagingHub.Client.Tester
     public class ClientTester : IDisposable
     {
         private static ConsoleTraceListener _listener;
-        private static TimeSpan DefaultTimeout => TimeSpan.FromSeconds(10);
+        private static TimeSpan DefaultTimeout => TimeSpan.FromSeconds(1);
         internal static IServiceProvider ApplicationServiceProvider { get; private set; }
 
         private ConcurrentQueue<Message> _lattestMessages;
