@@ -1,45 +1,23 @@
 ﻿using System.Threading.Tasks;
-using MTC2016.Configuration;
 using MTC2016.Receivers;
-using MTC2016.Tests.Mocks;
 using NUnit.Framework;
-using Shouldly;
-using Takenet.MessagingHub.Client.Tester;
 
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class SubscriptionTests
+    public class SubscriptionTests : TestsBase
     {
-        private ClientTester<Settings> _tester;
-
-        [SetUp]
-        public void SetUp()
-        {
-            _tester = new ClientTester<Settings>(new ClientTesterOptions
-            {
-                TestServiceProviderType = typeof(TestServiceProvider)
-            });
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _tester.Dispose();
-        }
-
         private async Task EnsureAlreadySubscribedAsync()
         {
-            await _tester.SendMessageAsync<SubscribeMessageReceiver>();
-            await _tester.IgnoreMessageAsync();
-            await _tester.ResetAsync();
+            await Tester.SendMessageAsync<SubscribeMessageReceiver>();
+            await Tester.IgnoreMessagesAsync(); //Only works if inbox size is 0
         }
         [Test]
         public async Task Subscribe()
         {
-            await _tester.SendMessageAsync<SubscribeMessageReceiver>();
-            var response = await _tester.ReceiveMessageAsync();
-            response?.Content?.ToString().ShouldBe(_tester.Settings.Messages.ConfirmSubscription);
+            await Tester.SendMessageAsync<SubscribeMessageReceiver>();
+            var response = await Tester.ReceiveMessageAsync();
+            Assert(response, Tester.Settings.Messages.ConfirmSubscription);
         }
 
         [Test]
@@ -47,9 +25,9 @@ namespace MTC2016.Tests
         {
             await EnsureAlreadySubscribedAsync();
 
-            await _tester.SendMessageAsync<SubscribeMessageReceiver>();
-            var response = await _tester.ReceiveMessageAsync();
-            response?.Content?.ToString().ShouldBe(_tester.Settings.Messages.AlreadySubscribed);
+            await Tester.SendMessageAsync<SubscribeMessageReceiver>();
+            var response = await Tester.ReceiveMessageAsync();
+            Assert(response, Tester.Settings.Messages.AlreadySubscribed);
         }
 
         [Test]
@@ -57,17 +35,17 @@ namespace MTC2016.Tests
         {
             await EnsureAlreadySubscribedAsync();
 
-            await _tester.SendMessageAsync<UnsubscribeMessageReceiver>();
-            var response = await _tester.ReceiveMessageAsync();
-            response?.Content?.ToString().ShouldBe(_tester.Settings.Messages.ConfirmSubscriptionCancellation);
+            await Tester.SendMessageAsync<UnsubscribeMessageReceiver>();
+            var response = await Tester.ReceiveMessageAsync();
+            Assert(response, Tester.Settings.Messages.ConfirmSubscriptionCancellation);
         }
 
         [Test]
         public async Task UnsubscribeWhenNotSubscribed()
         {
-            await _tester.SendMessageAsync<UnsubscribeMessageReceiver>();
-            var response = await _tester.ReceiveMessageAsync();
-            response?.Content?.ToString().ShouldBe(_tester.Settings.Messages.NotSubscribed);
+            await Tester.SendMessageAsync<UnsubscribeMessageReceiver>();
+            var response = await Tester.ReceiveMessageAsync();
+            Assert(response, Tester.Settings.Messages.NotSubscribed);
         }
     }
 }

@@ -3,7 +3,7 @@ using Takenet.MessagingHub.Client.Tester;
 
 namespace MTC2016.Tests.Mocks
 {
-    public class TestServiceProvider : ClientTesterServiceProvider
+    public class TestServiceProvider : ApplicationTesterServiceProvider
     {
         public TestServiceProvider() 
         {

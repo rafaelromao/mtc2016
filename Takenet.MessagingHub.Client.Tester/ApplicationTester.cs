@@ -15,13 +15,13 @@ using Takenet.MessagingHub.Client.Listener;
 
 namespace Takenet.MessagingHub.Client.Tester
 {
-    public class ClientTester : IDisposable
+    public class ApplicationTester : IDisposable
     {
         private static ConsoleTraceListener _listener;
-        private static TimeSpan DefaultTimeout => TimeSpan.FromSeconds(1);
         internal static IServiceProvider ApplicationServiceProvider { get; private set; }
 
         private ConcurrentQueue<Message> _lattestMessages;
+        private TimeSpan DefaultTimeout { get; set; }
 
         private IMessagingHubClient TestClient { get; set; }
         private IStoppable SmartContact { get; set; }
@@ -39,14 +39,14 @@ namespace Takenet.MessagingHub.Client.Tester
         public bool HasCustomTesterIdentifier => TesterIdentifier != Application.Identifier;
 
 
-        public ClientTester(ClientTesterOptions clientTesterOptions)
+        public ApplicationTester(ApplicationTesterOptions options)
         {
             LoadApplicationSettings();
 
-            if (clientTesterOptions.EnableConsoleListener)
-                EnableConsoleTraceListener(clientTesterOptions.UseErrorStream);
+            if (options.EnableConsoleListener)
+                EnableConsoleTraceListener(options.UseErrorStream);
 
-            PatchApplicationTestSettings(clientTesterOptions);
+            PatchApplicationTestSettings(options);
 
             DiscardReceivedMessages();
             StartSmartContactAsync().Wait();
@@ -57,8 +57,10 @@ namespace Takenet.MessagingHub.Client.Tester
         }
 
 
-        private void PatchApplicationTestSettings(ClientTesterOptions clientTesterOptions)
+        private void PatchApplicationTestSettings(ApplicationTesterOptions options)
         {
+            DefaultTimeout = options.DefaultTimeout == default(TimeSpan) ? TimeSpan.FromSeconds(20) : options.DefaultTimeout;
+
             if (Application.ServiceProviderType != null)
             {
                 ValidateApplicationServiceProviderType(Application.ServiceProviderType);
@@ -67,14 +69,14 @@ namespace Takenet.MessagingHub.Client.Tester
                 ApplicationServiceProvider = ApplicationServiceProvider ?? (IServiceProvider)Activator.CreateInstance(applicationServiceProviderType);
             }
 
-            if (clientTesterOptions.TestServiceProviderType != null)
+            if (options.TestServiceProviderType != null)
             {
-                ValidateTestServiceProviderType(clientTesterOptions.TestServiceProviderType);
-                Application.ServiceProviderType = clientTesterOptions.TestServiceProviderType.Name;
+                ValidateTestServiceProviderType(options.TestServiceProviderType);
+                Application.ServiceProviderType = options.TestServiceProviderType.Name;
             }
 
-            TesterIdentifier = clientTesterOptions.TesterIdentifier ?? Application.Identifier;
-            TesterAccessKey = clientTesterOptions.TesterAccesskey ?? Application.AccessKey;
+            TesterIdentifier = options.TesterIdentifier ?? Application.Identifier;
+            TesterAccessKey = options.TesterAccesskey ?? Application.AccessKey;
         }
 
         private static void ValidateApplicationServiceProviderType(string applicationServiceProviderTypeName)
@@ -88,7 +90,7 @@ namespace Takenet.MessagingHub.Client.Tester
 
         private static void ValidateTestServiceProviderType(Type testServiceProviderType)
         {
-            var baseTestServiceProviderType = typeof (ClientTesterServiceProvider);
+            var baseTestServiceProviderType = typeof (ApplicationTesterServiceProvider);
             if (!baseTestServiceProviderType.IsAssignableFrom(testServiceProviderType))
                 throw new ArgumentException(
                     $"{testServiceProviderType.Name} must be a subtype of {baseTestServiceProviderType.FullName}");
@@ -166,15 +168,24 @@ namespace Takenet.MessagingHub.Client.Tester
 
         private void InstantiateTestClient()
         {
-            TestClient = new MessagingHubClientBuilder()
-                .UsingEncryption(Application.SessionEncryption.GetValueOrDefault())
-                .UsingCompression(Application.SessionCompression.GetValueOrDefault())
-                .UsingHostName(Application.HostName ?? "msging.net")
-                .UsingDomain(Application.Domain ?? "msging.net")
+            var builder = new MessagingHubClientBuilder()
                 .UsingAccessKey(TesterIdentifier, TesterAccessKey)
                 .WithSendTimeout(DefaultTimeout)
-                .WithMaxConnectionRetries(1)
-                .Build();
+                .WithMaxConnectionRetries(1);
+
+            if (Application.SessionEncryption.HasValue)
+                builder = builder.UsingEncryption(Application.SessionEncryption.Value);
+
+            if (Application.SessionCompression.HasValue)
+                builder = builder.UsingCompression(Application.SessionCompression.Value);
+
+            if (!string.IsNullOrWhiteSpace(Application.HostName))
+                builder = builder.UsingHostName(Application.HostName);
+
+            if (!string.IsNullOrWhiteSpace(Application.Domain))
+                builder = builder.UsingDomain(Application.Domain);
+                
+            TestClient = builder.Build();
         }
 
         private static string GenerateRandomRegexMatch(string pattern)
@@ -196,17 +207,30 @@ namespace Takenet.MessagingHub.Client.Tester
             if (HasCustomTesterIdentifier)
             {
                 // Enqueue messages sent to the TestClient
-                TestClient.AddMessageReceiver((m, c) => { LattestMessages.Enqueue(m); return Task.CompletedTask; });
+                TestClient.AddMessageReceiver((m, c) =>
+                {
+                    LattestMessages.Enqueue(m);
+                    return Task.CompletedTask;
+                });
             }
             else
             {
                 // Ignore messages sent to the SmartContent
                 TestClient.AddMessageReceiver(
-                    new LambdaMessageReceiver((m, c) => Task.CompletedTask), m => m.MatchReceiverFilters(Application));
+                    new LambdaMessageReceiver((m, c) =>
+                    {
+                        Console.WriteLine("COMSUMED BY LambdaMessageReceiver AND IGNORED!");
+                        return Task.CompletedTask;
+                    }), m => m.MatchReceiverFilters(Application));
 
                 // Enqueue messages sent to the TestClient
                 TestClient.AddMessageReceiver(
-                    new LambdaMessageReceiver((m, c) => { LattestMessages.Enqueue(m); return Task.CompletedTask; }), m => !m.MatchReceiverFilters(Application));
+                    new LambdaMessageReceiver((m, c) =>
+                    {
+                        Console.WriteLine("COMSUMED BY LambdaMessageReceiver AND ENQUEUED!");
+                        LattestMessages.Enqueue(m);
+                        return Task.CompletedTask;
+                    }), m => !m.MatchReceiverFilters(Application));
             }
         }
 
@@ -227,15 +251,6 @@ namespace Takenet.MessagingHub.Client.Tester
         {
             var appJsonContent = File.ReadAllText(appJson);
             Application = JsonConvert.DeserializeObject<Application>(appJsonContent);
-        }
-
-        public async Task ResetAsync()
-        {
-            await StopSmartContactAsync();
-            await StopTestClientAsync();
-            DiscardReceivedMessages();
-            await StartSmartContactAsync();
-            await StartTestClientAsync();
         }
 
         public async Task SendMessageAsync(string message)
@@ -320,7 +335,7 @@ namespace Takenet.MessagingHub.Client.Tester
         }
     }
 
-    public class ClientTester<TSettingsType> : ClientTester
+    public class ApplicationTester<TSettingsType> : ApplicationTester
     {
         private void LoadSettings()
         {
@@ -330,8 +345,8 @@ namespace Takenet.MessagingHub.Client.Tester
 
         public TSettingsType Settings { get; private set; }
 
-        public ClientTester(ClientTesterOptions clientTesterOptions)
-            : base(clientTesterOptions)
+        public ApplicationTester(ApplicationTesterOptions options)
+            : base(options)
         {
         }
 
