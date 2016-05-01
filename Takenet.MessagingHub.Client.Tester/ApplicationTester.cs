@@ -97,7 +97,7 @@ namespace Takenet.MessagingHub.Client.Tester
                     Resource = new Account
                     {
                         Address = TestingIdentifier,
-                        Password = Application.Password,
+                        AccessKey = Application.AccessKey.FromBase64(),
                         InboxSize = 0
                     }
                 }).Result;
@@ -115,7 +115,7 @@ namespace Takenet.MessagingHub.Client.Tester
                     Resource = new Account
                     {
                         Address = TesterIdentifier,
-                        AccessKey = Application.AccessKey,
+                        AccessKey = Application.AccessKey.FromBase64(),
                         InboxSize = 0
                     }
                 }).Result;
