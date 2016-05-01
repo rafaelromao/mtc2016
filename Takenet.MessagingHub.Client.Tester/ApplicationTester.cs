@@ -7,7 +7,9 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using EntroBuilder;
+using Lime.Messaging.Resources;
 using Lime.Protocol;
+using Lime.Protocol.Network;
 using Lime.Protocol.Serialization;
 using Newtonsoft.Json;
 using Takenet.MessagingHub.Client.Host;
@@ -33,19 +35,18 @@ namespace Takenet.MessagingHub.Client.Tester
         }
 
 
-        public string TesterIdentifier { get; private set; }
-        public string TesterAccessKey { get; private set; }
+        private string TestingIdentifier { get; set; }
+        private string TesterIdentifier { get; set; }
+
         public Application Application { get; private set; }
 
 
         public ApplicationTester(ApplicationTesterOptions options)
         {
-            LoadApplicationSettings();
-
-            if (options.EnableConsoleListener)
-                EnableConsoleTraceListener(options.UseErrorStream);
-
             ApplyOptions(options);
+            LoadApplicationSettings();
+            CreateTestingAccounts();
+            PatchApplication(options);
 
             DiscardReceivedMessages();
             StartSmartContactAsync().Wait();
@@ -55,22 +56,81 @@ namespace Takenet.MessagingHub.Client.Tester
             SleepAsync().Wait();
         }
 
-
         private void ApplyOptions(ApplicationTesterOptions options)
         {
-            TesterIdentifier = options.TesterIdentifier;
-            TesterAccessKey = options.TesterAccesskey;
-
-            if (TesterIdentifier == null || TesterAccessKey == null || TesterIdentifier == Application.Identifier)
-            {
-                throw new InvalidOperationException(
-                    "You need a tester identifier different from the application identifier " +
-                    "in order to interact with you application during the tests! " +
-                    "Go to http://messaginghub.io, create another application and use its identifier " +
-                    "and access key as tester identifier and tester access key.");
-            }
-
             DefaultTimeout = options.DefaultTimeout == default(TimeSpan) ? TimeSpan.FromSeconds(20) : options.DefaultTimeout;
+
+            if (options.EnableConsoleListener)
+                EnableConsoleTraceListener(options.UseErrorStream);
+        }
+
+        private void CreateTestingAccounts()
+        {
+            var builder = new MessagingHubClientBuilder()
+                .UsingGuest()
+                .WithSendTimeout(DefaultTimeout)
+                .WithMaxConnectionRetries(1);
+
+            if (Application.SessionEncryption.HasValue)
+                builder = builder.UsingEncryption(Application.SessionEncryption.Value);
+
+            if (!string.IsNullOrWhiteSpace(Application.HostName))
+                builder = builder.UsingHostName(Application.HostName);
+
+            if (!string.IsNullOrWhiteSpace(Application.Domain))
+                builder = builder.UsingDomain(Application.Domain);
+
+            var guest = builder.Build();
+
+            guest.StartAsync().Wait();
+            try
+            {
+                TestingIdentifier = Application.Identifier + "$testing$";
+
+                var testingAccount = guest.SendCommandAsync(new Command
+                {
+                    Id = Guid.NewGuid(),
+                    Method = CommandMethod.Set,
+                    Uri = LimeUri.Parse("/account"),
+                    Resource = new Account
+                    {
+                        Address = TestingIdentifier,
+                        Password = Application.Password,
+                        InboxSize = 0
+                    }
+                }).Result;
+
+                if (testingAccount.Status != CommandStatus.Success)
+                    throw new LimeException(testingAccount.Reason);
+
+                TesterIdentifier = Application.Identifier + "$tester$";
+
+                var testerAccount = guest.SendCommandAsync(new Command
+                {
+                    Id = Guid.NewGuid(),
+                    Method = CommandMethod.Set,
+                    Uri = LimeUri.Parse("/account"),
+                    Resource = new Account
+                    {
+                        Address = TesterIdentifier,
+                        AccessKey = Application.AccessKey,
+                        InboxSize = 0
+                    }
+                }).Result;
+
+                if (testerAccount.Status != CommandStatus.Success)
+                    throw new LimeException(testingAccount.Reason);
+            }
+            finally
+            {
+                guest.StopAsync().Wait();
+            }
+        }
+
+
+        private void PatchApplication(ApplicationTesterOptions options)
+        {
+            Application.Identifier = TestingIdentifier;
 
             if (Application.ServiceProviderType != null)
             {
@@ -177,7 +237,7 @@ namespace Takenet.MessagingHub.Client.Tester
         private void InstantiateTestClient()
         {
             var builder = new MessagingHubClientBuilder()
-                .UsingAccessKey(TesterIdentifier, TesterAccessKey)
+                .UsingAccessKey(TesterIdentifier, Application.AccessKey)
                 .WithSendTimeout(DefaultTimeout)
                 .WithMaxConnectionRetries(1);
 
