@@ -66,6 +66,8 @@ namespace Takenet.MessagingHub.Client.Tester
 
         private void CreateTestingAccounts()
         {
+            //TODO: Testing account should be a total clone of the application account, but with inboxsize = 0
+
             var builder = new MessagingHubClientBuilder()
                 .UsingGuest()
                 .WithSendTimeout(DefaultTimeout)
