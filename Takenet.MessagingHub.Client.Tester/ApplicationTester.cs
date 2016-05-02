@@ -94,10 +94,11 @@ namespace Takenet.MessagingHub.Client.Tester
                     Id = Guid.NewGuid(),
                     Method = CommandMethod.Set,
                     Uri = LimeUri.Parse("/account"),
+                    Pp = guest.LocalNode,
                     Resource = new Account
                     {
                         Address = TestingIdentifier,
-                        AccessKey = Application.AccessKey.FromBase64(),
+                        AccessKey = Application.AccessKey,
                         InboxSize = 0
                     }
                 }).Result;
@@ -112,10 +113,11 @@ namespace Takenet.MessagingHub.Client.Tester
                     Id = Guid.NewGuid(),
                     Method = CommandMethod.Set,
                     Uri = LimeUri.Parse("/account"),
+                    Pp = guest.LocalNode,
                     Resource = new Account
                     {
                         Address = TesterIdentifier,
-                        AccessKey = Application.AccessKey.FromBase64(),
+                        AccessKey = Application.AccessKey,
                         InboxSize = 0
                     }
                 }).Result;
