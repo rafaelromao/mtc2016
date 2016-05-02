@@ -6,22 +6,10 @@ namespace MTC2016.Configuration
     {
         public string ConnectionString { get; set; }
 
-        public string TesterIdentifier { get; set; }
-        public string TesterAccessKey { get; set; }
-
         public Messages Messages { get; set; }
+
         public ScheduledMessage[] ScheduledMessages { get; set; }
-    }
 
-    public class Messages
-    {
-        public string ConfirmSubscription { get; set; }
-
-        public string SubscriptionFailed { get; set; }
-
-        public string NotSubscribed { get; set; }
-
-        public string ConfirmSubscriptionCancellation { get; set; }
-        public string AlreadySubscribed { get; set; }
+        public Question[] Questions { get; set; }
     }
 }

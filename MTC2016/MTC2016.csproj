@@ -101,6 +101,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\Messages.cs" />
+    <Compile Include="Configuration\Question.cs" />
+    <Compile Include="Receivers\QuestionMessageReceiver.cs" />
     <Compile Include="Scheduler\ScheduledMessage.cs" />
     <Compile Include="Configuration\ContainerJobActivator.cs" />
     <Compile Include="DistributionList\DistributionListExtension.cs" />

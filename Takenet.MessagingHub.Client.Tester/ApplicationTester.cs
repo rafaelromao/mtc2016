@@ -94,7 +94,7 @@ namespace Takenet.MessagingHub.Client.Tester
                     Id = Guid.NewGuid(),
                     Method = CommandMethod.Set,
                     Uri = LimeUri.Parse("/account"),
-                    Pp = guest.LocalNode,
+                    //Pp = guest.LocalNode,
                     Resource = new Account
                     {
                         Address = TestingIdentifier,
@@ -113,7 +113,7 @@ namespace Takenet.MessagingHub.Client.Tester
                     Id = Guid.NewGuid(),
                     Method = CommandMethod.Set,
                     Uri = LimeUri.Parse("/account"),
-                    Pp = guest.LocalNode,
+                    //Pp = guest.LocalNode,
                     Resource = new Account
                     {
                         Address = TesterIdentifier,
