@@ -6,7 +6,7 @@ namespace MTC2016.ArtificialInteligence
 {
     public interface IArtificialInteligenceExtension
     {
-        Task<string> GetAnswerForAsync(string question);
+        Task<string> GetAnswerAsync(string question);
         Task<IEnumerable<ScheduledMessage>> GetScheduledMessagesAsync();
     }
 }

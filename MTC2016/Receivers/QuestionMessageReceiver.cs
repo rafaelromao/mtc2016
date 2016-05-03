@@ -25,7 +25,7 @@ namespace MTC2016.Receivers
             _settings = settings;
             try
             {
-                _defaulAnswer = _artificialInteligenceExtension.GetAnswerForAsync(_settings.CouldNotUnderstand).Result;
+                _defaulAnswer = _artificialInteligenceExtension.GetAnswerAsync(_settings.CouldNotUnderstand).Result;
             }
             catch
             {
@@ -36,7 +36,7 @@ namespace MTC2016.Receivers
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
         {
             var question = message.Content?.ToString() ?? string.Empty;
-            var answer = !IsValidQuestion(question) ? _defaulAnswer : await _artificialInteligenceExtension.GetAnswerForAsync(question);
+            var answer = !IsValidQuestion(question) ? _defaulAnswer : await _artificialInteligenceExtension.GetAnswerAsync(question);
             if (answer == null)
             {
                 await _sender.SendMessageAsync(_defaulAnswer, message.From, cancellationToken);

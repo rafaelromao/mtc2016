@@ -32,10 +32,10 @@ namespace MTC2016.ArtificialInteligence
             using (var httpClient = NewHttpClient())
             {
                 var uri = new Uri($"{_settings.ApiaiUri}/intents");
-                var intentsResponse = await httpClient.GetAsync(uri);
-                var json = await intentsResponse.Content.ReadAsStringAsync();
-                var intents = JsonConvert.DeserializeObject<Intent[]>(json, JsonSerializerSettings);
-                return intents;
+                var response = await httpClient.GetAsync(uri);
+                var json = await response.Content.ReadAsStringAsync();
+                var intentsResponse = JsonConvert.DeserializeObject<Intent[]>(json, JsonSerializerSettings);
+                return intentsResponse;
             }
         }
         private async Task<Intent> GetIntentAsync(string intentId)
@@ -43,10 +43,10 @@ namespace MTC2016.ArtificialInteligence
             using (var httpClient = NewHttpClient())
             {
                 var uri = new Uri($"{_settings.ApiaiUri}/intents/{intentId}");
-                var intentsResponse = await httpClient.GetAsync(uri);
-                var json = await intentsResponse.Content.ReadAsStringAsync();
-                var intent = JsonConvert.DeserializeObject<Intent>(json, JsonSerializerSettings);
-                return intent;
+                var response = await httpClient.GetAsync(uri);
+                var json = await response.Content.ReadAsStringAsync();
+                var intentResponse = JsonConvert.DeserializeObject<Intent>(json, JsonSerializerSettings);
+                return intentResponse;
             }
         }
         private async Task<QueryResponse> GetQueryAsync(string question)
@@ -54,8 +54,8 @@ namespace MTC2016.ArtificialInteligence
             using (var httpClient = NewHttpClient())
             {
                 var uri = new Uri($"{_settings.ApiaiUri}/query?v=20150910&lang=PT-BR&query={question}");
-                var intentsResponse = await httpClient.GetAsync(uri);
-                var json = await intentsResponse.Content.ReadAsStringAsync();
+                var response = await httpClient.GetAsync(uri);
+                var json = await response.Content.ReadAsStringAsync();
                 var queryResponse = JsonConvert.DeserializeObject<QueryResponse>(json, JsonSerializerSettings);
                 return queryResponse;
             }
@@ -92,7 +92,7 @@ namespace MTC2016.ArtificialInteligence
         }
 
 
-        public async Task<string> GetAnswerForAsync(string question)
+        public async Task<string> GetAnswerAsync(string question)
         {
             try
             {

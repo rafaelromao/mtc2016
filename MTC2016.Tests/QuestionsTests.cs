@@ -15,7 +15,7 @@ namespace MTC2016.Tests
         {
             await Tester.SendMessageAsync("sobre");
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerForAsync("sobre");
+            var answer = await ArtificialInteligenceExtension.GetAnswerAsync("sobre");
             Assert(response, answer);
         }
 
@@ -24,7 +24,7 @@ namespace MTC2016.Tests
         {
             await Tester.SendMessageAsync("objetivo");
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerForAsync("objetivo");
+            var answer = await ArtificialInteligenceExtension.GetAnswerAsync("objetivo");
             Assert(response, answer);
         }
     }

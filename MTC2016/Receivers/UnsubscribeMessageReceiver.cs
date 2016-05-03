@@ -30,17 +30,17 @@ namespace MTC2016.Receivers
         {
             if (!await _distributionListExtension.ContainsAsync(message.From, cancellationToken))
             {
-                var answer = await _artificialInteligenceExtension.GetAnswerForAsync(_settings.NotSubscribed);
+                var answer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.NotSubscribed);
                 await _sender.SendMessageAsync(answer, message.From, cancellationToken);
             }
             else if (await _distributionListExtension.RemoveAsync(message.From, cancellationToken))
             {
-                var answer = await _artificialInteligenceExtension.GetAnswerForAsync(_settings.ConfirmSubscriptionCancellation);
+                var answer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.ConfirmSubscriptionCancellation);
                 await _sender.SendMessageAsync(answer, message.From, cancellationToken);
             }
             else
             {
-                var answer = await _artificialInteligenceExtension.GetAnswerForAsync(_settings.UnsubscriptionFailed);
+                var answer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.UnsubscriptionFailed);
                 await _sender.SendMessageAsync(answer, message.From, cancellationToken);
             }
         }
