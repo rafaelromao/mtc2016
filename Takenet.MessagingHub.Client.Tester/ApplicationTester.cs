@@ -61,9 +61,10 @@ namespace Takenet.MessagingHub.Client.Tester
             SleepAsync().Wait();
         }
 
+
         private void ApplyOptions(ApplicationTesterOptions options)
         {
-            DefaultTimeout = options.DefaultTimeout == default(TimeSpan) ? TimeSpan.FromSeconds(30) : options.DefaultTimeout;
+            DefaultTimeout = options.DefaultTimeout == default(TimeSpan) ? TimeSpan.FromSeconds(60) : options.DefaultTimeout;
 
             if (options.EnableConsoleListener)
                 EnableConsoleTraceListener(options.UseErrorStream);
@@ -356,6 +357,11 @@ namespace Takenet.MessagingHub.Client.Tester
         {
             base.LoadApplicationJson(appJson);
             LoadSettings();
+        }
+
+        public T GetServiceFromApplicationServiceProvider<T>()
+        {
+            return (T) ApplicationServiceProvider.GetService(typeof (T));
         }
     }
 }

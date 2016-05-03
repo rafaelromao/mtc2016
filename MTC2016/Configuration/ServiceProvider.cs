@@ -1,4 +1,5 @@
 using System;
+using MTC2016.ArtificialInteligence;
 using MTC2016.DistributionList;
 using MTC2016.Scheduler;
 using SimpleInjector;
@@ -16,6 +17,7 @@ namespace MTC2016.Configuration
 
             Container.Options.AllowOverridingRegistrations = true;
 
+            Container.RegisterSingleton<IArtificialInteligenceExtension, ArtificialInteligenceExtension>();
             Container.RegisterSingleton<ISchedulerExtension, SchedulerExtension>();
             Container.RegisterSingleton<IDistributionListExtension, DistributionListExtension>();
             Container.RegisterSingleton<IDistributionListRecipientsList, DistributionListRecipientsList>();

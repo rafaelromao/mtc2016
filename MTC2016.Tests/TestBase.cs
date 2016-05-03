@@ -3,6 +3,7 @@ using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 using Takenet.MessagingHub.Client.Tester;
 using Lime.Protocol;
+using MTC2016.ArtificialInteligence;
 using Shouldly;
 
 namespace MTC2016.Tests
@@ -10,6 +11,7 @@ namespace MTC2016.Tests
     public class TestBase
     {
         protected ApplicationTester<Settings> Tester { get; set; }
+        protected IArtificialInteligenceExtension ArtificialInteligenceExtension { get; set; }
 
         [SetUp]
         public void SetUp()
@@ -18,6 +20,7 @@ namespace MTC2016.Tests
             {
                 TestServiceProviderType = typeof(TestServiceProvider)
             });
+            ArtificialInteligenceExtension = Tester.GetServiceFromApplicationServiceProvider<IArtificialInteligenceExtension>();
         }
 
         [TearDown]

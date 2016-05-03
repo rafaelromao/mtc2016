@@ -17,7 +17,8 @@ namespace MTC2016.Tests
         {
             await Tester.SendMessageAsync<SubscribeMessageReceiver>();
             var response = await Tester.ReceiveMessageAsync();
-            Assert(response, Tester.Settings.Messages.ConfirmSubscription);
+            var answer = await ArtificialInteligenceExtension.GetAnswerForAsync(Tester.Settings.ConfirmSubscription);
+            Assert(response, answer);
         }
 
         [Test]
@@ -27,7 +28,8 @@ namespace MTC2016.Tests
 
             await Tester.SendMessageAsync<SubscribeMessageReceiver>();
             var response = await Tester.ReceiveMessageAsync();
-            Assert(response, Tester.Settings.Messages.AlreadySubscribed);
+            var answer = await ArtificialInteligenceExtension.GetAnswerForAsync(Tester.Settings.AlreadySubscribed);
+            Assert(response, answer);
         }
 
         [Test]
@@ -37,7 +39,8 @@ namespace MTC2016.Tests
 
             await Tester.SendMessageAsync<UnsubscribeMessageReceiver>();
             var response = await Tester.ReceiveMessageAsync();
-            Assert(response, Tester.Settings.Messages.ConfirmSubscriptionCancellation);
+            var answer = await ArtificialInteligenceExtension.GetAnswerForAsync(Tester.Settings.ConfirmSubscriptionCancellation);
+            Assert(response, answer);
         }
 
         [Test]
@@ -45,7 +48,8 @@ namespace MTC2016.Tests
         {
             await Tester.SendMessageAsync<UnsubscribeMessageReceiver>();
             var response = await Tester.ReceiveMessageAsync();
-            Assert(response, Tester.Settings.Messages.NotSubscribed);
+            var answer = await ArtificialInteligenceExtension.GetAnswerForAsync(Tester.Settings.NotSubscribed);
+            Assert(response, answer);
         }
     }
 }

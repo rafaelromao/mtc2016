@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MTC2016.Receivers;
+using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 
 namespace MTC2016.Tests
@@ -14,17 +15,17 @@ namespace MTC2016.Tests
         {
             await Tester.SendMessageAsync("sobre");
             var response = await Tester.ReceiveMessageAsync();
-            Assert(response, Tester.Settings.QuestionWithContent("sobre").Answer);
+            var answer = await ArtificialInteligenceExtension.GetAnswerForAsync("sobre");
+            Assert(response, answer);
         }
 
         [Test]
         public async Task AskObjectiveWithSingleWord()
         {
-            var question = Tester.Settings.QuestionWithContent("objetivo");
-            var message = Tester.GenerateRandomRegexMatch(question.Content);
-            await Tester.SendMessageAsync(message);
+            await Tester.SendMessageAsync("objetivo");
             var response = await Tester.ReceiveMessageAsync();
-            Assert(response, question.Answer);
+            var answer = await ArtificialInteligenceExtension.GetAnswerForAsync("objetivo");
+            Assert(response, answer);
         }
     }
 }

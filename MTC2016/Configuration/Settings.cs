@@ -1,22 +1,19 @@
-﻿using System.Linq;
-using System.Text.RegularExpressions;
-using MTC2016.Scheduler;
-
-namespace MTC2016.Configuration
+﻿namespace MTC2016.Configuration
 {
     public class Settings
     {
         public string ConnectionString { get; set; }
+        public string ApiaiUri { get; set; }
+        public string ApiaiClientToken { get; set; }
 
-        public Messages Messages { get; set; }
-
-        public ScheduledMessage[] ScheduledMessages { get; set; }
-
-        public Question[] Questions { get; set; }
-
-        public Question QuestionWithContent(string text)
-        {
-            return Questions.SingleOrDefault(q => Regex.IsMatch(text, q.Content, RegexOptions.Compiled | RegexOptions.IgnoreCase));
-        }
+        public string SchedulePrefix { get; set; }
+        public string GeneralError { get; set; }
+        public string CouldNotUnderstand { get; set; }
+        public string SubscriptionFailed { get; set; }
+        public string ConfirmSubscription { get; set; }
+        public string AlreadySubscribed { get; set; }
+        public string NotSubscribed { get; set; }
+        public string ConfirmSubscriptionCancellation { get; set; }
+        public string UnsubscriptionFailed { get; set; }
     }
 }

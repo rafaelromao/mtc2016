@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Lime.Protocol;
+using MTC2016.ArtificialInteligence;
 using MTC2016.Configuration;
 using MTC2016.DistributionList;
 using MTC2016.Scheduler;
@@ -15,13 +16,16 @@ namespace MTC2016
     {
         private readonly ISchedulerExtension _schedulerExtension;
         private readonly IDistributionListExtension _distributionListExtension;
+        private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
         private readonly Settings _settings;
         private readonly ConsoleTraceListener _listener;
 
-        public Startup(ISchedulerExtension schedulerExtension, IDistributionListExtension distributionListExtension, Settings settings)
+        public Startup(ISchedulerExtension schedulerExtension, IDistributionListExtension distributionListExtension, 
+            IArtificialInteligenceExtension artificialInteligenceExtension, Settings settings)
         {
             _schedulerExtension = schedulerExtension;
             _distributionListExtension = distributionListExtension;
+            _artificialInteligenceExtension = artificialInteligenceExtension;
             _settings = settings;
             _listener = new ConsoleTraceListener(false);
             Trace.Listeners.Add(_listener);
@@ -36,7 +40,7 @@ namespace MTC2016
         {
             await _schedulerExtension.ScheduleAsync(
                 GetRecipientsAsync(cancellationToken),
-                _settings.ScheduledMessages,
+                await _artificialInteligenceExtension.GetScheduledMessagesAsync(),
                 cancellationToken);
         }
 

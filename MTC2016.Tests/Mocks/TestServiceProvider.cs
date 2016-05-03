@@ -1,4 +1,5 @@
-﻿using MTC2016.DistributionList;
+﻿using MTC2016.ArtificialInteligence;
+using MTC2016.DistributionList;
 using MTC2016.Scheduler;
 using Takenet.MessagingHub.Client.Tester;
 

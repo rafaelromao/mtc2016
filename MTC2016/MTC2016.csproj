@@ -101,8 +101,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\Messages.cs" />
-    <Compile Include="Configuration\Question.cs" />
+    <Compile Include="ArtificialInteligence\ArtificialInteligenceExtension.cs" />
+    <Compile Include="ArtificialInteligence\IArtificialInteligenceExtension.cs" />
     <Compile Include="Receivers\QuestionMessageReceiver.cs" />
     <Compile Include="Scheduler\ScheduledMessage.cs" />
     <Compile Include="Configuration\ContainerJobActivator.cs" />
@@ -123,7 +123,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="application.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
