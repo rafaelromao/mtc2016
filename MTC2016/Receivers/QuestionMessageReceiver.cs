@@ -24,7 +24,7 @@ namespace MTC2016.Receivers
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
         {
             var text = message.Content?.ToString() ?? string.Empty;
-            var question = _settings.Questions.SingleOrDefault(q => Regex.IsMatch(text, q.Content));
+            var question = _settings.QuestionWithContent(text);
             if (question == null)
             {
                 await

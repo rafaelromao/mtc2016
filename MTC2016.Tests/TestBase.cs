@@ -7,7 +7,7 @@ using Shouldly;
 
 namespace MTC2016.Tests
 {
-    public class TestsBase
+    public class TestBase
     {
         protected ApplicationTester<Settings> Tester { get; set; }
 

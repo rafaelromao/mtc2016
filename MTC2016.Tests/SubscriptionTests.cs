@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class SubscriptionTests : TestsBase
+    public class SubscriptionTests : TestBase
     {
         private async Task EnsureAlreadySubscribedAsync()
         {

@@ -213,20 +213,6 @@ namespace Takenet.MessagingHub.Client.Tester
             TestClient = builder.Build();
         }
 
-        private static string GenerateRandomRegexMatch(string pattern)
-        {
-            try
-            {
-                var builder = Builder.Create<string>();
-                builder = builder.For(Any.ValueLike(pattern));
-                return builder.Build();
-            }
-            catch (Exception)
-            {
-                throw new ArgumentException($"Invalid regex pattern: {pattern}");
-            }
-        }
-
         private void RegisterTestClientMessageReceivers()
         {
             TestClient.AddMessageReceiver((m, c) =>
@@ -269,6 +255,20 @@ namespace Takenet.MessagingHub.Client.Tester
 
             var randomReceiverMessage = GenerateRandomRegexMatch(receiverContentFilter);
             await SendMessageAsync(randomReceiverMessage);
+        }
+
+        public string GenerateRandomRegexMatch(string pattern)
+        {
+            try
+            {
+                var builder = Builder.Create<string>();
+                builder = builder.For(Any.ValueLike(pattern));
+                return builder.Build();
+            }
+            catch (Exception)
+            {
+                throw new ArgumentException($"Invalid regex pattern: {pattern}");
+            }
         }
 
         public async Task<Message> ReceiveMessageAsync(TimeSpan timeout = default(TimeSpan))

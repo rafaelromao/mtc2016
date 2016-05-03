@@ -90,9 +90,10 @@
     <Compile Include="Mocks\TestSchedulerExtension.cs" />
     <Compile Include="Mocks\TestDistributionListExtension.cs" />
     <Compile Include="Mocks\TestServiceProvider.cs" />
+    <Compile Include="QuestionsTests.cs" />
     <Compile Include="SubscriptionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestsBase.cs" />
+    <Compile Include="TestBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
