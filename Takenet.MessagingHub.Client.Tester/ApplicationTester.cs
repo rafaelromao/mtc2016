@@ -63,7 +63,7 @@ namespace Takenet.MessagingHub.Client.Tester
 
         private void ApplyOptions(ApplicationTesterOptions options)
         {
-            DefaultTimeout = options.DefaultTimeout == default(TimeSpan) ? TimeSpan.FromSeconds(20) : options.DefaultTimeout;
+            DefaultTimeout = options.DefaultTimeout == default(TimeSpan) ? TimeSpan.FromSeconds(30) : options.DefaultTimeout;
 
             if (options.EnableConsoleListener)
                 EnableConsoleTraceListener(options.UseErrorStream);
