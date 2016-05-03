@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using EntroBuilder;
 using Lime.Messaging.Resources;
 using Lime.Protocol;
+using Lime.Protocol.Client;
 using Lime.Protocol.Network;
+using Lime.Protocol.Security;
 using Lime.Protocol.Serialization;
 using Newtonsoft.Json;
 using Takenet.MessagingHub.Client.Host;
@@ -36,7 +38,10 @@ namespace Takenet.MessagingHub.Client.Tester
 
 
         private string TestingIdentifier { get; set; }
+        private string TestingAccessKey { get; set; }
+
         private string TesterIdentifier { get; set; }
+        private string TesterAccessKey { get; set; }
 
         public Application Application { get; private set; }
 
@@ -45,7 +50,7 @@ namespace Takenet.MessagingHub.Client.Tester
         {
             ApplyOptions(options);
             LoadApplicationSettings();
-            CreateTestingAccounts();
+            CreateTestingAccountsAsync().Wait();
             PatchApplication(options);
 
             DiscardReceivedMessages();
@@ -64,77 +69,25 @@ namespace Takenet.MessagingHub.Client.Tester
                 EnableConsoleTraceListener(options.UseErrorStream);
         }
 
-        private void CreateTestingAccounts()
+        private async Task CreateTestingAccountsAsync()
         {
             //TODO: Testing account should be a total clone of the application account, but with inboxsize = 0
 
-            var builder = new MessagingHubClientBuilder()
-                .UsingGuest()
-                .WithSendTimeout(DefaultTimeout)
-                .WithMaxConnectionRetries(1);
+            var testingAccountManager = new TestingAccountManager(Application, DefaultTimeout);
 
-            if (Application.SessionEncryption.HasValue)
-                builder = builder.UsingEncryption(Application.SessionEncryption.Value);
+            var testingPassword = (Application.AccessKey ?? Application.Password).FromBase64();
 
-            if (!string.IsNullOrWhiteSpace(Application.HostName))
-                builder = builder.UsingHostName(Application.HostName);
+            TestingIdentifier = Application.Identifier + "$testing";
+            TestingAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TestingIdentifier, testingPassword);
 
-            if (!string.IsNullOrWhiteSpace(Application.Domain))
-                builder = builder.UsingDomain(Application.Domain);
-
-            var guest = builder.Build();
-
-            guest.StartAsync().Wait();
-            try
-            {
-                TestingIdentifier = Application.Identifier + "$testing$";
-
-                var testingAccount = guest.SendCommandAsync(new Command
-                {
-                    Id = Guid.NewGuid(),
-                    Method = CommandMethod.Set,
-                    Uri = LimeUri.Parse("/account"),
-                    //Pp = guest.LocalNode,
-                    Resource = new Account
-                    {
-                        Address = TestingIdentifier,
-                        AccessKey = Application.AccessKey,
-                        InboxSize = 0
-                    }
-                }).Result;
-
-                if (testingAccount.Status != CommandStatus.Success)
-                    throw new LimeException(testingAccount.Reason);
-
-                TesterIdentifier = Application.Identifier + "$tester$";
-
-                var testerAccount = guest.SendCommandAsync(new Command
-                {
-                    Id = Guid.NewGuid(),
-                    Method = CommandMethod.Set,
-                    Uri = LimeUri.Parse("/account"),
-                    //Pp = guest.LocalNode,
-                    Resource = new Account
-                    {
-                        Address = TesterIdentifier,
-                        AccessKey = Application.AccessKey,
-                        InboxSize = 0
-                    }
-                }).Result;
-
-                if (testerAccount.Status != CommandStatus.Success)
-                    throw new LimeException(testingAccount.Reason);
-            }
-            finally
-            {
-                guest.StopAsync().Wait();
-            }
+            TesterIdentifier = Application.Identifier + "$tester";
+            TesterAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TesterIdentifier, testingPassword);
         }
-
 
         private void PatchApplication(ApplicationTesterOptions options)
         {
             Application.Identifier = TestingIdentifier;
+            Application.AccessKey = TestingAccessKey;
 
             if (Application.ServiceProviderType != null)
             {
@@ -241,7 +194,7 @@ namespace Takenet.MessagingHub.Client.Tester
         private void InstantiateTestClient()
         {
             var builder = new MessagingHubClientBuilder()
-                .UsingAccessKey(TesterIdentifier, Application.AccessKey)
+                .UsingAccessKey(TesterIdentifier, TesterAccessKey)
                 .WithSendTimeout(DefaultTimeout)
                 .WithMaxConnectionRetries(1);
 

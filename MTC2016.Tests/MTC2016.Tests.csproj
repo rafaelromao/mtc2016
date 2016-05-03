@@ -87,6 +87,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Mocks\TestSchedulerExtension.cs" />
     <Compile Include="Mocks\TestDistributionListExtension.cs" />
     <Compile Include="Mocks\TestServiceProvider.cs" />
     <Compile Include="SubscriptionTests.cs" />

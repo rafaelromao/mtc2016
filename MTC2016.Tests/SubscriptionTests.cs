@@ -10,7 +10,7 @@ namespace MTC2016.Tests
         private async Task EnsureAlreadySubscribedAsync()
         {
             await Tester.SendMessageAsync<SubscribeMessageReceiver>();
-            await Tester.IgnoreMessagesAsync(); //Only works if inbox size is 0
+            await Tester.IgnoreMessagesAsync();
         }
         [Test]
         public async Task Subscribe()

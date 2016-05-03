@@ -10,12 +10,12 @@ using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.Receivers
 {
-    public class QeustionMessageReceiver : IMessageReceiver
+    public class QuestionMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
         private readonly Settings _settings;
 
-        public QeustionMessageReceiver(IMessagingHubSender sender, Settings settings)
+        public QuestionMessageReceiver(IMessagingHubSender sender, Settings settings)
         {
             _sender = sender;
             _settings = settings;
