@@ -1,4 +1,5 @@
-﻿using MTC2016.Configuration;
+﻿using System.Threading.Tasks;
+using MTC2016.Configuration;
 using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 using Takenet.MessagingHub.Client.Tester;
@@ -20,12 +21,14 @@ namespace MTC2016.Tests
             {
                 TestServiceProviderType = typeof(TestServiceProvider)
             });
+            Tester.StartAsync().Wait();
             ArtificialInteligenceExtension = Tester.GetServiceFromApplicationServiceProvider<IArtificialInteligenceExtension>();
         }
 
         [OneTimeTearDown]
         public void TearDown()
         {
+            Tester.StopAsync().Wait();
             Tester.Dispose();
         }
 

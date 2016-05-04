@@ -21,6 +21,7 @@ namespace Takenet.MessagingHub.Client.Tester
 {
     public class ApplicationTester : IDisposable
     {
+        private readonly ApplicationTesterOptions _options;
         private static ConsoleTraceListener _listener;
         public static IServiceProvider ApplicationServiceProvider { get; private set; }
 
@@ -48,26 +49,30 @@ namespace Takenet.MessagingHub.Client.Tester
 
         public ApplicationTester(ApplicationTesterOptions options)
         {
-            ApplyOptions(options);
-            LoadApplicationSettings();
-            CreateTestingAccountsAsync().Wait();
-            PatchApplication(options);
-
-            DiscardReceivedMessages();
-            StartSmartContactAsync().Wait();
-            InstantiateTestClient();
-            RegisterTestClientMessageReceivers();
-            StartTestClientAsync().Wait();
-            SleepAsync().Wait();
+            _options = options;
         }
 
 
-        private void ApplyOptions(ApplicationTesterOptions options)
+        public async Task StartAsync()
         {
-            DefaultTimeout = options.DefaultTimeout == default(TimeSpan) ? TimeSpan.FromSeconds(30) : options.DefaultTimeout;
+            ApplyOptions();
+            LoadApplicationSettings();
+            await CreateTestingAccountsAsync();
+            PatchApplication();
+            DiscardReceivedMessages();
+            await StartSmartContactAsync();
+            InstantiateTestClient();
+            RegisterTestClientMessageReceivers();
+            await StartTestClientAsync();
+            await SleepAsync();
+        }
 
-            if (options.EnableConsoleListener)
-                EnableConsoleTraceListener(options.UseErrorStream);
+        private void ApplyOptions()
+        {
+            DefaultTimeout = _options.DefaultTimeout == default(TimeSpan) ? TimeSpan.FromSeconds(30) : _options.DefaultTimeout;
+
+            if (_options.EnableConsoleListener)
+                EnableConsoleTraceListener(_options.UseErrorStream);
         }
 
         private async Task CreateTestingAccountsAsync()
@@ -85,7 +90,7 @@ namespace Takenet.MessagingHub.Client.Tester
             TesterAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TesterIdentifier, testingPassword);
         }
 
-        private void PatchApplication(ApplicationTesterOptions options)
+        private void PatchApplication()
         {
             Application.Identifier = TestingIdentifier;
             Application.AccessKey = TestingAccessKey;
@@ -98,10 +103,10 @@ namespace Takenet.MessagingHub.Client.Tester
                 ApplicationServiceProvider = ApplicationServiceProvider ?? (IServiceProvider)Activator.CreateInstance(applicationServiceProviderType);
             }
 
-            if (options.TestServiceProviderType != null)
+            if (_options.TestServiceProviderType != null)
             {
-                ValidateTestServiceProviderType(options.TestServiceProviderType);
-                Application.ServiceProviderType = options.TestServiceProviderType.Name;
+                ValidateTestServiceProviderType(_options.TestServiceProviderType);
+                Application.ServiceProviderType = _options.TestServiceProviderType.Name;
             }
         }
 
@@ -231,8 +236,6 @@ namespace Takenet.MessagingHub.Client.Tester
 
         public virtual void Dispose()
         {
-            StopSmartContactAsync().Wait();
-            StopTestClientAsync().Wait();
             _listener?.Dispose();
         }
 
@@ -315,6 +318,12 @@ namespace Takenet.MessagingHub.Client.Tester
             catch (TaskCanceledException)
             {
             }
+        }
+
+        public async Task StopAsync()
+        {
+            await StopSmartContactAsync();
+            await StopTestClientAsync();
         }
     }
 
