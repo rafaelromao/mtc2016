@@ -30,9 +30,5 @@ namespace Takenet.MessagingHub.Client.Tester
                 // Ignore registration errors
             }
         }
-
-        public abstract void RegisterTestService<TInterface, TClass>() 
-            where TInterface : class
-            where TClass : class, TInterface;
     }
 }
