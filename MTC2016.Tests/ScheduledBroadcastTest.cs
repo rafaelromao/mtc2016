@@ -16,7 +16,8 @@ namespace MTC2016.Tests
             // When intantiated, TestArtificialInteligenceExtension will reschedule all messages to the instantiation time plus Delay,
             // So it shall be scheduled when the Smart Contact is instantiated (TestBase.Setup) and the Tester should then receive the message
 
-            var response = await Tester.ReceiveMessageAsync(TestArtificialInteligenceExtension.Delay);
+            await Task.Delay(TestArtificialInteligenceExtension.Delay);
+            var response = await Tester.ReceiveMessageAsync();
             var answer = TestArtificialInteligenceExtension.TestScheduleText;
             Assert(response, answer);
         }

@@ -13,7 +13,7 @@ namespace MTC2016.Tests
         protected ApplicationTester<Settings> Tester { get; set; }
         protected IArtificialInteligenceExtension ArtificialInteligenceExtension { get; set; }
 
-        [SetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             Tester = new ApplicationTester<Settings>(new ApplicationTesterOptions
@@ -23,7 +23,7 @@ namespace MTC2016.Tests
             ArtificialInteligenceExtension = Tester.GetServiceFromApplicationServiceProvider<IArtificialInteligenceExtension>();
         }
 
-        [TearDown]
+        [OneTimeTearDown]
         public void TearDown()
         {
             Tester.Dispose();

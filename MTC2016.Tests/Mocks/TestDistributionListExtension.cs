@@ -25,12 +25,14 @@ namespace MTC2016.Tests.Mocks
 
         public Task<bool> ContainsAsync(Identity recipient, CancellationToken cancellationToken)
         {
-            return Task.FromResult(_storage.Contains(recipient));
+            return Task.FromResult(_storage.Any(r => r.Equals(recipient)));
         }
 
         public Task<bool> RemoveAsync(Identity recipient, CancellationToken cancellationToken)
         {
-            _storage.Remove(recipient);
+            var rec = _storage.SingleOrDefault(r => r.Equals(recipient));
+            if (rec != null)
+                _storage.Remove(rec);
             return TaskUtil.TrueCompletedTask;
         }
     }
