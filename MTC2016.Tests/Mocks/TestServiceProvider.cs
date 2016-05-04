@@ -1,5 +1,4 @@
-﻿using System;
-using MTC2016.ArtificialInteligence;
+﻿using MTC2016.ArtificialInteligence;
 using MTC2016.Configuration;
 using MTC2016.DistributionList;
 using MTC2016.Scheduler;
@@ -11,7 +10,7 @@ namespace MTC2016.Tests.Mocks
     {
         static TestServiceProvider()
         {
-            //RegisterTestService<IDistributionListExtension, TestDistributionListExtension>();
+            RegisterTestService<IDistributionListExtension, TestDistributionListExtension>();
             RegisterTestService<IJobScheduler, TestJobScheduler>();
             RegisterTestService<IArtificialInteligenceExtension, TestArtificialInteligenceExtension>();
         }

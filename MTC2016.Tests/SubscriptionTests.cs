@@ -23,6 +23,8 @@ namespace MTC2016.Tests
         [Test]
         public async Task Subscribe()
         {
+            await EnsureNotSubscribedAsync();
+
             await Tester.SendMessageAsync<SubscribeMessageReceiver>();
             var response = await Tester.ReceiveMessageAsync();
             var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Tester.Settings.ConfirmSubscription);
