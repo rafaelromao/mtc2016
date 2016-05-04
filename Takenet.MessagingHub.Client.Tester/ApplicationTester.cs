@@ -316,26 +316,6 @@ namespace Takenet.MessagingHub.Client.Tester
             {
             }
         }
-
-        public async Task IgnoreMessagesAsync(TimeSpan timeout = default(TimeSpan))
-        {
-            try
-            {
-                timeout = timeout == default(TimeSpan) ? DefaultTimeout : timeout;
-                using (var cts = new CancellationTokenSource(timeout))
-                {
-                    while (!cts.IsCancellationRequested)
-                    {
-                        Message lastMessage;
-                        LattestMessages.TryDequeue(out lastMessage);
-                        await Task.Delay(10, cts.Token);
-                    }
-                }
-            }
-            catch (TaskCanceledException)
-            {
-            }
-        }
     }
 
     public class ApplicationTester<TSettingsType> : ApplicationTester

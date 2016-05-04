@@ -11,8 +11,15 @@ namespace MTC2016.Tests
         private async Task EnsureAlreadySubscribedAsync()
         {
             await Tester.SendMessageAsync<SubscribeMessageReceiver>();
-            await Tester.IgnoreMessagesAsync(TimeSpan.FromSeconds(60));
+            await Tester.IgnoreMessageAsync();
         }
+        private async Task EnsureNotSubscribedAsync()
+        {
+            await Tester.SendMessageAsync<UnsubscribeMessageReceiver>();
+            await Tester.IgnoreMessageAsync();
+        }
+
+
         [Test]
         public async Task Subscribe()
         {
@@ -36,7 +43,7 @@ namespace MTC2016.Tests
         [Test]
         public async Task Unsubscribe()
         {
-            //await EnsureAlreadySubscribedAsync();
+            await EnsureAlreadySubscribedAsync();
 
             await Tester.SendMessageAsync<UnsubscribeMessageReceiver>();
             var response = await Tester.ReceiveMessageAsync();
@@ -47,6 +54,8 @@ namespace MTC2016.Tests
         [Test]
         public async Task UnsubscribeWhenNotSubscribed()
         {
+            await EnsureNotSubscribedAsync();
+
             await Tester.SendMessageAsync<UnsubscribeMessageReceiver>();
             var response = await Tester.ReceiveMessageAsync();
             var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Tester.Settings.NotSubscribed);

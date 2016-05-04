@@ -15,72 +15,57 @@ using Newtonsoft.Json.Serialization;
 
 namespace MTC2016.ArtificialInteligence
 {
-    public class ArtificialInteligenceExtension : IArtificialInteligenceExtension
+    public class ArtificialInteligenceExtension : IArtificialInteligenceExtension, IDisposable
     {
-        private readonly Settings _settings;
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
-
+        const string MediaType = "application/json";
+        private readonly Settings _settings;
+        private readonly HttpClient _httpClient;
 
         public ArtificialInteligenceExtension(Settings settings)
         {
             _settings = settings;
+            _httpClient = new HttpClient();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _settings.ApiaiDeveloperApiKey);
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaType));
         }
 
 
         private async Task<IEnumerable<Intent>> GetIntentsAsync()
         {
-            using (var httpClient = NewHttpClient())
-            {
-                var uri = new Uri($"{_settings.ApiaiUri}/intents");
-                var response = await httpClient.GetAsync(uri);
-                var json = await response.Content.ReadAsStringAsync();
-                var intentsResponse = JsonConvert.DeserializeObject<Intent[]>(json, JsonSerializerSettings);
-                return intentsResponse;
-            }
+            var uri = new Uri($"{_settings.ApiaiUri}/intents");
+            var response = await _httpClient.GetAsync(uri);
+            var json = await response.Content.ReadAsStringAsync();
+            var intentsResponse = JsonConvert.DeserializeObject<Intent[]>(json, JsonSerializerSettings);
+            return intentsResponse;
         }
         private async Task<Intent> GetIntentAsync(string intentId)
         {
-            using (var httpClient = NewHttpClient())
-            {
-                var uri = new Uri($"{_settings.ApiaiUri}/intents/{intentId}");
-                var response = await httpClient.GetAsync(uri);
-                var json = await response.Content.ReadAsStringAsync();
-                var intentResponse = JsonConvert.DeserializeObject<Intent>(json, JsonSerializerSettings);
-                return intentResponse;
-            }
+            var uri = new Uri($"{_settings.ApiaiUri}/intents/{intentId}");
+            var response = await _httpClient.GetAsync(uri);
+            var json = await response.Content.ReadAsStringAsync();
+            var intentResponse = JsonConvert.DeserializeObject<Intent>(json, JsonSerializerSettings);
+            return intentResponse;
         }
         private async Task<QueryResponse> GetQueryAsync(string question)
         {
-            using (var httpClient = NewHttpClient())
-            {
-                var uri = new Uri($"{_settings.ApiaiUri}/query?v=20150910&lang=PT-BR&query={question}");
-                var response = await httpClient.GetAsync(uri);
-                var json = await response.Content.ReadAsStringAsync();
-                var queryResponse = JsonConvert.DeserializeObject<QueryResponse>(json, JsonSerializerSettings);
-                return queryResponse;
-            }
+            var uri = new Uri($"{_settings.ApiaiUri}/query?v=20150910&lang=PT-BR&query={question}");
+            var response = await _httpClient.GetAsync(uri);
+            var json = await response.Content.ReadAsStringAsync();
+            var queryResponse = JsonConvert.DeserializeObject<QueryResponse>(json, JsonSerializerSettings);
+            return queryResponse;
         }
         private async Task<IEnumerable<Entry>> GetEntityEntriesAsync(string entity)
         {
-            using (var httpClient = NewHttpClient())
-            {
-                var uri = new Uri($"{_settings.ApiaiUri}/entities/{entity}");
-                var response = await httpClient.GetAsync(uri);
-                var json = await response.Content.ReadAsStringAsync();
-                var entryResponse = JsonConvert.DeserializeObject<Entity>(json, JsonSerializerSettings);
-                return entryResponse.Entries;
-            }
+            var uri = new Uri($"{_settings.ApiaiUri}/entities/{entity}");
+            var response = await _httpClient.GetAsync(uri);
+            var json = await response.Content.ReadAsStringAsync();
+            var entryResponse = JsonConvert.DeserializeObject<Entity>(json, JsonSerializerSettings);
+            return entryResponse.Entries;
         }
-        private HttpClient NewHttpClient()
-        {
-            var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _settings.ApiaiDeveloperApiKey);
-            return httpClient;
-        }
-
 
         private class Intent
         {
@@ -122,10 +107,6 @@ namespace MTC2016.ArtificialInteligence
                 Value = $"{node.ToString().Replace("@", settings.AtReplacement).Replace("$", settings.DolarReplacement)}"
             };
         }
-        private class Status
-        {
-            public int Code { get; set; }
-        }
 
 
         public async Task<string> GetAnswerAsync(string question)
@@ -159,17 +140,12 @@ namespace MTC2016.ArtificialInteligence
 
         public async Task<bool> AddUserAsync(Node user)
         {
-            var entries = new [] { Entry.FromNode(user, _settings) };
-            using (var httpClient = NewHttpClient())
-            {
-                const string mediaType = "application/json";
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
+            var entries = new[] { Entry.FromNode(user, _settings) };
 
-                var uri = new Uri($"{_settings.ApiaiUri}/entities/{_settings.UsersEntity}/entries");
-                var json = JsonConvert.SerializeObject(entries, JsonSerializerSettings);
-                var response = await httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, mediaType));
-                return response.StatusCode == HttpStatusCode.OK;
-            }
+            var uri = new Uri($"{_settings.ApiaiUri}/entities/{_settings.UsersEntity}/entries");
+            var json = JsonConvert.SerializeObject(entries, JsonSerializerSettings);
+            var response = await _httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, MediaType));
+            return response.StatusCode == HttpStatusCode.OK;
         }
 
         public async Task<IEnumerable<Node>> GetUsersAsync()
@@ -187,25 +163,22 @@ namespace MTC2016.ArtificialInteligence
 
         public async Task<bool> RemoveUserAsync(Node user)
         {
-            var entries = new[] { Entry.FromNode(user, _settings) };
+            var entries = new[] { Entry.FromNode(user, _settings).Value };
 
-            using (var httpClient = NewHttpClient())
+            var uri = new Uri($"{_settings.ApiaiUri}/entities/{_settings.UsersEntity}/entries");
+            var json = JsonConvert.SerializeObject(entries, JsonSerializerSettings);
+            var response = await _httpClient.SendAsync(new HttpRequestMessage
             {
-                const string mediaType = "application/json";
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
+                Method = HttpMethod.Delete,
+                RequestUri = uri,
+                Content = new StringContent(json, Encoding.UTF8, MediaType)
+            });
+            return response.StatusCode == HttpStatusCode.OK;
+        }
 
-                var uri = new Uri($"{_settings.ApiaiUri}/entities/{_settings.UsersEntity}/entries");
-                var json = JsonConvert.SerializeObject(entries, JsonSerializerSettings);
-                var response = await httpClient.SendAsync(new HttpRequestMessage
-                {
-                    Method = HttpMethod.Delete,
-                    RequestUri = uri,
-                    Content = new StringContent(json, Encoding.UTF8, mediaType)
-                });
-                json = await response.Content.ReadAsStringAsync();
-                var statusResponse = JsonConvert.DeserializeObject<Status>(json, JsonSerializerSettings);
-                return response.StatusCode == HttpStatusCode.OK && statusResponse.Code == 200;
-            }
+        public void Dispose()
+        {
+            _httpClient.Dispose();
         }
     }
 }

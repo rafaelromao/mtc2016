@@ -11,20 +11,22 @@ namespace MTC2016.Tests
     public class QuestionsTests : TestBase
     {
         [Test]
-        public async Task AskAboutWithSingleWord()
+        public async Task AskAbout()
         {
-            await Tester.SendMessageAsync("sobre");
+            var intent = "Fale me sobre o evento!";
+            await Tester.SendMessageAsync(intent);
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync("sobre");
+            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(intent);
             Assert(response, answer);
         }
 
         [Test]
-        public async Task AskObjectiveWithSingleWord()
+        public async Task AskObjective()
         {
-            await Tester.SendMessageAsync("objetivo");
+            var intent = "Quais os objetivos do evento?";
+            await Tester.SendMessageAsync(intent);
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync("objetivo");
+            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(intent);
             Assert(response, answer);
         }
     }
