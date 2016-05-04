@@ -34,6 +34,10 @@
       <HintPath>packages\Hangfire.Core.1.5.6\lib\net45\Hangfire.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Hangfire.MemoryStorage, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Hangfire.MemoryStorage.1.2.0.0\lib\net45\Hangfire.MemoryStorage.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Hangfire.SqlServer, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Hangfire.SqlServer.1.5.6\lib\net45\Hangfire.SqlServer.dll</HintPath>
       <Private>True</Private>
@@ -104,6 +108,8 @@
     <Compile Include="ArtificialInteligence\ArtificialInteligenceExtension.cs" />
     <Compile Include="ArtificialInteligence\IArtificialInteligenceExtension.cs" />
     <Compile Include="Receivers\QuestionMessageReceiver.cs" />
+    <Compile Include="Scheduler\IJobScheduler.cs" />
+    <Compile Include="Scheduler\JobScheduler.cs" />
     <Compile Include="Scheduler\ScheduledMessage.cs" />
     <Compile Include="Configuration\ContainerJobActivator.cs" />
     <Compile Include="DistributionList\DistributionListExtension.cs" />

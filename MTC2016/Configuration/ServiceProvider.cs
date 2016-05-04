@@ -7,9 +7,9 @@ using Takenet.MessagingHub.Client.Host;
 
 namespace MTC2016.Configuration
 {
-    internal class ServiceProvider : IServiceContainer
+    public class ServiceProvider : IServiceContainer
     {
-        private Container Container { get; }
+        public Container Container { get; }
 
         public ServiceProvider()
         {
@@ -18,6 +18,7 @@ namespace MTC2016.Configuration
             Container.Options.AllowOverridingRegistrations = true;
 
             Container.RegisterSingleton<IArtificialInteligenceExtension, ArtificialInteligenceExtension>();
+            Container.RegisterSingleton<IJobScheduler, JobScheduler>();
             Container.RegisterSingleton<ISchedulerExtension, SchedulerExtension>();
             Container.RegisterSingleton<IDistributionListExtension, DistributionListExtension>();
             Container.RegisterSingleton<IDistributionListRecipientsList, DistributionListRecipientsList>();

@@ -104,7 +104,7 @@ namespace MTC2016.ArtificialInteligence
                 return _settings.GeneralError;
             }
         }
-        public async Task<IEnumerable<ScheduledMessage>> GetScheduledMessagesAsync()
+        public virtual async Task<IEnumerable<ScheduledMessage>> GetScheduledMessagesAsync()
         {
             var result = new List<ScheduledMessage>();
             var intents = await GetIntentsAsync();

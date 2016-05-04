@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using MTC2016.Receivers;
 using NUnit.Framework;
 
@@ -10,7 +11,7 @@ namespace MTC2016.Tests
         private async Task EnsureAlreadySubscribedAsync()
         {
             await Tester.SendMessageAsync<SubscribeMessageReceiver>();
-            await Tester.IgnoreMessagesAsync();
+            await Tester.IgnoreMessagesAsync(TimeSpan.FromSeconds(60));
         }
         [Test]
         public async Task Subscribe()

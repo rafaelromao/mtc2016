@@ -83,8 +83,8 @@
   <ItemGroup>
     <Compile Include="AccessKey.cs" />
     <Compile Include="AccountKeyRequest.cs" />
-    <Compile Include="TestingAccountManager.cs" />
     <Compile Include="ApplicationTesterServiceProvider.cs" />
+    <Compile Include="TestingAccountManager.cs" />
     <Compile Include="ApplicationTester.cs" />
     <Compile Include="MessageExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -92,7 +92,14 @@
     <Compile Include="ApplicationTesterOptions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MTC2016\MTC2016.csproj">
+      <Project>{AE4E3778-1AB5-4E79-8268-E1C0E7996554}</Project>
+      <Name>MTC2016</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

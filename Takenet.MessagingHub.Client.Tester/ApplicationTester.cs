@@ -22,7 +22,7 @@ namespace Takenet.MessagingHub.Client.Tester
     public class ApplicationTester : IDisposable
     {
         private static ConsoleTraceListener _listener;
-        internal static IServiceProvider ApplicationServiceProvider { get; private set; }
+        public static IServiceProvider ApplicationServiceProvider { get; private set; }
 
         private ConcurrentQueue<Message> _lattestMessages;
         private TimeSpan DefaultTimeout { get; set; }
@@ -64,7 +64,7 @@ namespace Takenet.MessagingHub.Client.Tester
 
         private void ApplyOptions(ApplicationTesterOptions options)
         {
-            DefaultTimeout = options.DefaultTimeout == default(TimeSpan) ? TimeSpan.FromSeconds(60) : options.DefaultTimeout;
+            DefaultTimeout = options.DefaultTimeout == default(TimeSpan) ? TimeSpan.FromSeconds(30) : options.DefaultTimeout;
 
             if (options.EnableConsoleListener)
                 EnableConsoleTraceListener(options.UseErrorStream);
@@ -116,7 +116,7 @@ namespace Takenet.MessagingHub.Client.Tester
 
         private static void ValidateTestServiceProviderType(Type testServiceProviderType)
         {
-            var baseTestServiceProviderType = typeof(ApplicationTesterServiceProvider);
+            var baseTestServiceProviderType = typeof(IServiceProvider);
             if (!baseTestServiceProviderType.IsAssignableFrom(testServiceProviderType))
                 throw new ArgumentException(
                     $"{testServiceProviderType.Name} must be a subtype of {baseTestServiceProviderType.FullName}");
