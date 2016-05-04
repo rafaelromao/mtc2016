@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
+using Lime.Protocol;
 using MTC2016.Configuration;
 using MTC2016.Scheduler;
 using Newtonsoft.Json;
@@ -60,10 +63,21 @@ namespace MTC2016.ArtificialInteligence
                 return queryResponse;
             }
         }
+        private async Task<IEnumerable<Entry>> GetEntityEntriesAsync(string entity)
+        {
+            using (var httpClient = NewHttpClient())
+            {
+                var uri = new Uri($"{_settings.ApiaiUri}/entities/{entity}");
+                var response = await httpClient.GetAsync(uri);
+                var json = await response.Content.ReadAsStringAsync();
+                var entryResponse = JsonConvert.DeserializeObject<Entity>(json, JsonSerializerSettings);
+                return entryResponse.Entries;
+            }
+        }
         private HttpClient NewHttpClient()
         {
             var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _settings.ApiaiClientToken);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _settings.ApiaiDeveloperApiKey);
             return httpClient;
         }
 
@@ -89,6 +103,28 @@ namespace MTC2016.ArtificialInteligence
         private class QueryResultFulfillment
         {
             public string Speech { get; set; }
+        }
+        private class Entity
+        {
+            public Entry[] Entries { get; set; }
+        }
+
+        private class Entry
+        {
+            public string Value { get; set; }
+            public string[] Synonyms { get; set; }
+
+            public Node ToIdentity(Settings settings)
+                => Node.Parse(Value.Replace(settings.AtReplacement, "@").Replace(settings.DolarReplacement, "$"));
+
+            public static Entry FromNode(Node node, Settings settings) => new Entry
+            {
+                Value = $"{node.ToString().Replace("@", settings.AtReplacement).Replace("$", settings.DolarReplacement)}"
+            };
+        }
+        private class Status
+        {
+            public int Code { get; set; }
         }
 
 
@@ -119,6 +155,57 @@ namespace MTC2016.ArtificialInteligence
                 });
             }
             return result;
+        }
+
+        public async Task<bool> AddUserAsync(Node user)
+        {
+            var entries = new [] { Entry.FromNode(user, _settings) };
+            using (var httpClient = NewHttpClient())
+            {
+                const string mediaType = "application/json";
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
+
+                var uri = new Uri($"{_settings.ApiaiUri}/entities/{_settings.UsersEntity}/entries");
+                var json = JsonConvert.SerializeObject(entries, JsonSerializerSettings);
+                var response = await httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, mediaType));
+                return response.StatusCode == HttpStatusCode.OK;
+            }
+        }
+
+        public async Task<IEnumerable<Node>> GetUsersAsync()
+        {
+            var entries = await GetEntityEntriesAsync(_settings.UsersEntity);
+            var users = entries.Select(e => e.ToIdentity(_settings));
+            return users;
+        }
+
+        public async Task<bool> ContainsUserAsync(Node user)
+        {
+            var users = await GetUsersAsync();
+            return users.Any(u => u.Equals(user));
+        }
+
+        public async Task<bool> RemoveUserAsync(Node user)
+        {
+            var entries = new[] { Entry.FromNode(user, _settings) };
+
+            using (var httpClient = NewHttpClient())
+            {
+                const string mediaType = "application/json";
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
+
+                var uri = new Uri($"{_settings.ApiaiUri}/entities/{_settings.UsersEntity}/entries");
+                var json = JsonConvert.SerializeObject(entries, JsonSerializerSettings);
+                var response = await httpClient.SendAsync(new HttpRequestMessage
+                {
+                    Method = HttpMethod.Delete,
+                    RequestUri = uri,
+                    Content = new StringContent(json, Encoding.UTF8, mediaType)
+                });
+                json = await response.Content.ReadAsStringAsync();
+                var statusResponse = JsonConvert.DeserializeObject<Status>(json, JsonSerializerSettings);
+                return response.StatusCode == HttpStatusCode.OK && statusResponse.Code == 200;
+            }
         }
     }
 }

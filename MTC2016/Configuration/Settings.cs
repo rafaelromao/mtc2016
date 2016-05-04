@@ -2,11 +2,12 @@
 {
     public class Settings
     {
-        public string ConnectionString { get; set; }
         public string ApiaiUri { get; set; }
-        public string ApiaiClientToken { get; set; }
+        public string ApiaiDeveloperApiKey { get; set; }
 
-        public string UserPrefix { get; set; }
+        public string UsersEntity { get; set; }
+        public string AtReplacement { get; set; }
+        public string DolarReplacement { get; set; }
         public string SchedulePrefix { get; set; }
         public string GeneralError { get; set; }
         public string CouldNotUnderstand { get; set; }

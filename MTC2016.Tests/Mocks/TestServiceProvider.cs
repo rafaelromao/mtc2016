@@ -11,15 +11,14 @@ namespace MTC2016.Tests.Mocks
     {
         public TestServiceProvider()
         {
-            RegisterTestService<IDistributionListExtension, TestDistributionListExtension>();
-            RegisterTestService<ISchedulerExtension, TestSchedulerExtension>();
+            //RegisterTestService<IDistributionListExtension, TestDistributionListExtension>();
             RegisterTestService<IJobScheduler, TestJobScheduler>();
             RegisterTestService<IArtificialInteligenceExtension, TestArtificialInteligenceExtension>();
         }
 
         public sealed override void RegisterTestService<TInterface, TClass>()
         {
-            ((ServiceProvider)ApplicationTester.ApplicationServiceProvider).Container.Register<TInterface, TClass>();
+            ((ServiceProvider)ApplicationTester.ApplicationServiceProvider).Container.RegisterSingleton<TInterface, TClass>();
         }
     }
 }

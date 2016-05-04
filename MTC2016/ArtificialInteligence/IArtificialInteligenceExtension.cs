@@ -9,9 +9,9 @@ namespace MTC2016.ArtificialInteligence
     {
         Task<string> GetAnswerAsync(string question);
         Task<IEnumerable<ScheduledMessage>> GetScheduledMessagesAsync();
-        Task AddEntityAsync(string toString);
-        Task<IEnumerable<Identity>> GetUsersAsync();
-        Task<bool> ContainsUserAsync(Identity user);
-        Task<bool> RemoveUserAsync(Identity recipient);
+        Task<bool> AddUserAsync(Node user);
+        Task<IEnumerable<Node>> GetUsersAsync();
+        Task<bool> ContainsUserAsync(Node user);
+        Task<bool> RemoveUserAsync(Node user);
     }
 }

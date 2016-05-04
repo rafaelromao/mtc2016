@@ -36,7 +36,7 @@ namespace MTC2016.Tests
         [Test]
         public async Task Unsubscribe()
         {
-            await EnsureAlreadySubscribedAsync();
+            //await EnsureAlreadySubscribedAsync();
 
             await Tester.SendMessageAsync<UnsubscribeMessageReceiver>();
             var response = await Tester.ReceiveMessageAsync();

@@ -12,12 +12,10 @@ namespace MTC2016.DistributionList
     internal class DistributionListExtension : IDistributionListExtension
     {
         private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
-        private readonly Settings _settings;
 
         public DistributionListExtension(IArtificialInteligenceExtension artificialInteligenceExtension, Settings settings)
         {
             _artificialInteligenceExtension = artificialInteligenceExtension;
-            _settings = settings;
         }
 
         public async Task<bool> AddAsync(Identity recipient, CancellationToken cancellationToken)
@@ -27,8 +25,7 @@ namespace MTC2016.DistributionList
 
             try
             {
-                await _artificialInteligenceExtension.AddEntityAsync(recipient.ToString());
-                return true;
+                return await _artificialInteligenceExtension.AddUserAsync(recipient.ToNode());
             }
             catch (Exception)
             {
@@ -43,12 +40,12 @@ namespace MTC2016.DistributionList
 
         public async Task<bool> ContainsAsync(Identity recipient, CancellationToken cancellationToken)
         {
-            return await _artificialInteligenceExtension.ContainsUserAsync(recipient);
+            return await _artificialInteligenceExtension.ContainsUserAsync(recipient.ToNode());
         }
 
         public async Task<bool> RemoveAsync(Identity recipient, CancellationToken cancellationToken)
         {
-            return await _artificialInteligenceExtension.RemoveUserAsync(recipient);
+            return await _artificialInteligenceExtension.RemoveUserAsync(recipient.ToNode());
         }
     }
 }

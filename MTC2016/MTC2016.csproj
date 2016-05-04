@@ -113,9 +113,7 @@
     <Compile Include="Scheduler\ScheduledMessage.cs" />
     <Compile Include="Configuration\ContainerJobActivator.cs" />
     <Compile Include="DistributionList\DistributionListExtension.cs" />
-    <Compile Include="DistributionList\DistributionListRecipientsList.cs" />
     <Compile Include="DistributionList\IDistributionListExtension.cs" />
-    <Compile Include="DistributionList\IDistributionListRecipientsList.cs" />
     <Compile Include="Scheduler\ISchedulerExtension.cs" />
     <Compile Include="Scheduler\MessageExtensions.cs" />
     <Compile Include="Scheduler\SchedulerExtension.cs" />

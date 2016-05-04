@@ -105,7 +105,6 @@
   <ItemGroup>
     <Compile Include="Mocks\TestArtificialInteligenceExtension.cs" />
     <Compile Include="Mocks\TestJobScheduler.cs" />
-    <Compile Include="Mocks\TestSchedulerExtension.cs" />
     <Compile Include="Mocks\TestDistributionListExtension.cs" />
     <Compile Include="Mocks\TestServiceProvider.cs" />
     <Compile Include="ScheduledBroadcastTest.cs" />
