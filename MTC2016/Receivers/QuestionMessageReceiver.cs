@@ -1,5 +1,3 @@
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Lime.Protocol;
@@ -37,7 +35,13 @@ namespace MTC2016.Receivers
         {
             var question = message.Content?.ToString() ?? string.Empty;
             var answer = !IsValidQuestion(question) ? _defaulAnswer : await _artificialInteligenceExtension.GetAnswerAsync(question);
-            if (answer == null)
+
+            if (string.IsNullOrWhiteSpace(answer))
+            {
+                answer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.Quote);
+            }
+
+            if (string.IsNullOrWhiteSpace(answer))
             {
                 await _sender.SendMessageAsync(_defaulAnswer, message.From, cancellationToken);
             }

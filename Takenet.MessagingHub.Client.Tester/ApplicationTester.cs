@@ -7,11 +7,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using EntroBuilder;
-using Lime.Messaging.Resources;
 using Lime.Protocol;
-using Lime.Protocol.Client;
-using Lime.Protocol.Network;
-using Lime.Protocol.Security;
 using Lime.Protocol.Serialization;
 using Newtonsoft.Json;
 using Takenet.MessagingHub.Client.Host;
@@ -320,37 +316,15 @@ namespace Takenet.MessagingHub.Client.Tester
             }
         }
 
+        public T GetServiceFromApplicationServiceProvider<T>()
+        {
+            return (T)ApplicationServiceProvider.GetService(typeof(T));
+        }
+
         public async Task StopAsync()
         {
             await StopSmartContactAsync();
             await StopTestClientAsync();
-        }
-    }
-
-    public class ApplicationTester<TSettingsType> : ApplicationTester
-    {
-        private void LoadSettings()
-        {
-            var settingsJsonContent = JsonConvert.SerializeObject(Application.Settings);
-            Settings = JsonConvert.DeserializeObject<TSettingsType>(settingsJsonContent);
-        }
-
-        public TSettingsType Settings { get; private set; }
-
-        public ApplicationTester(ApplicationTesterOptions options)
-            : base(options)
-        {
-        }
-
-        public override void LoadApplicationJson(string appJson)
-        {
-            base.LoadApplicationJson(appJson);
-            LoadSettings();
-        }
-
-        public T GetServiceFromApplicationServiceProvider<T>()
-        {
-            return (T) ApplicationServiceProvider.GetService(typeof (T));
         }
     }
 }

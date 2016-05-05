@@ -12,7 +12,7 @@ namespace MTC2016.Tests.Mocks
         {
             RegisterTestService<IDistributionListExtension, TestDistributionListExtension>();
             RegisterTestService<IJobScheduler, TestJobScheduler>();
-            RegisterTestService<IArtificialInteligenceExtension, TestArtificialInteligenceExtension>();
+            //RegisterTestService<IArtificialInteligenceExtension, TestArtificialInteligenceExtension>();
         }
 
         public static void RegisterTestService<TInterface, TClass>()

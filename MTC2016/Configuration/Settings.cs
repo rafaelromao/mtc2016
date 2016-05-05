@@ -17,5 +17,6 @@
         public string NotSubscribed { get; set; }
         public string ConfirmSubscriptionCancellation { get; set; }
         public string UnsubscriptionFailed { get; set; }
+        public string Quote { get; set; }
     }
 }
