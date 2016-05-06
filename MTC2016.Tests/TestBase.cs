@@ -1,4 +1,5 @@
-﻿using MTC2016.Configuration;
+﻿using System.Data.SQLite;
+using MTC2016.Configuration;
 using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 using Takenet.MessagingHub.Client.Tester;
@@ -19,13 +20,18 @@ namespace MTC2016.Tests
         [OneTimeSetUp]
         public void SetUp()
         {
-            Tester = new ApplicationTester(new ApplicationTesterOptions
+            Tester = CreateApplicationTester();
+            Tester.StartAsync().Wait();
+            ArtificialInteligenceExtension = Tester.GetService<IArtificialInteligenceExtension>();
+            Settings = Tester.GetService<Settings>();
+        }
+
+        protected ApplicationTester CreateApplicationTester()
+        {
+            return new ApplicationTester(new ApplicationTesterOptions
             {
                 TestServiceProviderType = typeof(TestServiceProvider)
             });
-            Tester.StartAsync().Wait();
-            ArtificialInteligenceExtension = Tester.GetServiceFromApplicationServiceProvider<IArtificialInteligenceExtension>();
-            Settings = Tester.GetServiceFromApplicationServiceProvider<Settings>();
         }
 
         [OneTimeTearDown]
@@ -35,13 +41,12 @@ namespace MTC2016.Tests
             Tester.Dispose();
         }
 
-        protected static void Assert(Message response, string expected)
+        public static void Assert(Message response, string expected)
         {
             response.ShouldNotBeNull();
             response.Content.ShouldNotBeNull();
             response.Content.ToString().ShouldNotBeNull();
             response.Content.ToString().ShouldBe(expected);
         }
-
     }
 }

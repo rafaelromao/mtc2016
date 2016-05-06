@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
@@ -6,53 +7,51 @@ using System.Threading;
 using System.Threading.Tasks;
 using Lime.Messaging.Contents;
 using Lime.Protocol;
+using MTC2016.ArtificialInteligence;
 using MTC2016.Configuration;
 using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.Scheduler
 {
-    public sealed class SchedulerExtension : ISchedulerExtension, IDisposable
+    public class SchedulerExtension : ISchedulerExtension, IDisposable
     {
+        private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
         private readonly IJobScheduler _jobScheduler;
         private readonly IMessagingHubSender _sender;
+        private readonly Settings _settings;
         private readonly ObjectCache _cache;
 
-        public SchedulerExtension(IServiceProvider serviceProvider, IJobScheduler jobScheduler, IMessagingHubSender sender, Settings settings)
+        public SchedulerExtension(IArtificialInteligenceExtension artificialInteligenceExtension, IJobScheduler jobScheduler, IMessagingHubSender sender, Settings settings)
         {
             _cache = new MemoryCache(nameof(MTC2016));
+            _artificialInteligenceExtension = artificialInteligenceExtension;
             _jobScheduler = jobScheduler;
             _sender = sender;
-
-            _jobScheduler.Start();
+            _settings = settings;
         }
 
-        public Task ScheduleAsync(Func<Task<IEnumerable<Identity>>> getRecipientsAsync, IEnumerable<ScheduledMessage> scheduledMessages, CancellationToken cancellationToken)
+        public virtual async Task ScheduleAsync(
+            Func<Task<IEnumerable<Identity>>> recipients,
+            IEnumerable<ScheduledMessage> scheduledMessages,
+            CancellationToken cancellationToken)
         {
-            var scheduledMessagesGroup = scheduledMessages.GroupBy(a => a.Time);
-            foreach (var scheduledMessageGroup in scheduledMessagesGroup)
+            foreach (var group in scheduledMessages.GroupBy(s => s.Time))
             {
-                _jobScheduler.Schedule(
-                    () => SendScheduledMessages(scheduledMessageGroup, getRecipientsAsync, cancellationToken),
-                    scheduledMessageGroup.Key);
+                var schedule = new Schedule
+                {
+                    Recipients = recipients,
+                    ScheduledMessages = group
+                };
+
+                await _jobScheduler.ScheduleAsync(async () => await SendScheduledMessagesAsync(schedule), group.Key, cancellationToken);
             }
-            return Task.CompletedTask;
         }
 
-        // ReSharper disable once MemberCanBePrivate.Global - This method MUST be public to be seen by HangFire
-        public void SendScheduledMessages(IEnumerable<ScheduledMessage> scheduledMessages, Func<Task<IEnumerable<Identity>>> getRecipientsAsync, CancellationToken cancellationToken)
+        private async Task SendScheduledMessagesAsync(Schedule schedule)
         {
-            SendScheduledMessagesAsync(scheduledMessages, getRecipientsAsync, cancellationToken).Wait(cancellationToken);
-        }
-
-        private async Task SendScheduledMessagesAsync(IEnumerable<ScheduledMessage> scheduledMessages, Func<Task<IEnumerable<Identity>>> getRecipientsAsync, CancellationToken cancellationToken)
-        {
-            var recipients = (getRecipientsAsync != null ? await getRecipientsAsync.Invoke() : null) ?? new Identity[0];
-
-            scheduledMessages = scheduledMessages as ScheduledMessage[] ?? scheduledMessages.ToArray();
-
-            foreach (var recipient in recipients)
+            foreach (var recipient in await schedule.Recipients())
             {
-                foreach (var scheduledMessage in scheduledMessages)
+                foreach (var scheduledMessage in schedule.ScheduledMessages)
                 {
                     var message = new Message
                     {
@@ -68,16 +67,33 @@ namespace MTC2016.Scheduler
                     if (!_cache.Contains(message.ToKey()))
                     {
                         Console.WriteLine($"{message} -> {recipient}");
-                        await _sender.SendMessageAsync(message, cancellationToken);
+                        await _sender.SendMessageAsync(message);
                         _cache.Add(message.ToKey(), message, DateTimeOffset.Now.AddMinutes(1));
                     }
                 }
             }
         }
 
+        public virtual async Task<IEnumerable<ScheduledMessage>> GetScheduledMessagesAsync(CancellationToken cancellationToken)
+        {
+            var result = new List<ScheduledMessage>();
+            var intents = await _artificialInteligenceExtension.GetIntentsAsync();
+            var schedulePrefix = _settings.SchedulePrefix;
+            var schedules = intents.Where(i => i.Name.StartsWith(schedulePrefix));
+            foreach (var schedule in schedules)
+            {
+                result.Add(new ScheduledMessage
+                {
+                    Time = DateTimeOffset.Parse(schedule.Name.Substring(schedulePrefix.Length)),
+                    Text = (await _artificialInteligenceExtension.GetIntentAsync(schedule.Id)).Responses.First().Speech
+                });
+            }
+            return result;
+        }
+
         public void Dispose()
         {
-            _jobScheduler.Stop();
+            _jobScheduler.Dispose();
         }
     }
 }

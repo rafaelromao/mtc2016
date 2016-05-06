@@ -316,7 +316,7 @@ namespace Takenet.MessagingHub.Client.Tester
             }
         }
 
-        public T GetServiceFromApplicationServiceProvider<T>()
+        public T GetService<T>()
         {
             return (T)ApplicationServiceProvider.GetService(typeof(T));
         }
@@ -325,6 +325,12 @@ namespace Takenet.MessagingHub.Client.Tester
         {
             await StopSmartContactAsync();
             await StopTestClientAsync();
+        }
+
+        public async Task RestartAsync()
+        {
+            await StopAsync();
+            await StartAsync();
         }
     }
 }

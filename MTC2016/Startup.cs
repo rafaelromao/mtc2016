@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Lime.Protocol;
-using MTC2016.ArtificialInteligence;
-using MTC2016.Configuration;
 using MTC2016.DistributionList;
 using MTC2016.Scheduler;
 using Takenet.MessagingHub.Client.Listener;
@@ -16,17 +12,12 @@ namespace MTC2016
     {
         private readonly ISchedulerExtension _schedulerExtension;
         private readonly IDistributionListExtension _distributionListExtension;
-        private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
-        private readonly Settings _settings;
         private readonly ConsoleTraceListener _listener;
 
-        public Startup(ISchedulerExtension schedulerExtension, IDistributionListExtension distributionListExtension, 
-            IArtificialInteligenceExtension artificialInteligenceExtension, Settings settings)
+        public Startup(ISchedulerExtension schedulerExtension, IDistributionListExtension distributionListExtension)
         {
             _schedulerExtension = schedulerExtension;
             _distributionListExtension = distributionListExtension;
-            _artificialInteligenceExtension = artificialInteligenceExtension;
-            _settings = settings;
             _listener = new ConsoleTraceListener(false);
             Trace.Listeners.Add(_listener);
         }
@@ -39,14 +30,9 @@ namespace MTC2016
         private async Task ScheduleScheduledMessagesAsync(CancellationToken cancellationToken)
         {
             await _schedulerExtension.ScheduleAsync(
-                GetRecipientsAsync(cancellationToken),
-                await _artificialInteligenceExtension.GetScheduledMessagesAsync(),
+                async () => await _distributionListExtension.GetRecipientsAsync(cancellationToken),
+                await _schedulerExtension.GetScheduledMessagesAsync(cancellationToken),
                 cancellationToken);
-        }
-
-        private Func<Task<IEnumerable<Identity>>> GetRecipientsAsync(CancellationToken cancellationToken)
-        {
-            return async () => await _distributionListExtension.GetRecipientsAsync(cancellationToken);
         }
 
         public void Dispose()

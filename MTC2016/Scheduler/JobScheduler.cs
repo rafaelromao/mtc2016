@@ -1,39 +1,38 @@
 ﻿using System;
-using System.Linq.Expressions;
-using Hangfire;
-using Hangfire.MemoryStorage;
-using Hangfire.SqlServer;
-using MTC2016.Configuration;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MTC2016.Scheduler
 {
     public class JobScheduler : IJobScheduler
     {
-        private readonly IServiceProvider _serviceProvider;
-        private BackgroundJobServer _server;
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-        public JobScheduler(IServiceProvider serviceProvider)
+        public Task ScheduleAsync(Action action, DateTimeOffset time, CancellationToken cancellationToken)
         {
-            _serviceProvider = serviceProvider;
+            var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_cancellationTokenSource.Token, cancellationToken);
+
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    if (cancellationTokenSource.IsCancellationRequested)
+                        break;
+                    if (DateTime.Now > time)
+                    {
+                        action();
+                        break;
+                    }
+                    await Task.Delay(TimeSpan.FromMinutes(1), cancellationTokenSource.Token);
+                }
+            }, cancellationTokenSource.Token);
+
+            return Task.CompletedTask;
         }
 
-        public void Start()
+        public void Dispose()
         {
-            GlobalConfiguration.Configuration
-                .UseActivator(new ContainerJobActivator(_serviceProvider))
-                .UseStorage(new MemoryStorage());
-
-            _server = new BackgroundJobServer();
-        }
-
-        public void Schedule(Expression<Action> action, DateTimeOffset time)
-        {
-            BackgroundJob.Schedule(action, time);
-        }
-
-        public void Stop()
-        {
-            _server.Dispose();
+            _cancellationTokenSource.Cancel();
         }
     }
 }

@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MTC2016.Scheduler
 {
-    public interface IJobScheduler
+    public interface IJobScheduler : IDisposable
     {
-        void Start();
-        void Stop();
-        void Schedule(Expression<Action> action, DateTimeOffset time);
+        Task ScheduleAsync(Action action, DateTimeOffset time, CancellationToken cancellationToken);
     }
 }

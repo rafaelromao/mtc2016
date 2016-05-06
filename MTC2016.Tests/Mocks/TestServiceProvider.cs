@@ -11,8 +11,7 @@ namespace MTC2016.Tests.Mocks
         static TestServiceProvider()
         {
             RegisterTestService<IDistributionListExtension, TestDistributionListExtension>();
-            RegisterTestService<IJobScheduler, TestJobScheduler>();
-            //RegisterTestService<IArtificialInteligenceExtension, TestArtificialInteligenceExtension>();
+            RegisterTestService<ISchedulerExtension, TestSchedulerExtension>();
         }
 
         public static void RegisterTestService<TInterface, TClass>()

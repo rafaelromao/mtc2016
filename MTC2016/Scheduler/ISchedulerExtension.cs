@@ -8,6 +8,7 @@ namespace MTC2016.Scheduler
 {
     public interface ISchedulerExtension
     {
-        Task ScheduleAsync(Func<Task<IEnumerable<Identity>>> getRecipientsAsync, IEnumerable<ScheduledMessage> scheduledMessages, CancellationToken cancellationToken);
+        Task ScheduleAsync(Func<Task<IEnumerable<Identity>>> recipients, IEnumerable<ScheduledMessage> scheduledMessages, CancellationToken cancellationToken);
+        Task<IEnumerable<ScheduledMessage>> GetScheduledMessagesAsync(CancellationToken cancellationToken);
     }
 }

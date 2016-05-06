@@ -34,22 +34,6 @@ namespace MTC2016.ArtificialInteligence
         }
 
 
-        private async Task<IEnumerable<Intent>> GetIntentsAsync()
-        {
-            var uri = new Uri($"{_settings.ApiaiUri}/intents");
-            var response = await _httpClient.GetAsync(uri);
-            var json = await response.Content.ReadAsStringAsync();
-            var intentsResponse = JsonConvert.DeserializeObject<Intent[]>(json, JsonSerializerSettings);
-            return intentsResponse;
-        }
-        private async Task<Intent> GetIntentAsync(string intentId)
-        {
-            var uri = new Uri($"{_settings.ApiaiUri}/intents/{intentId}");
-            var response = await _httpClient.GetAsync(uri);
-            var json = await response.Content.ReadAsStringAsync();
-            var intentResponse = JsonConvert.DeserializeObject<Intent>(json, JsonSerializerSettings);
-            return intentResponse;
-        }
         private async Task<QueryResponse> GetQueryAsync(string question)
         {
             var uri = new Uri($"{_settings.ApiaiUri}/query?v=20150910&lang=PT-BR&query={question}");
@@ -67,16 +51,6 @@ namespace MTC2016.ArtificialInteligence
             return entryResponse.Entries;
         }
 
-        private class Intent
-        {
-            public string Id { get; set; }
-            public string Name { get; set; }
-            public IntentResponse[] Responses { get; set; }
-        }
-        private class IntentResponse
-        {
-            public string Speech { get; set; }
-        }
         private class QueryResponse
         {
             public QueryResult Result { get; set; }
@@ -97,7 +71,6 @@ namespace MTC2016.ArtificialInteligence
         private class Entry
         {
             public string Value { get; set; }
-            public string[] Synonyms { get; set; }
 
             public Node ToIdentity(Settings settings)
                 => Node.Parse(Value.Replace(settings.AtReplacement, "@").Replace(settings.DolarReplacement, "$"));
@@ -108,6 +81,24 @@ namespace MTC2016.ArtificialInteligence
             };
         }
 
+
+        public async Task<IEnumerable<Intent>> GetIntentsAsync()
+        {
+            var uri = new Uri($"{_settings.ApiaiUri}/intents");
+            var response = await _httpClient.GetAsync(uri);
+            var json = await response.Content.ReadAsStringAsync();
+            var intentsResponse = JsonConvert.DeserializeObject<Intent[]>(json, JsonSerializerSettings);
+            return intentsResponse;
+        }
+
+        public async Task<Intent> GetIntentAsync(string intentId)
+        {
+            var uri = new Uri($"{_settings.ApiaiUri}/intents/{intentId}");
+            var response = await _httpClient.GetAsync(uri);
+            var json = await response.Content.ReadAsStringAsync();
+            var intentResponse = JsonConvert.DeserializeObject<Intent>(json, JsonSerializerSettings);
+            return intentResponse;
+        }
 
         public async Task<string> GetAnswerAsync(string question)
         {
@@ -120,22 +111,6 @@ namespace MTC2016.ArtificialInteligence
             {
                 return _settings.GeneralError;
             }
-        }
-        public virtual async Task<IEnumerable<ScheduledMessage>> GetScheduledMessagesAsync()
-        {
-            var result = new List<ScheduledMessage>();
-            var intents = await GetIntentsAsync();
-            var schedulePrefix = _settings.SchedulePrefix;
-            var schedules = intents.Where(i => i.Name.StartsWith(schedulePrefix));
-            foreach (var schedule in schedules)
-            {
-                result.Add(new ScheduledMessage
-                {
-                    Time = DateTimeOffset.Parse(schedule.Name.Substring(schedulePrefix.Length)),
-                    Text = (await GetIntentAsync(schedule.Id)).Responses.First().Speech
-                });
-            }
-            return result;
         }
 
         public async Task<bool> AddUserAsync(Node user)
