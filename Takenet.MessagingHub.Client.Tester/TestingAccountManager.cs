@@ -53,8 +53,7 @@ namespace Takenet.MessagingHub.Client.Tester
                     Uri = new LimeUri(UriTemplates.ACCOUNT),
                     Resource = new Account
                     {
-                        Password = password.ToBase64(),
-                        InboxSize = 0
+                        Password = password.ToBase64()
                     }
                 };
 

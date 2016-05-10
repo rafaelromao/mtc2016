@@ -14,7 +14,7 @@ namespace MTC2016.Receivers
         private readonly IMessagingHubSender _sender;
         private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
         private readonly Settings _settings;
-        private readonly string _defaulAnswer;
+        private readonly string _defaultAnswer;
 
         public QuestionMessageReceiver(IMessagingHubSender sender, IArtificialInteligenceExtension artificialInteligenceExtension, Settings settings)
         {
@@ -23,18 +23,18 @@ namespace MTC2016.Receivers
             _settings = settings;
             try
             {
-                _defaulAnswer = _artificialInteligenceExtension.GetAnswerAsync(_settings.CouldNotUnderstand).Result;
+                _defaultAnswer = _artificialInteligenceExtension.GetAnswerAsync(_settings.CouldNotUnderstand).Result;
             }
             catch
             {
-                _defaulAnswer = _settings.GeneralError;
+                _defaultAnswer = _settings.GeneralError;
             }
         }
 
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
         {
             var question = message.Content?.ToString() ?? string.Empty;
-            var answer = !IsValidQuestion(question) ? _defaulAnswer : await _artificialInteligenceExtension.GetAnswerAsync(question);
+            var answer = !IsValidQuestion(question) ? _defaultAnswer : await _artificialInteligenceExtension.GetAnswerAsync(question);
 
             if (string.IsNullOrWhiteSpace(answer))
             {
@@ -43,7 +43,7 @@ namespace MTC2016.Receivers
 
             if (string.IsNullOrWhiteSpace(answer))
             {
-                await _sender.SendMessageAsync(_defaulAnswer, message.From, cancellationToken);
+                await _sender.SendMessageAsync(_defaultAnswer, message.From, cancellationToken);
             }
             else
             {
@@ -54,7 +54,9 @@ namespace MTC2016.Receivers
         private bool IsValidQuestion(string question)
         {
             // Does not allow questions starting with $ or %
-            return !question.StartsWith("$") && !question.StartsWith(_settings.SchedulePrefix);
+            return !question.StartsWith("$") && 
+                   !question.StartsWith(_settings.SchedulePrefix) && 
+                   !question.StartsWith(_settings.FeedbackPrefix);
         }
     }
 }

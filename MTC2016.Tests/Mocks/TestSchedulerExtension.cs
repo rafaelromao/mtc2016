@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Lime.Protocol;
@@ -8,9 +7,7 @@ using Lime.Protocol.Serialization;
 using MTC2016.ArtificialInteligence;
 using MTC2016.Configuration;
 using MTC2016.DistributionList;
-using MTC2016.Receivers;
 using MTC2016.Scheduler;
-using Takenet.MessagingHub.Client.Host;
 using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.Tests.Mocks

@@ -80,6 +80,9 @@ namespace MTC2016.Scheduler
             var intents = await _artificialInteligenceExtension.GetIntentsAsync();
             var schedulePrefix = _settings.SchedulePrefix;
             var schedules = intents.Where(i => i.Name.StartsWith(schedulePrefix));
+            // Ignore expired schedules
+            schedules =
+                schedules.Where(s => DateTimeOffset.Parse(s.Name.Substring(schedulePrefix.Length)) >= DateTime.Now);
             foreach (var schedule in schedules)
             {
                 result.Add(new ScheduledMessage

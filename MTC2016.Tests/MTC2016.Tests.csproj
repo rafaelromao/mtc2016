@@ -101,6 +101,7 @@
     <Compile Include="Mocks\TestSchedulerExtension.cs" />
     <Compile Include="Mocks\TestDistributionListExtension.cs" />
     <Compile Include="Mocks\TestServiceProvider.cs" />
+    <Compile Include="FeedbackTests.cs" />
     <Compile Include="ScheduledBroadcastTest.cs" />
     <Compile Include="QuestionsTests.cs" />
     <Compile Include="SubscriptionTests.cs" />

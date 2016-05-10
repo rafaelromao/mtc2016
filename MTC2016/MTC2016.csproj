@@ -96,9 +96,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArtificialInteligence\ArtificialInteligenceExtension.cs" />
+    <Compile Include="ArtificialInteligence\Entity.cs" />
+    <Compile Include="ArtificialInteligence\Entry.cs" />
     <Compile Include="ArtificialInteligence\IArtificialInteligenceExtension.cs" />
     <Compile Include="ArtificialInteligence\Intent.cs" />
     <Compile Include="ArtificialInteligence\IntentResponse.cs" />
+    <Compile Include="ArtificialInteligence\QueryResponse.cs" />
+    <Compile Include="ArtificialInteligence\QueryResult.cs" />
+    <Compile Include="ArtificialInteligence\QueryResultFulfillment.cs" />
+    <Compile Include="Receivers\FeedbackMessageReceiver.cs" />
     <Compile Include="Receivers\QuestionMessageReceiver.cs" />
     <Compile Include="Scheduler\IJobScheduler.cs" />
     <Compile Include="Scheduler\JobScheduler.cs" />

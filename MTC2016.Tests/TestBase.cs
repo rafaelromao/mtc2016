@@ -1,4 +1,6 @@
-﻿using System.Data.SQLite;
+﻿using System;
+using System.Data.SQLite;
+using System.Linq;
 using MTC2016.Configuration;
 using MTC2016.Tests.Mocks;
 using NUnit.Framework;
@@ -47,6 +49,15 @@ namespace MTC2016.Tests
             response.Content.ShouldNotBeNull();
             response.Content.ToString().ShouldNotBeNull();
             response.Content.ToString().ShouldBe(expected);
+        }
+
+        public static void Assert(Intent intent, string expectedSpeech)
+        {
+            intent.ShouldNotBeNull();
+            intent.Responses.ShouldNotBeNull();
+            intent.Responses.Length.ShouldBe(1);
+            intent.Responses.Single().Speech.ShouldNotBeNull();
+            intent.Responses.Single().Speech.ShouldBe(expectedSpeech);
         }
     }
 }

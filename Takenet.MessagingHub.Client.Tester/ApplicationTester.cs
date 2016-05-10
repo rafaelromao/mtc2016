@@ -37,7 +37,7 @@ namespace Takenet.MessagingHub.Client.Tester
         private string TestingIdentifier { get; set; }
         private string TestingAccessKey { get; set; }
 
-        private string TesterIdentifier { get; set; }
+        public string TesterIdentifier { get; set; }
         private string TesterAccessKey { get; set; }
 
         public Application Application { get; private set; }
@@ -73,17 +73,25 @@ namespace Takenet.MessagingHub.Client.Tester
 
         private async Task CreateTestingAccountsAsync()
         {
-            //TODO: Testing account should be a total clone of the application account, but with inboxsize = 0
+            if (_options.UseSeparateTestingAccount)
+            {
+                //TODO: Testing account should be a total clone of the application account, but with inboxsize = 0
 
-            var testingAccountManager = new TestingAccountManager(Application, DefaultTimeout);
+                var testingAccountManager = new TestingAccountManager(Application, DefaultTimeout);
 
-            var testingPassword = (Application.AccessKey ?? Application.Password).FromBase64();
+                var testingPassword = (Application.AccessKey ?? Application.Password).FromBase64();
 
-            TestingIdentifier = Application.Identifier + "$testing";
-            TestingAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TestingIdentifier, testingPassword);
+                TestingIdentifier = Application.Identifier + "$testing";
+                TestingAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TestingIdentifier, testingPassword);
 
-            TesterIdentifier = Application.Identifier + "$tester";
-            TesterAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TesterIdentifier, testingPassword);
+                TesterIdentifier = Application.Identifier + "$tester";
+                TesterAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TesterIdentifier, testingPassword);
+            }
+            else
+            {
+                TesterIdentifier = Application.Identifier;
+                TesterAccessKey = Application.AccessKey;
+            }
         }
 
         private void PatchApplication()

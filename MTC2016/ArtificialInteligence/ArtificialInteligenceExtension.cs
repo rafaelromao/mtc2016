@@ -8,9 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Lime.Protocol;
 using MTC2016.Configuration;
-using MTC2016.Scheduler;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 namespace MTC2016.ArtificialInteligence
@@ -31,6 +29,7 @@ namespace MTC2016.ArtificialInteligence
             _httpClient = new HttpClient();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _settings.ApiaiDeveloperApiKey);
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaType));
+            _httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue();
         }
 
 
@@ -51,37 +50,6 @@ namespace MTC2016.ArtificialInteligence
             return entryResponse.Entries;
         }
 
-        private class QueryResponse
-        {
-            public QueryResult Result { get; set; }
-        }
-        private class QueryResult
-        {
-            public QueryResultFulfillment Fulfillment { get; set; }
-        }
-        private class QueryResultFulfillment
-        {
-            public string Speech { get; set; }
-        }
-        private class Entity
-        {
-            public Entry[] Entries { get; set; }
-        }
-
-        private class Entry
-        {
-            public string Value { get; set; }
-
-            public Node ToIdentity(Settings settings)
-                => Node.Parse(Value.Replace(settings.AtReplacement, "@").Replace(settings.DolarReplacement, "$"));
-
-            public static Entry FromNode(Node node, Settings settings) => new Entry
-            {
-                Value = $"{node.ToString().Replace("@", settings.AtReplacement).Replace("$", settings.DolarReplacement)}"
-            };
-        }
-
-
         public async Task<IEnumerable<Intent>> GetIntentsAsync()
         {
             var uri = new Uri($"{_settings.ApiaiUri}/intents");
@@ -98,6 +66,37 @@ namespace MTC2016.ArtificialInteligence
             var json = await response.Content.ReadAsStringAsync();
             var intentResponse = JsonConvert.DeserializeObject<Intent>(json, JsonSerializerSettings);
             return intentResponse;
+        }
+
+        public async Task<bool> AddIntentAsync(Intent intent)
+        {
+            var uri = new Uri($"{_settings.ApiaiUri}/intents");
+            var json = JsonConvert.SerializeObject(intent, JsonSerializerSettings);
+            var response = await _httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, MediaType));
+            return response.StatusCode == HttpStatusCode.OK;
+        }
+
+        public async Task<bool> DeleteIntent(string intentId)
+        {
+            var uri = new Uri($"{_settings.ApiaiUri}/intents/{intentId}");
+            var response = await _httpClient.DeleteAsync(uri);
+            return response.StatusCode == HttpStatusCode.OK;
+        }
+
+        public async Task<bool> AddFeedbackAsync(string feedbackId, string feedback)
+        {
+            var intent = new Intent
+            {
+                Name = feedbackId,
+                Responses = new[]
+                {
+                    new IntentResponse
+                    {
+                        Speech = feedback
+                    }
+                }
+            };
+            return await AddIntentAsync(intent);
         }
 
         public async Task<string> GetAnswerAsync(string question)
