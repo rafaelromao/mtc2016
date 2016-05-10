@@ -56,7 +56,8 @@ namespace MTC2016.Receivers
             // Does not allow questions starting with $ or %
             return !question.StartsWith("$") && 
                    !question.StartsWith(_settings.SchedulePrefix) && 
-                   !question.StartsWith(_settings.FeedbackPrefix);
+                   !question.StartsWith(_settings.FeedbackPrefix) &&
+                   !question.StartsWith(_settings.RatingPrefix);
         }
     }
 }

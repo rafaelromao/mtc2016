@@ -21,5 +21,10 @@
         public string FeedbackConfirmation { get; set; }
         public string FeedbackPrefix { get; set; }
         public string FeedbackFailed { get; set; }
+        public string RatingText { get; set; }
+        public string RatingTitle { get; set; }
+        public string RatingConfirmation { get; set; }
+        public string RatingFailed { get; set; }
+        public string RatingPrefix { get; set; }
     }
 }
