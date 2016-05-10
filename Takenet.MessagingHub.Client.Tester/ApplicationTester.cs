@@ -75,16 +75,16 @@ namespace Takenet.MessagingHub.Client.Tester
         {
             if (_options.UseSeparateTestingAccount)
             {
-                //TODO: Testing account should be a total clone of the application account, but with inboxsize = 0
+                //TODO: Testing account should be a total clone of the application account
 
                 var testingAccountManager = new TestingAccountManager(Application, DefaultTimeout);
 
                 var testingPassword = (Application.AccessKey ?? Application.Password).FromBase64();
 
-                TestingIdentifier = Application.Identifier + "$testing";
+                TestingIdentifier = Application.Identifier + "$testingAccount";
                 TestingAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TestingIdentifier, testingPassword);
 
-                TesterIdentifier = Application.Identifier + "$tester";
+                TesterIdentifier = Application.Identifier + "$testerAccount";
                 TesterAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TesterIdentifier, testingPassword);
             }
             else
