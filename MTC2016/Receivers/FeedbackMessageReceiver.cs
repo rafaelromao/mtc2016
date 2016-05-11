@@ -22,7 +22,15 @@ namespace MTC2016.Receivers
             _sender = sender;
             _artificialInteligenceExtension = artificialInteligenceExtension;
             _settings = settings;
-            _feedbackAnswer = _artificialInteligenceExtension.GetAnswerAsync(_settings.FeedbackConfirmation).Result;
+            try
+            {
+                _feedbackAnswer = _artificialInteligenceExtension.GetAnswerAsync(_settings.FeedbackConfirmation).Result;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception when querying for {_settings.FeedbackConfirmation}: {e}");
+                _feedbackAnswer = _settings.GeneralError;
+            }
         }
 
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
