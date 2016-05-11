@@ -81,10 +81,10 @@ namespace Takenet.MessagingHub.Client.Tester
 
                 var testingPassword = (Application.AccessKey ?? Application.Password).FromBase64();
 
-                TestingIdentifier = Application.Identifier + "$testingAccount";
+                TestingIdentifier = Application.Identifier + "$testing";
                 TestingAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TestingIdentifier, testingPassword);
 
-                TesterIdentifier = Application.Identifier + "$testerAccount";
+                TesterIdentifier = Application.Identifier + "$tester";
                 TesterAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TesterIdentifier, testingPassword);
             }
             else
@@ -273,9 +273,9 @@ namespace Takenet.MessagingHub.Client.Tester
                 builder = builder.For(Any.ValueLike(pattern));
                 return builder.Build();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new ArgumentException($"Invalid regex pattern: {pattern}");
+                throw new ArgumentException($"Invalid regex pattern: {pattern}", e);
             }
         }
 

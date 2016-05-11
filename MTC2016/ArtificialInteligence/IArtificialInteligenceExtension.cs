@@ -11,7 +11,7 @@ namespace MTC2016.ArtificialInteligence
         Task<IEnumerable<Intent>> GetIntentsAsync();
         Task<Intent> GetIntentAsync(string intentId);
         Task<bool> AddIntentAsync(Intent intent);
-        Task<bool> DeleteIntent(string intentId);
+        Task<bool> DeleteIntent(string intentQuestion);
 
         Task<IEnumerable<Node>> GetUsersAsync();
         Task<bool> ContainsUserAsync(Node user);

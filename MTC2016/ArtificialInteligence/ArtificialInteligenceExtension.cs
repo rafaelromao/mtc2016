@@ -35,7 +35,7 @@ namespace MTC2016.ArtificialInteligence
 
         private async Task<QueryResponse> GetQueryAsync(string question)
         {
-            var uri = new Uri($"{_settings.ApiaiUri}/query?v=20150910&lang=PT-BR&query={question}");
+            var uri = new Uri($"{_settings.ApiaiUri}/query?v=20150910&query={question}&lang=pt-br");
             var response = await _httpClient.GetAsync(uri);
             var json = await response.Content.ReadAsStringAsync();
             var queryResponse = JsonConvert.DeserializeObject<QueryResponse>(json, JsonSerializerSettings);
@@ -76,9 +76,13 @@ namespace MTC2016.ArtificialInteligence
             return response.StatusCode == HttpStatusCode.OK;
         }
 
-        public async Task<bool> DeleteIntent(string intentId)
+        public async Task<bool> DeleteIntent(string intentQuestion)
         {
-            var uri = new Uri($"{_settings.ApiaiUri}/intents/{intentId}");
+            var queryResponse = await GetQueryAsync(intentQuestion);
+            if (queryResponse?.Result?.Metadata?.IntentId == null)
+                return false;
+
+            var uri = new Uri($"{_settings.ApiaiUri}/intents/{queryResponse.Result.Metadata.IntentId}");
             var response = await _httpClient.DeleteAsync(uri);
             return response.StatusCode == HttpStatusCode.OK;
         }
@@ -88,11 +92,29 @@ namespace MTC2016.ArtificialInteligence
             var intent = new Intent
             {
                 Name = feedbackId,
+                Templates = new []
+                {
+                    feedbackId
+                },
+                UserSays = new []
+                {
+                    new UserSays
+                    {
+                        Data = new []
+                        {
+                            new UserSaysData
+                            {
+                                Text = feedbackId.Replace("_", " ")
+                            }
+                        },
+                        IsTemplate = false
+                    }
+                },
                 Responses = new[]
                 {
                     new IntentResponse
                     {
-                        Speech = feedback
+                        Speech = feedback.Replace("#", "")
                     }
                 }
             };
@@ -114,7 +136,7 @@ namespace MTC2016.ArtificialInteligence
 
         public async Task<bool> AddUserAsync(Node user)
         {
-            var entries = new[] { Entry.FromNode(user, _settings) };
+            var entries = new[] { _settings.EncodeIdentity(user.ToNode().ToString()) };
 
             var uri = new Uri($"{_settings.ApiaiUri}/entities/{_settings.UsersEntity}/entries");
             var json = JsonConvert.SerializeObject(entries, JsonSerializerSettings);
@@ -137,7 +159,7 @@ namespace MTC2016.ArtificialInteligence
 
         public async Task<bool> RemoveUserAsync(Node user)
         {
-            var entries = new[] { Entry.FromNode(user, _settings).Value };
+            var entries = new[] { _settings.EncodeIdentity(user.ToNode().ToString()) };
 
             var uri = new Uri($"{_settings.ApiaiUri}/entities/{_settings.UsersEntity}/entries");
             var json = JsonConvert.SerializeObject(entries, JsonSerializerSettings);

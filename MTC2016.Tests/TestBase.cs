@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SQLite;
 using System.Linq;
 using MTC2016.Configuration;
 using MTC2016.Tests.Mocks;
@@ -11,7 +10,8 @@ using Shouldly;
 
 namespace MTC2016.Tests
 {
-    public class TestBase
+    public class TestBase<TServiceProvider>
+        where TServiceProvider : IServiceProvider
     {
         protected ApplicationTester Tester { get; private set; }
 
@@ -22,17 +22,18 @@ namespace MTC2016.Tests
         [OneTimeSetUp]
         public void SetUp()
         {
-            Tester = CreateApplicationTester();
+            Tester = CreateApplicationTester<TServiceProvider>();
             Tester.StartAsync().Wait();
             ArtificialInteligenceExtension = Tester.GetService<IArtificialInteligenceExtension>();
             Settings = Tester.GetService<Settings>();
         }
 
-        protected ApplicationTester CreateApplicationTester()
+        protected ApplicationTester CreateApplicationTester<TTestServiceProvider>()
+            where TTestServiceProvider : IServiceProvider
         {
             return new ApplicationTester(new ApplicationTesterOptions
             {
-                TestServiceProviderType = typeof(TestServiceProvider)
+                TestServiceProviderType = typeof(TTestServiceProvider)
             });
         }
 
@@ -51,13 +52,10 @@ namespace MTC2016.Tests
             response.Content.ToString().ShouldBe(expected);
         }
 
-        public static void Assert(Intent intent, string expectedSpeech)
+        public static void Assert(string actual, string expected)
         {
-            intent.ShouldNotBeNull();
-            intent.Responses.ShouldNotBeNull();
-            intent.Responses.Length.ShouldBe(1);
-            intent.Responses.Single().Speech.ShouldNotBeNull();
-            intent.Responses.Single().Speech.ShouldBe(expectedSpeech);
+            actual.ShouldNotBeNull();
+            actual.ShouldBe(expected);
         }
     }
 }

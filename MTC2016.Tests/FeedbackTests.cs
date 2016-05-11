@@ -1,34 +1,35 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Lime.Protocol;
-using MTC2016.ArtificialInteligence;
 using MTC2016.Receivers;
+using MTC2016.Tests.Mocks;
 using NUnit.Framework;
-using Shouldly;
 
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class FeedbackTests : TestBase
+    public class FeedbackTests : TestBase<TestsServiceProvider>
     {
         [Test]
-        [TestCase("feedback Gostei do Evento $15774$")]
+        [TestCase("feedback Gostei do Evento")]
+        [TestCase("#feedback Foi legal")]
+        [TestCase("feedback: Muito bacana")]
+        [TestCase("#feedback:É isso ai")]
         public async Task SendFeedback(string feedback)
         {
             var currentMinute = DateTime.Now;
             await Tester.SendMessageAsync(feedback);
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(feedback);
+            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.FeedbackConfirmation);
             Assert(response, answer);
 
-            var from = Node.Parse(Tester.TesterIdentifier).ToString();
-            var feedbackId = FeedbackMessageReceiver.CreateFeedbackId(Settings, from, currentMinute);
-            var storedFeedback = await ArtificialInteligenceExtension.GetIntentAsync(feedbackId);
+            var from = new Node(Tester.TesterIdentifier, "msging.net", null).ToString();
+            var feedbackIntent = FeedbackMessageReceiver.CreateFeedbackId(Settings, from, currentMinute).Replace("_", " ");
+            var storedFeedback = await ArtificialInteligenceExtension.GetAnswerAsync(feedbackIntent);
+            Assert(storedFeedback, feedback.Replace("#", ""));
 
-            var deleted = await ArtificialInteligenceExtension.DeleteIntent(feedbackId);
-            deleted.ShouldBeTrue();
-
-            Assert(storedFeedback, feedback);
+            var deleted = await ArtificialInteligenceExtension.DeleteIntent(feedbackIntent);
+            Assert(deleted.ToString(), true.ToString());
         }
     }
 }

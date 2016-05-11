@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using MTC2016.Receivers;
+using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class SubscriptionTests : TestBase
+    public class SubscriptionTests : TestBase<SubscriptionTestsServiceProvider>
     {
         private async Task EnsureAlreadySubscribedAsync()
         {
@@ -30,6 +31,18 @@ namespace MTC2016.Tests
             var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.ConfirmSubscription);
             Assert(response, answer);
         }
+
+        [Test]
+        public async Task SubscribeConversationally()
+        {
+            await EnsureNotSubscribedAsync();
+
+            await Tester.SendMessageAsync("Olá, quero me inscrever!");
+            var response = await Tester.ReceiveMessageAsync();
+            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.ConfirmSubscription);
+            Assert(response, answer);
+        }
+
 
         [Test]
         public async Task SubscribeWhenAlreadySubscribed()

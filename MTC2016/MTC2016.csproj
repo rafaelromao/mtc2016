@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Fare, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Fare.1.0.3\lib\net35\Fare.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Lime.Messaging, Version=0.4.95.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Lime.Messaging.0.4.95\lib\net461\Lime.Messaging.dll</HintPath>
       <Private>True</Private>
@@ -63,16 +67,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Threading.Tasks.Dataflow, Version=4.5.24.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.Tpl.Dataflow.4.5.24\lib\portable-net45+win8+wpa81\System.Threading.Tasks.Dataflow.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
     <Reference Include="Takenet.Elephant, Version=0.4.54.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Takenet.Elephant.0.4.54.0\lib\net461\Takenet.Elephant.dll</HintPath>
       <Private>True</Private>
@@ -97,9 +92,12 @@
     <Compile Include="ArtificialInteligence\IArtificialInteligenceExtension.cs" />
     <Compile Include="ArtificialInteligence\Intent.cs" />
     <Compile Include="ArtificialInteligence\IntentResponse.cs" />
+    <Compile Include="ArtificialInteligence\QueryMetadata.cs" />
     <Compile Include="ArtificialInteligence\QueryResponse.cs" />
     <Compile Include="ArtificialInteligence\QueryResult.cs" />
     <Compile Include="ArtificialInteligence\QueryResultFulfillment.cs" />
+    <Compile Include="ArtificialInteligence\UserSays.cs" />
+    <Compile Include="ArtificialInteligence\UserSaysData.cs" />
     <Compile Include="Receivers\RatingMessageReceiver.cs" />
     <Compile Include="Receivers\FeedbackMessageReceiver.cs" />
     <Compile Include="Receivers\QuestionMessageReceiver.cs" />
@@ -122,7 +120,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="application.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
   </ItemGroup>

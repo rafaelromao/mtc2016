@@ -1,14 +1,11 @@
-﻿using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using MTC2016.Receivers;
+﻿using System.Threading.Tasks;
 using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class QuestionsTests : TestBase
+    public class QuestionsTests : TestBase<TestsServiceProvider>
     {
         [Test]
         [TestCase("Fale me sobre o evento!")]

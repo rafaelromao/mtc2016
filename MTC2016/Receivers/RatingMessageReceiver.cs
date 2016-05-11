@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Lime.Messaging.Contents;
@@ -48,11 +49,9 @@ namespace MTC2016.Receivers
                         Text = _ratingText,
                         Options = new[]
                         {
-                            new SelectOption { Order = 1, Text = "Péssimo" },
-                            new SelectOption { Order = 2, Text = "Ruim" },
-                            new SelectOption { Order = 3, Text = "Razoável" },
-                            new SelectOption { Order = 4, Text = "Bom" },
-                            new SelectOption { Order = 5, Text = "Excelente" }
+                            new SelectOption { Order = 1, Text = "Péssimo", Value = new PlainText { Text = "Péssimo" } },
+                            new SelectOption { Order = 3, Text = "Razoável", Value = new PlainText { Text = "Razoável" } },
+                            new SelectOption { Order = 5, Text = "Excelente", Value = new PlainText { Text = "Excelente" } }
                         }
                     };
                     await _sender.SendMessageAsync(ratingOptions, message.From, cancellationToken);

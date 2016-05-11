@@ -9,10 +9,5 @@ namespace MTC2016.ArtificialInteligence
 
         public Node ToIdentity(Settings settings)
             => Node.Parse(Value.Replace(settings.AtReplacement, "@").Replace(settings.DolarReplacement, "$"));
-
-        public static Entry FromNode(Node node, Settings settings) => new Entry
-        {
-            Value = $"{node.ToString().Replace("@", settings.AtReplacement).Replace("$", settings.DolarReplacement)}"
-        };
     }
 }

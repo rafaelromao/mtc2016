@@ -26,5 +26,10 @@
         public string RatingConfirmation { get; set; }
         public string RatingFailed { get; set; }
         public string RatingPrefix { get; set; }
+
+        public string EncodeIdentity(string text)
+        {
+            return text.Replace("@", AtReplacement).Replace("$", DolarReplacement).Replace(".", "_").Replace("#", "_");
+        }
     }
 }

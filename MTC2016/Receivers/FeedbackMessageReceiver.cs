@@ -45,7 +45,8 @@ namespace MTC2016.Receivers
 
         public static string CreateFeedbackId(Settings settings, string from, DateTime time)
         {
-            return $"{settings.FeedbackPrefix} from_{from}_at_{time.ToString("yyyyMMddhhnn")}";
+            from = settings.EncodeIdentity(from);
+            return $"{settings.FeedbackPrefix}from_{from}_at_{time.ToString("yyyyMMddhhmm")}";
         }
     }
 }
