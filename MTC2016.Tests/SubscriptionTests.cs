@@ -7,17 +7,17 @@ using NUnit.Framework;
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class SubscriptionTests : TestBase<SubscriptionTestsServiceProvider>
+    public class SubscriptionTests : TestBase<FakeScheduleAndSubscriptionTestsServiceProvider>
     {
         private async Task EnsureAlreadySubscribedAsync()
         {
             await Tester.SendMessageAsync<SubscribeMessageReceiver>();
-            await Tester.IgnoreMessageAsync();
+            await Tester.IgnoreMessageAsync(TimeSpan.FromSeconds(2));
         }
         private async Task EnsureNotSubscribedAsync()
         {
             await Tester.SendMessageAsync<UnsubscribeMessageReceiver>();
-            await Tester.IgnoreMessageAsync();
+            await Tester.IgnoreMessageAsync(TimeSpan.FromSeconds(2));
         }
 
 

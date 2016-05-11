@@ -16,28 +16,12 @@ namespace MTC2016.Tests.Mocks
         }
     }
 
-    public class SubscriptionTestsServiceProvider : TestsServiceProvider
+    public class FakeScheduleAndSubscriptionTestsServiceProvider : TestsServiceProvider
     {
-        static SubscriptionTestsServiceProvider()
-        {
-            RegisterTestService<IDistributionListExtension, TestDistributionListExtension>();
-        }
-    }
-
-    public class FakeScheduleTestsServiceProvider : TestsServiceProvider
-    {
-        static FakeScheduleTestsServiceProvider()
+        static FakeScheduleAndSubscriptionTestsServiceProvider()
         {
             RegisterTestService<IDistributionListExtension, TestDistributionListExtension>();
             RegisterTestService<ISchedulerExtension, TestSchedulerExtension>();
-        }
-    }
-
-    public class RealScheduleTestsServiceProvider : TestsServiceProvider
-    {
-        static RealScheduleTestsServiceProvider()
-        {
-            RegisterTestService<IDistributionListExtension, TestDistributionListExtension>();
         }
     }
 }

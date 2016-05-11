@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class ScheduledBroadcastTests : TestBase<FakeScheduleTestsServiceProvider>
+    public class ScheduledBroadcastTests : TestBase<FakeScheduleAndSubscriptionTestsServiceProvider>
     {
         [Test]
         public async Task ScheduledBroadcastIsExecuted()
