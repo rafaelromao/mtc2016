@@ -24,4 +24,13 @@ namespace MTC2016.Tests.Mocks
             RegisterTestService<ISchedulerExtension, TestSchedulerExtension>();
         }
     }
+
+    public class FakeRatingScheduleAndSubscriptionTestsServiceProvider : TestsServiceProvider
+    {
+        static FakeRatingScheduleAndSubscriptionTestsServiceProvider()
+        {
+            RegisterTestService<IDistributionListExtension, TestDistributionListExtension>();
+            RegisterTestService<ISchedulerExtension, RatingTestSchedulerExtension>();
+        }
+    }
 }

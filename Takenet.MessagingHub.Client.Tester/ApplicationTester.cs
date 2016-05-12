@@ -254,6 +254,11 @@ namespace Takenet.MessagingHub.Client.Tester
             await TestClient.SendMessageAsync(message, Application.Identifier);
         }
 
+        public async Task SendMessageAsync(Document message)
+        {
+            await TestClient.SendMessageAsync(message, Application.Identifier);
+        }
+
         public async Task SendMessageAsync<TReceiverType>()
         {
             var receiverName = typeof(TReceiverType).Name;

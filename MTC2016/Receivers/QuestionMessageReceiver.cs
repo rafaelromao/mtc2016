@@ -78,7 +78,7 @@ namespace MTC2016.Receivers
 
         private async Task<string> ExtractAndSendImagesAsync(string answer, Node from, CancellationToken cancellationToken)
         {
-            var match = Regex.Match(answer, "\\[(.*?)\\]");
+            var match = Regex.Match(answer, "\\[(.*?)\\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 foreach (Capture capture in match.Captures)

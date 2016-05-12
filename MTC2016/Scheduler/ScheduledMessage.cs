@@ -1,4 +1,5 @@
 ﻿using System;
+using Lime.Protocol;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -8,6 +9,6 @@ namespace MTC2016.Scheduler
     {
         [JsonConverter(typeof(IsoDateTimeConverter))]
         public DateTimeOffset Time { get; set; }
-        public string Text { get; set; }
+        public Document Message { get; set; }
     }
 }

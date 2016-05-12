@@ -3,12 +3,15 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Lime.Messaging.Contents;
 using Lime.Protocol;
+using Lime.Protocol.Serialization.Newtonsoft;
 using MTC2016.ArtificialInteligence;
 using MTC2016.Configuration;
+using Newtonsoft.Json;
 using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.Scheduler
@@ -56,10 +59,7 @@ namespace MTC2016.Scheduler
                     var message = new Message
                     {
                         Id = Guid.NewGuid(),
-                        Content = new PlainText
-                        {
-                            Text = scheduledMessage.Text
-                        },
+                        Content = scheduledMessage.Message,
                         To = recipient.ToNode()
                     };
 
@@ -85,13 +85,65 @@ namespace MTC2016.Scheduler
                 schedules.Where(s => DateTimeOffset.Parse(s.Name.Substring(schedulePrefix.Length)) >= DateTime.Now);
             foreach (var schedule in schedules)
             {
-                result.Add(new ScheduledMessage
+                var text = (await _artificialInteligenceExtension.GetIntentAsync(schedule.Id)).Responses.First().Speech;
+                var ratingOptions = ExtractRatingFromText(text);
+                if (ratingOptions != null)
                 {
-                    Time = DateTimeOffset.Parse(schedule.Name.Substring(schedulePrefix.Length)),
-                    Text = (await _artificialInteligenceExtension.GetIntentAsync(schedule.Id)).Responses.First().Speech
-                });
+                    // Rating request
+                    result.Add(new ScheduledMessage
+                    {
+                        Time = DateTimeOffset.Parse(schedule.Name.Substring(schedulePrefix.Length)),
+                        Message = ratingOptions
+                    });
+                }
+                else
+                {
+                    // Text message
+                    result.Add(new ScheduledMessage
+                    {
+                        Time = DateTimeOffset.Parse(schedule.Name.Substring(schedulePrefix.Length)),
+                        Message = new PlainText { Text = text }
+                    });
+                }
             }
             return result;
+        }
+
+        private Select ExtractRatingFromText(string text)
+        {
+            var match = Regex.Match(text, "\\[(.*?)\\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                var capture = match.Captures[0];
+                text = text.Replace(capture.Value, string.Empty).Trim();
+                return CreateRatingOptions(text, capture.Value.Replace("[", "").Replace("]", ""));
+            }
+            return null;
+        }
+
+        private Select CreateRatingOptions(string text, string toBeRated)
+        {
+            var select = new Select
+            {
+                Text = text,
+                Options = new SelectOption[]
+                {
+                    CreateRatingOption(toBeRated, _settings.PrettyBadRating),
+                    CreateRatingOption(toBeRated, _settings.BadRating),
+                    CreateRatingOption(toBeRated, _settings.RegularRating),
+                    CreateRatingOption(toBeRated, _settings.GoodRating),
+                    CreateRatingOption(toBeRated, _settings.PrettyGoodRating)
+                }
+            };
+            return select;
+        }
+
+        private SelectOption CreateRatingOption(string toBeRated, string rating)
+        {
+            return new SelectOption
+            {
+                Text = rating, Value = new PlainText { Text = $"{_settings.RatingPrefix}{toBeRated}:{rating}" }
+            };
         }
 
         public void Dispose()

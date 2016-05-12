@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using MTC2016.Receivers;
+﻿using System.Threading.Tasks;
 using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 

@@ -22,10 +22,14 @@
         public string FeedbackPrefix { get; set; }
         public string FeedbackFailed { get; set; }
         public string RatingText { get; set; }
-        public string RatingTitle { get; set; }
         public string RatingConfirmation { get; set; }
         public string RatingFailed { get; set; }
         public string RatingPrefix { get; set; }
+        public string PrettyBadRating { get; set; }
+        public string BadRating { get; set; }
+        public string RegularRating { get; set; }
+        public string GoodRating { get; set; }
+        public string PrettyGoodRating { get; set; }
 
         public string EncodeIdentity(string text)
         {
