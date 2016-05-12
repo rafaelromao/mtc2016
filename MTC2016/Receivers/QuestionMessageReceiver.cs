@@ -76,7 +76,7 @@ namespace MTC2016.Receivers
             }
         }
 
-        private async Task<string> ExtractAndSendImagesAsync(string answer, Node from, CancellationToken cancellationToken)
+        protected virtual async Task<string> ExtractAndSendImagesAsync(string answer, Node from, CancellationToken cancellationToken)
         {
             var match = Regex.Match(answer, "\\[(.*?)\\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             if (match.Success)

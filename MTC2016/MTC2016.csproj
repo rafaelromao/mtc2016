@@ -98,6 +98,7 @@
     <Compile Include="ArtificialInteligence\QueryResultFulfillment.cs" />
     <Compile Include="ArtificialInteligence\UserSays.cs" />
     <Compile Include="ArtificialInteligence\UserSaysData.cs" />
+    <Compile Include="Receivers\ImageMessageReceiver.cs" />
     <Compile Include="Receivers\RatingMessageReceiver.cs" />
     <Compile Include="Receivers\FeedbackMessageReceiver.cs" />
     <Compile Include="Receivers\QuestionMessageReceiver.cs" />

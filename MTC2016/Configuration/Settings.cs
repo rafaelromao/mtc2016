@@ -1,4 +1,6 @@
-﻿namespace MTC2016.Configuration
+﻿using System.Dynamic;
+
+namespace MTC2016.Configuration
 {
     public class Settings
     {
@@ -30,6 +32,7 @@
         public string RegularRating { get; set; }
         public string GoodRating { get; set; }
         public string PrettyGoodRating { get; set; }
+        public string ImageConfirmation { get; set; }
 
         public string EncodeIdentity(string text)
         {

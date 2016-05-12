@@ -1,6 +1,7 @@
 ﻿using MTC2016.ArtificialInteligence;
 using MTC2016.Configuration;
 using MTC2016.DistributionList;
+using MTC2016.Receivers;
 using MTC2016.Scheduler;
 using Takenet.MessagingHub.Client.Tester;
 
@@ -31,6 +32,14 @@ namespace MTC2016.Tests.Mocks
         {
             RegisterTestService<IDistributionListExtension, TestDistributionListExtension>();
             RegisterTestService<ISchedulerExtension, RatingTestSchedulerExtension>();
+        }
+    }
+
+    public class FakeQuestionReceiverTestsServiceProvider : TestsServiceProvider
+    {
+        static FakeQuestionReceiverTestsServiceProvider()
+        {
+            RegisterTestService<QuestionMessageReceiver, TestQuestionMessageReceiver>();
         }
     }
 }

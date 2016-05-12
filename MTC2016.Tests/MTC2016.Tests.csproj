@@ -89,6 +89,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Mocks\RatingTestSchedulerExtension.cs" />
+    <Compile Include="Mocks\TestQuestionMessageReceiver.cs" />
     <Compile Include="Mocks\TestSchedulerExtension.cs" />
     <Compile Include="Mocks\TestDistributionListExtension.cs" />
     <Compile Include="Mocks\TestServiceProvider.cs" />

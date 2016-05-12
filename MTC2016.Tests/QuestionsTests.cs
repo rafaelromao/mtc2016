@@ -1,11 +1,12 @@
 ﻿using System.Threading.Tasks;
 using MTC2016.Tests.Mocks;
 using NUnit.Framework;
+using Shouldly;
 
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class QuestionsTests : TestBase<TestsServiceProvider>
+    public class QuestionsTests : TestBase<FakeQuestionReceiverTestsServiceProvider>
     {
         [Test]
         [TestCase("Fale me sobre o evento!")]
