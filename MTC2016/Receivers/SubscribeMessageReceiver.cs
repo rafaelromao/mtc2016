@@ -17,7 +17,10 @@ namespace MTC2016.Receivers
         private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
         private readonly IDistributionListExtension _distributionListExtension;
         private readonly Settings _settings;
-        private readonly string _defaultAnswer;
+        private string _defaultAnswer;
+        private string _confirmSubscription;
+        private string _alreadySubscribed;
+        private string _subscriptionFailed;
 
         public SubscribeMessageReceiver(IMessagingHubSender sender, IArtificialInteligenceExtension artificialInteligenceExtension,
             IDistributionListExtension distributionListExtension, Settings settings)
@@ -28,7 +31,7 @@ namespace MTC2016.Receivers
             _settings = settings;
             try
             {
-                _defaultAnswer = _artificialInteligenceExtension.GetAnswerAsync(_settings.CouldNotUnderstand).Result;
+                InitializeDefaultAnswersAsync().Wait();
             }
             catch (Exception e)
             {
@@ -37,24 +40,29 @@ namespace MTC2016.Receivers
             }
         }
 
+        private async Task InitializeDefaultAnswersAsync()
+        {
+            _defaultAnswer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.CouldNotUnderstand);
+            _confirmSubscription = await _artificialInteligenceExtension.GetAnswerAsync(_settings.ConfirmSubscription);
+            _alreadySubscribed = await _artificialInteligenceExtension.GetAnswerAsync(_settings.AlreadySubscribed);
+            _subscriptionFailed = await _artificialInteligenceExtension.GetAnswerAsync(_settings.SubscriptionFailed);
+        }
+
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
         {
             try
             {
                 if (await _distributionListExtension.ContainsAsync(message.From, cancellationToken))
                 {
-                    var answer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.AlreadySubscribed);
-                    await _sender.SendMessageAsync(answer, message.From, cancellationToken);
+                    await _sender.SendMessageAsync(_alreadySubscribed, message.From, cancellationToken);
                 }
                 else if (await _distributionListExtension.AddAsync(message.From, cancellationToken))
                 {
-                    var answer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.ConfirmSubscription);
-                    await _sender.SendMessageAsync(answer, message.From, cancellationToken);
+                    await _sender.SendMessageAsync(_confirmSubscription, message.From, cancellationToken);
                 }
                 else
                 {
-                    var answer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.SubscriptionFailed);
-                    await _sender.SendMessageAsync(answer, message.From, cancellationToken);
+                    await _sender.SendMessageAsync(_subscriptionFailed, message.From, cancellationToken);
                 }
             }
             catch (Exception e)

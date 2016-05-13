@@ -12,7 +12,7 @@ namespace MTC2016.Tests.Mocks
             where TInterface : class
             where TClass : class, TInterface
         {
-            ((ServiceProvider)ApplicationTester.ApplicationServiceProvider).Container.RegisterSingleton<TInterface, TClass>();
+            ((ServiceProvider)ApplicationTester.Current.ApplicationServiceProvider).Container.RegisterSingleton<TInterface, TClass>();
         }
     }
 
@@ -29,7 +29,16 @@ namespace MTC2016.Tests.Mocks
     {
         static NoSubscriptionAndSingleFakeScheduleServiceProvider()
         {
-            RegisterTestService<IDistributionListExtension, DummyTestDistributionListExtension>();
+            RegisterTestService<IDistributionListExtension, NoPersistenceDistributionListExtension>();
+            RegisterTestService<ISchedulerExtension, SchedulerExtensionWithSingleFakeSchedule>();
+        }
+    }
+
+    public class EveryoneIsSubscribedSubscriptionServiceProvider : TestServiceProvider
+    {
+        static EveryoneIsSubscribedSubscriptionServiceProvider()
+        {
+            RegisterTestService<IDistributionListExtension, EveryoneIsSubscribedDistributionListExtension>();
             RegisterTestService<ISchedulerExtension, SchedulerExtensionWithSingleFakeSchedule>();
         }
     }

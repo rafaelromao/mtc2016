@@ -7,44 +7,30 @@ using NUnit.Framework;
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class InMemorySubscribeTests : TestWith<InMemorySubscriptionServiceProvider>
+    public class EveryoneIsAlreadySubscribedSubscribeTests : TestWith<EveryoneIsSubscribedSubscriptionServiceProvider>
     {
         [Test]
         public async Task SubscribeWhenAlreadySubscribed()
         {
-            await Tester.SendMessageAsync("Olá, quero me inscrever!");
-            var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.ConfirmSubscription);
-            Assert(response, answer);
-
             await Tester.SendMessageAsync("entrar");
-            response = await Tester.ReceiveMessageAsync();
-            answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.AlreadySubscribed);
+            var response = await Tester.ReceiveMessageAsync();
+            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.AlreadySubscribed);
             Assert(response, answer);
         }
-    }
 
-    [TestFixture]
-    public class InMemoryUnsubscribeTests : TestWith<InMemorySubscriptionServiceProvider>
-    {
         [Test]
         public async Task Unsubscribe()
         {
-            await Tester.SendMessageAsync("Olá, quero me inscrever!");
+            await Tester.SendMessageAsync("Mudei de idéia, quero cancelar");
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.ConfirmSubscription);
-            Assert(response, answer);
-
-            await Tester.SendMessageAsync("Prefiro cancelar");
-            response = await Tester.ReceiveMessageAsync();
-            answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.ConfirmSubscriptionCancellation);
+            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.ConfirmSubscriptionCancellation);
             Assert(response, answer);
         }
 
     }
 
     [TestFixture]
-    public class NoPersistentSubscriptionTests : TestWith<NoSubscriptionAndSingleFakeScheduleServiceProvider>
+    public class NoOneIsAlreadySubscribedSubscriptionTests : TestWith<NoSubscriptionAndSingleFakeScheduleServiceProvider>
     {
         [Test]
         public async Task Subscribe()

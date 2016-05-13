@@ -17,7 +17,10 @@ namespace MTC2016.Receivers
         private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
         private readonly IDistributionListExtension _distributionListExtension;
         private readonly Settings _settings;
-        private readonly string _defaultAnswer;
+        private string _defaultAnswer;
+        private string _confirmUnsubscription;
+        private string _notSubscribed;
+        private string _unsubscriptionFailed;
 
         public UnsubscribeMessageReceiver(IMessagingHubSender sender, IArtificialInteligenceExtension artificialInteligenceExtension,
             IDistributionListExtension distributionListExtension, Settings settings)
@@ -28,7 +31,7 @@ namespace MTC2016.Receivers
             _settings = settings;
             try
             {
-                _defaultAnswer = _artificialInteligenceExtension.GetAnswerAsync(_settings.CouldNotUnderstand).Result;
+                InitializeDefaultAnswersAsync().Wait();
             }
             catch (Exception e)
             {
@@ -37,24 +40,29 @@ namespace MTC2016.Receivers
             }
         }
 
+        private async Task InitializeDefaultAnswersAsync()
+        {
+            _defaultAnswer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.CouldNotUnderstand);
+            _confirmUnsubscription = await _artificialInteligenceExtension.GetAnswerAsync(_settings.ConfirmSubscriptionCancellation);
+            _notSubscribed = await _artificialInteligenceExtension.GetAnswerAsync(_settings.NotSubscribed);
+            _unsubscriptionFailed = await _artificialInteligenceExtension.GetAnswerAsync(_settings.UnsubscriptionFailed);
+        }
+
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
         {
             try
             {
                 if (!await _distributionListExtension.ContainsAsync(message.From, cancellationToken))
                 {
-                    var answer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.NotSubscribed);
-                    await _sender.SendMessageAsync(answer, message.From, cancellationToken);
+                    await _sender.SendMessageAsync(_notSubscribed, message.From, cancellationToken);
                 }
                 else if (await _distributionListExtension.RemoveAsync(message.From, cancellationToken))
                 {
-                    var answer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.ConfirmSubscriptionCancellation);
-                    await _sender.SendMessageAsync(answer, message.From, cancellationToken);
+                    await _sender.SendMessageAsync(_confirmUnsubscription, message.From, cancellationToken);
                 }
                 else
                 {
-                    var answer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.UnsubscriptionFailed);
-                    await _sender.SendMessageAsync(answer, message.From, cancellationToken);
+                    await _sender.SendMessageAsync(_unsubscriptionFailed, message.From, cancellationToken);
                 }
             }
             catch (Exception e)

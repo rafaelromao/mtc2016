@@ -18,7 +18,9 @@ namespace Takenet.MessagingHub.Client.Tester
     {
         private readonly ApplicationTesterOptions _options;
         private static ConsoleTraceListener _listener;
-        public static IServiceProvider ApplicationServiceProvider { get; private set; }
+        public IServiceProvider ApplicationServiceProvider { get; private set; }
+
+        public static ApplicationTester Current { get; private set; }
 
         private ConcurrentQueue<Message> _lattestMessages;
         private TimeSpan DefaultTimeout { get; set; }
@@ -44,6 +46,7 @@ namespace Takenet.MessagingHub.Client.Tester
 
         public ApplicationTester(ApplicationTesterOptions options)
         {
+            Current = this;
             _options = options;
         }
 
@@ -103,7 +106,7 @@ namespace Takenet.MessagingHub.Client.Tester
                 ValidateApplicationServiceProviderType(Application.ServiceProviderType);
                 var applicationServiceProviderType = ParseTypeName(Application.ServiceProviderType);
 
-                ApplicationServiceProvider = ApplicationServiceProvider ?? (IServiceProvider)Activator.CreateInstance(applicationServiceProviderType);
+                ApplicationServiceProvider = (IServiceProvider)Activator.CreateInstance(applicationServiceProviderType);
             }
 
             if (_options.TestServiceProviderType != null)

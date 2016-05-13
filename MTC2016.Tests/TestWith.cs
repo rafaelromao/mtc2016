@@ -11,7 +11,7 @@ using Shouldly;
 namespace MTC2016.Tests
 {
     public class TestWith<TServiceProvider>
-        where TServiceProvider : IServiceProvider
+        where TServiceProvider : ApplicationTesterServiceProvider
     {
         protected ApplicationTester Tester { get; private set; }
 
@@ -29,7 +29,7 @@ namespace MTC2016.Tests
         }
 
         protected ApplicationTester CreateApplicationTester<TTestServiceProvider>()
-            where TTestServiceProvider : IServiceProvider
+            where TTestServiceProvider : ApplicationTesterServiceProvider
         {
             return new ApplicationTester(new ApplicationTesterOptions
             {
