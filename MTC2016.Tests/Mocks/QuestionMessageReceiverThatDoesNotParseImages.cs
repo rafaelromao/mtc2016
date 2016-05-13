@@ -8,9 +8,9 @@ using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.Tests.Mocks
 {
-    class TestQuestionMessageReceiver : QuestionMessageReceiver
+    class QuestionMessageReceiverThatDoesNotParseImages : QuestionMessageReceiver
     {
-        public TestQuestionMessageReceiver(IMessagingHubSender sender, IArtificialInteligenceExtension artificialInteligenceExtension, Settings settings) 
+        public QuestionMessageReceiverThatDoesNotParseImages(IMessagingHubSender sender, IArtificialInteligenceExtension artificialInteligenceExtension, Settings settings) 
             : base(sender, artificialInteligenceExtension, settings)
         {
         }

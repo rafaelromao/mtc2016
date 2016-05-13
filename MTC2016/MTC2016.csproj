@@ -32,10 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Fare, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Fare.1.0.3\lib\net35\Fare.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Lime.Messaging, Version=0.4.95.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Lime.Messaging.0.4.95\lib\net461\Lime.Messaging.dll</HintPath>
       <Private>True</Private>

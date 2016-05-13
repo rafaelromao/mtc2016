@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using EntroBuilder;
 using Lime.Protocol;
 using Lime.Protocol.Serialization;
 using Newtonsoft.Json;
@@ -257,31 +256,6 @@ namespace Takenet.MessagingHub.Client.Tester
         public async Task SendMessageAsync(Document message)
         {
             await TestClient.SendMessageAsync(message, Application.Identifier);
-        }
-
-        public async Task SendMessageAsync<TReceiverType>()
-        {
-            var receiverName = typeof(TReceiverType).Name;
-            var receiverContentFilter = Application.MessageReceivers.SingleOrDefault(r => r.Type == receiverName)?.Content;
-            if (string.IsNullOrWhiteSpace(receiverContentFilter))
-                throw new ArgumentException($"Could not find a content filter expression for a receiver named {receiverName}!");
-
-            var randomReceiverMessage = GenerateRandomRegexMatch(receiverContentFilter);
-            await SendMessageAsync(randomReceiverMessage);
-        }
-
-        public string GenerateRandomRegexMatch(string pattern)
-        {
-            try
-            {
-                var builder = Builder.Create<string>();
-                builder = builder.For(Any.ValueLike(pattern));
-                return builder.Build();
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException($"Invalid regex pattern: {pattern}", e);
-            }
         }
 
         public async Task<Message> ReceiveMessageAsync(TimeSpan timeout = default(TimeSpan))

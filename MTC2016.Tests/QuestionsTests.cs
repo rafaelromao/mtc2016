@@ -6,7 +6,7 @@ using Shouldly;
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class QuestionsTests : TestBase<FakeQuestionReceiverTestsServiceProvider>
+    public class QuestionsTests : TestWith<QuestionMessageReceiverThatDoesNotParseImagesServiceProvider>
     {
         [Test]
         [TestCase("Fale me sobre o evento!")]

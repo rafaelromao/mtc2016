@@ -11,15 +11,27 @@ using Shouldly;
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class ScheduledRatingTests : TestBase<FakeRatingScheduleAndSubscriptionTestsServiceProvider>
+    public class MessageScheduleTests : TestWith<InMemorySubscriptionAndSingleFakeScheduleServiceProvider>
     {
         [Test]
-        public async Task ScheduledRatingIsExecuted()
+        public async Task ReceiveScheduledMessage()
+        {
+            var response = await Tester.ReceiveMessageAsync();
+            var answer = SchedulerExtensionWithSingleFakeSchedule.TestScheduleText;
+            Assert(response, answer);
+        }
+    }
+
+    [TestFixture]
+    public class RatingScheduleTests : TestWith<InMemorySubscriptionAndSingleFakeRatingScheduleServiceProvider>
+    {
+        [Test]
+        public async Task ReveiveScheduledRatingRequestAndAnswerIt()
         {
             var response = await Tester.ReceiveMessageAsync();
             var ratingOptions = response.Content as Select;
             ratingOptions.ShouldNotBeNull();
-            ratingOptions?.Text.ShouldStartWith(RatingTestSchedulerExtension.TestScheduleText);
+            ratingOptions?.Text.ShouldStartWith(SchedulerExtensionWithSingleFakeRatingSchedule.TestScheduleText);
             ratingOptions?.Options.Length.ShouldBe(5);
             ratingOptions?.Options.First().Text.ShouldBe(Settings.PrettyBadRating);
             ratingOptions?.Options.Last().Text.ShouldBe(Settings.PrettyGoodRating);

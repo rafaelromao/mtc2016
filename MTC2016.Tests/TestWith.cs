@@ -10,7 +10,7 @@ using Shouldly;
 
 namespace MTC2016.Tests
 {
-    public class TestBase<TServiceProvider>
+    public class TestWith<TServiceProvider>
         where TServiceProvider : IServiceProvider
     {
         protected ApplicationTester Tester { get; private set; }

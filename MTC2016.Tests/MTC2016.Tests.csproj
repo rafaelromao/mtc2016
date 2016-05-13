@@ -37,10 +37,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Fare, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\MTC2016\packages\Fare.1.0.3\lib\net35\Fare.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Lime.Messaging, Version=0.4.95.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\MTC2016\packages\Lime.Messaging.0.4.95\lib\net461\Lime.Messaging.dll</HintPath>
       <Private>True</Private>
@@ -88,18 +84,17 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Mocks\RatingTestSchedulerExtension.cs" />
-    <Compile Include="Mocks\TestQuestionMessageReceiver.cs" />
-    <Compile Include="Mocks\TestSchedulerExtension.cs" />
-    <Compile Include="Mocks\TestDistributionListExtension.cs" />
+    <Compile Include="Mocks\SchedulerExtensionWithSingleFakeRatingSchedule.cs" />
+    <Compile Include="Mocks\QuestionMessageReceiverThatDoesNotParseImages.cs" />
+    <Compile Include="Mocks\SchedulerExtensionWithSingleFakeSchedule.cs" />
+    <Compile Include="Mocks\InMemoryDistributionListExtension.cs" />
     <Compile Include="Mocks\TestServiceProvider.cs" />
     <Compile Include="FeedbackTests.cs" />
-    <Compile Include="ScheduledBroadcastTest.cs" />
     <Compile Include="QuestionsTests.cs" />
-    <Compile Include="ScheduledRatingTests.cs" />
-    <Compile Include="SubscriptionTests.cs" />
+    <Compile Include="RatingScheduleTests.cs" />
+    <Compile Include="InMemorySubscriptionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestBase.cs" />
+    <Compile Include="TestWith.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

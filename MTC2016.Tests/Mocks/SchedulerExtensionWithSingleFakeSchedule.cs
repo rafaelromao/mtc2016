@@ -14,14 +14,14 @@ using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.Tests.Mocks
 {
-    internal class TestSchedulerExtension : SchedulerExtension
+    internal class SchedulerExtensionWithSingleFakeSchedule : SchedulerExtension
     {
         public static DateTimeOffset TestScheduleTime { get; protected set; }
         public static string TestScheduleText { get; } = "TEST_SCHEDULED_MESSAGE";
 
         private readonly IDistributionListExtension _distributionListExtension;
 
-        public TestSchedulerExtension(IArtificialInteligenceExtension artificialInteligenceExtension,
+        public SchedulerExtensionWithSingleFakeSchedule(IArtificialInteligenceExtension artificialInteligenceExtension,
             IDistributionListExtension distributionListExtension,
             IJobScheduler jobScheduler, IMessagingHubSender sender, Settings settings)
             : base(artificialInteligenceExtension, jobScheduler, sender, settings)

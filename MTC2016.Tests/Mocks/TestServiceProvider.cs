@@ -1,5 +1,4 @@
-﻿using MTC2016.ArtificialInteligence;
-using MTC2016.Configuration;
+﻿using MTC2016.Configuration;
 using MTC2016.DistributionList;
 using MTC2016.Receivers;
 using MTC2016.Scheduler;
@@ -7,7 +6,7 @@ using Takenet.MessagingHub.Client.Tester;
 
 namespace MTC2016.Tests.Mocks
 {
-    public class TestsServiceProvider : ApplicationTesterServiceProvider
+    public class TestServiceProvider : ApplicationTesterServiceProvider
     {
         public static void RegisterTestService<TInterface, TClass>()
             where TInterface : class
@@ -17,29 +16,46 @@ namespace MTC2016.Tests.Mocks
         }
     }
 
-    public class FakeScheduleAndSubscriptionTestsServiceProvider : TestsServiceProvider
+    public class InMemorySubscriptionAndSingleFakeScheduleServiceProvider : TestServiceProvider
     {
-        static FakeScheduleAndSubscriptionTestsServiceProvider()
+        static InMemorySubscriptionAndSingleFakeScheduleServiceProvider()
         {
-            RegisterTestService<IDistributionListExtension, TestDistributionListExtension>();
-            RegisterTestService<ISchedulerExtension, TestSchedulerExtension>();
+            RegisterTestService<IDistributionListExtension, InMemoryDistributionListExtension>();
+            RegisterTestService<ISchedulerExtension, SchedulerExtensionWithSingleFakeSchedule>();
         }
     }
 
-    public class FakeRatingScheduleAndSubscriptionTestsServiceProvider : TestsServiceProvider
+    public class NoSubscriptionAndSingleFakeScheduleServiceProvider : TestServiceProvider
     {
-        static FakeRatingScheduleAndSubscriptionTestsServiceProvider()
+        static NoSubscriptionAndSingleFakeScheduleServiceProvider()
         {
-            RegisterTestService<IDistributionListExtension, TestDistributionListExtension>();
-            RegisterTestService<ISchedulerExtension, RatingTestSchedulerExtension>();
+            RegisterTestService<IDistributionListExtension, DummyTestDistributionListExtension>();
+            RegisterTestService<ISchedulerExtension, SchedulerExtensionWithSingleFakeSchedule>();
         }
     }
 
-    public class FakeQuestionReceiverTestsServiceProvider : TestsServiceProvider
+    public class InMemorySubscriptionServiceProvider : TestServiceProvider
     {
-        static FakeQuestionReceiverTestsServiceProvider()
+        static InMemorySubscriptionServiceProvider()
         {
-            RegisterTestService<QuestionMessageReceiver, TestQuestionMessageReceiver>();
+            RegisterTestService<IDistributionListExtension, InMemoryDistributionListExtension>();
+        }
+    }
+
+    public class InMemorySubscriptionAndSingleFakeRatingScheduleServiceProvider : TestServiceProvider
+    {
+        static InMemorySubscriptionAndSingleFakeRatingScheduleServiceProvider()
+        {
+            RegisterTestService<IDistributionListExtension, InMemoryDistributionListExtension>();
+            RegisterTestService<ISchedulerExtension, SchedulerExtensionWithSingleFakeRatingSchedule>();
+        }
+    }
+
+    public class QuestionMessageReceiverThatDoesNotParseImagesServiceProvider : TestServiceProvider
+    {
+        static QuestionMessageReceiverThatDoesNotParseImagesServiceProvider()
+        {
+            RegisterTestService<QuestionMessageReceiver, QuestionMessageReceiverThatDoesNotParseImages>();
         }
     }
 }
