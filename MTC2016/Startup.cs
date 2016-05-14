@@ -2,20 +2,24 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Lime.Protocol;
 using MTC2016.DistributionList;
 using MTC2016.Scheduler;
 using Takenet.MessagingHub.Client.Listener;
+using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016
 {
     public sealed class Startup : IStartable, IDisposable
     {
+        private readonly IMessagingHubSender _sender;
         private readonly ISchedulerExtension _schedulerExtension;
         private readonly IDistributionListExtension _distributionListExtension;
         private readonly ConsoleTraceListener _listener;
 
-        public Startup(ISchedulerExtension schedulerExtension, IDistributionListExtension distributionListExtension)
+        public Startup(IMessagingHubSender sender, ISchedulerExtension schedulerExtension, IDistributionListExtension distributionListExtension)
         {
+            _sender = sender;
             _schedulerExtension = schedulerExtension;
             _distributionListExtension = distributionListExtension;
             _listener = new ConsoleTraceListener(false);
@@ -24,6 +28,7 @@ namespace MTC2016
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            await UsersRepository.EnsureMtc2016IsADistributionListAsync(_sender, cancellationToken);
             await ScheduleScheduledMessagesAsync(cancellationToken);
         }
 

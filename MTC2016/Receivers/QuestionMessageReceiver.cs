@@ -15,18 +15,18 @@ namespace MTC2016.Receivers
     public class QuestionMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
-        private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
+        private readonly IApiAI _apiAi;
         private readonly Settings _settings;
         private readonly string _defaultAnswer;
 
-        public QuestionMessageReceiver(IMessagingHubSender sender, IArtificialInteligenceExtension artificialInteligenceExtension, Settings settings)
+        public QuestionMessageReceiver(IMessagingHubSender sender, IApiAI apiAi, Settings settings)
         {
             _sender = sender;
-            _artificialInteligenceExtension = artificialInteligenceExtension;
+            _apiAi = apiAi;
             _settings = settings;
             try
             {
-                _defaultAnswer = _artificialInteligenceExtension.GetAnswerAsync(_settings.CouldNotUnderstand).Result;
+                _defaultAnswer = _apiAi.GetAnswerAsync(_settings.CouldNotUnderstand).Result;
             }
             catch (Exception e)
             {
@@ -42,11 +42,11 @@ namespace MTC2016.Receivers
                 var question = message.Content?.ToString() ?? string.Empty;
                 var answer = !IsValidQuestion(question)
                     ? _defaultAnswer
-                    : await _artificialInteligenceExtension.GetAnswerAsync(question);
+                    : await _apiAi.GetAnswerAsync(question);
 
                 if (string.IsNullOrWhiteSpace(answer))
                 {
-                    answer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.Quote);
+                    answer = await _apiAi.GetAnswerAsync(_settings.Quote);
                 }
 
                 if (string.IsNullOrWhiteSpace(answer))

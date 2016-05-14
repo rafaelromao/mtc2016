@@ -11,11 +11,11 @@ namespace MTC2016.DistributionList
 {
     internal class DistributionListExtension : IDistributionListExtension
     {
-        private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
+        private readonly IUsersRepository _users;
 
-        public DistributionListExtension(IArtificialInteligenceExtension artificialInteligenceExtension, Settings settings)
+        public DistributionListExtension(IUsersRepository users, Settings settings)
         {
-            _artificialInteligenceExtension = artificialInteligenceExtension;
+            _users = users;
         }
 
         public async Task<bool> AddAsync(Identity recipient, CancellationToken cancellationToken)
@@ -25,7 +25,7 @@ namespace MTC2016.DistributionList
 
             try
             {
-                return await _artificialInteligenceExtension.AddUserAsync(recipient.ToNode());
+                return await _users.AddUserAsync(recipient.ToNode());
             }
             catch (Exception)
             {
@@ -35,17 +35,17 @@ namespace MTC2016.DistributionList
 
         public async Task<IEnumerable<Identity>> GetRecipientsAsync(CancellationToken cancellationToken)
         {
-            return await _artificialInteligenceExtension.GetUsersAsync();
+            return await _users.GetUsersAsync();
         }
 
         public async Task<bool> ContainsAsync(Identity recipient, CancellationToken cancellationToken)
         {
-            return await _artificialInteligenceExtension.ContainsUserAsync(recipient.ToNode());
+            return await _users.ContainsUserAsync(recipient.ToNode());
         }
 
         public async Task<bool> RemoveAsync(Identity recipient, CancellationToken cancellationToken)
         {
-            return await _artificialInteligenceExtension.RemoveUserAsync(recipient.ToNode());
+            return await _users.RemoveUserAsync(recipient.ToNode());
         }
     }
 }

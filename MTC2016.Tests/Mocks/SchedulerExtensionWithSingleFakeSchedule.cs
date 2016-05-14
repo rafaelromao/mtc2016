@@ -21,10 +21,10 @@ namespace MTC2016.Tests.Mocks
 
         private readonly IDistributionListExtension _distributionListExtension;
 
-        public SchedulerExtensionWithSingleFakeSchedule(IArtificialInteligenceExtension artificialInteligenceExtension,
+        public SchedulerExtensionWithSingleFakeSchedule(IApiAI apiAi,
             IDistributionListExtension distributionListExtension,
             IJobScheduler jobScheduler, IMessagingHubSender sender, Settings settings)
-            : base(artificialInteligenceExtension, jobScheduler, sender, settings)
+            : base(apiAi, jobScheduler, sender, settings)
         {
             _distributionListExtension = distributionListExtension;
         }

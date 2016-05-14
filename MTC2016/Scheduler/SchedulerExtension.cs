@@ -18,16 +18,16 @@ namespace MTC2016.Scheduler
 {
     public class SchedulerExtension : ISchedulerExtension, IDisposable
     {
-        private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
+        private readonly IApiAI _apiAi;
         private readonly IJobScheduler _jobScheduler;
         private readonly IMessagingHubSender _sender;
         private readonly Settings _settings;
         private readonly ObjectCache _cache;
 
-        public SchedulerExtension(IArtificialInteligenceExtension artificialInteligenceExtension, IJobScheduler jobScheduler, IMessagingHubSender sender, Settings settings)
+        public SchedulerExtension(IApiAI apiAi, IJobScheduler jobScheduler, IMessagingHubSender sender, Settings settings)
         {
             _cache = new MemoryCache(nameof(MTC2016));
-            _artificialInteligenceExtension = artificialInteligenceExtension;
+            _apiAi = apiAi;
             _jobScheduler = jobScheduler;
             _sender = sender;
             _settings = settings;
@@ -77,7 +77,7 @@ namespace MTC2016.Scheduler
         public virtual async Task<IEnumerable<ScheduledMessage>> GetScheduledMessagesAsync(CancellationToken cancellationToken)
         {
             var result = new List<ScheduledMessage>();
-            var intents = await _artificialInteligenceExtension.GetIntentsAsync();
+            var intents = await _apiAi.GetIntentsAsync();
             var schedulePrefix = _settings.SchedulePrefix;
             var schedules = intents.Where(i => i.Name.StartsWith(schedulePrefix));
             // Ignore expired schedules
@@ -85,7 +85,7 @@ namespace MTC2016.Scheduler
                 schedules.Where(s => DateTimeOffset.Parse(s.Name.Substring(schedulePrefix.Length)) >= DateTime.Now);
             foreach (var schedule in schedules)
             {
-                var text = (await _artificialInteligenceExtension.GetIntentAsync(schedule.Id)).Responses.First().Speech;
+                var text = (await _apiAi.GetIntentAsync(schedule.Id)).Responses.First().Speech;
                 var ratingOptions = ExtractRatingFromText(text);
                 if (ratingOptions != null)
                 {
@@ -128,11 +128,11 @@ namespace MTC2016.Scheduler
                 Text = text,
                 Options = new SelectOption[]
                 {
-                    CreateRatingOption(toBeRated, _settings.PrettyBadRating),
+                    //CreateRatingOption(toBeRated, _settings.PrettyBadRating),
                     CreateRatingOption(toBeRated, _settings.BadRating),
                     CreateRatingOption(toBeRated, _settings.RegularRating),
                     CreateRatingOption(toBeRated, _settings.GoodRating),
-                    CreateRatingOption(toBeRated, _settings.PrettyGoodRating)
+                    //CreateRatingOption(toBeRated, _settings.PrettyGoodRating)
                 }
             };
             return select;

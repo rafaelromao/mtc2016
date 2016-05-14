@@ -10,21 +10,21 @@ using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.Receivers
 {
-    public class ImageMessageReceiver : IMessageReceiver
+    public class ImageJpgMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
-        private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
+        private readonly IApiAI _apiAi;
         private readonly Settings _settings;
         private readonly string _imageAnswer;
 
-        public ImageMessageReceiver(IMessagingHubSender sender, IArtificialInteligenceExtension artificialInteligenceExtension, Settings settings)
+        public ImageJpgMessageReceiver(IMessagingHubSender sender, IApiAI apiAi, Settings settings)
         {
             _sender = sender;
-            _artificialInteligenceExtension = artificialInteligenceExtension;
+            _apiAi = apiAi;
             _settings = settings;
             try
             {
-                _imageAnswer = _artificialInteligenceExtension.GetAnswerAsync(_settings.ImageConfirmation).Result;
+                _imageAnswer = _apiAi.GetAnswerAsync(_settings.ImageConfirmation).Result;
             }
             catch (Exception e)
             {
@@ -36,6 +36,20 @@ namespace MTC2016.Receivers
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
         {
              await _sender.SendMessageAsync(_imageAnswer, message.From, cancellationToken);
+        }
+    }
+
+    internal class ImageJpgJpegMessageReceiver : ImageJpgMessageReceiver
+    {
+        public ImageJpgJpegMessageReceiver(IMessagingHubSender sender, IApiAI apiAi, Settings settings) : base(sender, apiAi, settings)
+        {
+        }
+    }
+
+    internal class ImageJpgPngMessageReceiver : ImageJpgMessageReceiver
+    {
+        public ImageJpgPngMessageReceiver(IMessagingHubSender sender, IApiAI apiAi, Settings settings) : base(sender, apiAi, settings)
+        {
         }
     }
 }

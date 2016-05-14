@@ -14,7 +14,7 @@ namespace MTC2016.Receivers
     public class UnsubscribeMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
-        private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
+        private readonly IApiAI _apiAi;
         private readonly IDistributionListExtension _distributionListExtension;
         private readonly Settings _settings;
         private string _defaultAnswer;
@@ -22,11 +22,11 @@ namespace MTC2016.Receivers
         private string _notSubscribed;
         private string _unsubscriptionFailed;
 
-        public UnsubscribeMessageReceiver(IMessagingHubSender sender, IArtificialInteligenceExtension artificialInteligenceExtension,
+        public UnsubscribeMessageReceiver(IMessagingHubSender sender, IApiAI apiAi,
             IDistributionListExtension distributionListExtension, Settings settings)
         {
             _sender = sender;
-            _artificialInteligenceExtension = artificialInteligenceExtension;
+            _apiAi = apiAi;
             _distributionListExtension = distributionListExtension;
             _settings = settings;
             try
@@ -42,10 +42,10 @@ namespace MTC2016.Receivers
 
         private async Task InitializeDefaultAnswersAsync()
         {
-            _defaultAnswer = await _artificialInteligenceExtension.GetAnswerAsync(_settings.CouldNotUnderstand);
-            _confirmUnsubscription = await _artificialInteligenceExtension.GetAnswerAsync(_settings.ConfirmSubscriptionCancellation);
-            _notSubscribed = await _artificialInteligenceExtension.GetAnswerAsync(_settings.NotSubscribed);
-            _unsubscriptionFailed = await _artificialInteligenceExtension.GetAnswerAsync(_settings.UnsubscriptionFailed);
+            _defaultAnswer = await _apiAi.GetAnswerAsync(_settings.CouldNotUnderstand);
+            _confirmUnsubscription = await _apiAi.GetAnswerAsync(_settings.ConfirmSubscriptionCancellation);
+            _notSubscribed = await _apiAi.GetAnswerAsync(_settings.NotSubscribed);
+            _unsubscriptionFailed = await _apiAi.GetAnswerAsync(_settings.UnsubscriptionFailed);
         }
 
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)

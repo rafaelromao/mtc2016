@@ -13,18 +13,18 @@ namespace MTC2016.Receivers
     public class FeedbackMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
-        private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
+        private readonly IApiAI _apiAi;
         private readonly Settings _settings;
         private readonly string _feedbackAnswer;
 
-        public FeedbackMessageReceiver(IMessagingHubSender sender, IArtificialInteligenceExtension artificialInteligenceExtension, Settings settings)
+        public FeedbackMessageReceiver(IMessagingHubSender sender, IApiAI apiAi, Settings settings)
         {
             _sender = sender;
-            _artificialInteligenceExtension = artificialInteligenceExtension;
+            _apiAi = apiAi;
             _settings = settings;
             try
             {
-                _feedbackAnswer = _artificialInteligenceExtension.GetAnswerAsync(_settings.FeedbackConfirmation).Result;
+                _feedbackAnswer = _apiAi.GetAnswerAsync(_settings.FeedbackConfirmation).Result;
             }
             catch (Exception e)
             {
@@ -40,7 +40,7 @@ namespace MTC2016.Receivers
             var from = message.From.ToNode().ToString();
             var feedbackId = CreateFeedbackId(_settings, from, DateTime.Now);
 
-            var ok = await _artificialInteligenceExtension.AddFeedbackAsync(feedbackId, feedback);
+            var ok = await _apiAi.AddFeedbackAsync(feedbackId, feedback);
             if (ok)
             {
                 await _sender.SendMessageAsync(_feedbackAnswer, message.From, cancellationToken);

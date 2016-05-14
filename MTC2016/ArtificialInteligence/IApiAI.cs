@@ -5,7 +5,7 @@ using MTC2016.Scheduler;
 
 namespace MTC2016.ArtificialInteligence
 {
-    public interface IArtificialInteligenceExtension
+    public interface IApiAI
     {
         Task<string> GetAnswerAsync(string question);
         Task<IEnumerable<Intent>> GetIntentsAsync();
@@ -13,10 +13,10 @@ namespace MTC2016.ArtificialInteligence
         Task<bool> AddIntentAsync(Intent intent);
         Task<bool> DeleteIntent(string intentQuestion);
 
-        Task<IEnumerable<Node>> GetUsersAsync();
-        Task<bool> ContainsUserAsync(Node user);
-        Task<bool> RemoveUserAsync(Node user);
-        Task<bool> AddUserAsync(Node user);
+        //Task<IEnumerable<Node>> GetUsersAsync();
+        //Task<bool> ContainsUserAsync(Node user);
+        //Task<bool> RemoveUserAsync(Node user);
+        //Task<bool> AddUserAsync(Node user);
         Task<bool> AddFeedbackAsync(string feedbackId, string feedback);
     }
 }

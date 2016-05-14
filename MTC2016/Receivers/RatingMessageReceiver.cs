@@ -15,18 +15,18 @@ namespace MTC2016.Receivers
     public class RatingMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
-        private readonly IArtificialInteligenceExtension _artificialInteligenceExtension;
+        private readonly IApiAI _apiAi;
         private readonly Settings _settings;
         private readonly string _ratingConfirmation;
         private readonly string _ratingFailed;
 
-        public RatingMessageReceiver(IMessagingHubSender sender, IArtificialInteligenceExtension artificialInteligenceExtension, Settings settings)
+        public RatingMessageReceiver(IMessagingHubSender sender, IApiAI apiAi, Settings settings)
         {
             _sender = sender;
-            _artificialInteligenceExtension = artificialInteligenceExtension;
+            _apiAi = apiAi;
             _settings = settings;
-            _ratingConfirmation = _artificialInteligenceExtension.GetAnswerAsync(_settings.RatingConfirmation).Result;
-            _ratingFailed = _artificialInteligenceExtension.GetAnswerAsync(_settings.RatingFailed).Result;
+            _ratingConfirmation = _apiAi.GetAnswerAsync(_settings.RatingConfirmation).Result;
+            _ratingFailed = _apiAi.GetAnswerAsync(_settings.RatingFailed).Result;
         }
 
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
@@ -35,7 +35,7 @@ namespace MTC2016.Receivers
             var from = message.From.ToNode().ToString();
             var ratingId = CreateRatingId(_settings, from, DateTime.Now);
 
-            var ok = await _artificialInteligenceExtension.AddFeedbackAsync(ratingId, ratting);
+            var ok = await _apiAi.AddFeedbackAsync(ratingId, ratting);
             if (ok)
             {
                 await _sender.SendMessageAsync(_ratingConfirmation, message.From, cancellationToken);

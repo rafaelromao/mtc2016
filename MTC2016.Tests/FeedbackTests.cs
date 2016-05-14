@@ -20,15 +20,15 @@ namespace MTC2016.Tests
             var currentMinute = DateTime.Now;
             await Tester.SendMessageAsync(feedback);
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.FeedbackConfirmation);
+            var answer = await ApiAi.GetAnswerAsync(Settings.FeedbackConfirmation);
             Assert(response, answer);
 
             var from = new Node(Tester.TesterIdentifier, "msging.net", null).ToString();
             var feedbackIntent = FeedbackMessageReceiver.CreateFeedbackId(Settings, from, currentMinute).Replace("_", " ");
-            var storedFeedback = await ArtificialInteligenceExtension.GetAnswerAsync(feedbackIntent);
+            var storedFeedback = await ApiAi.GetAnswerAsync(feedbackIntent);
             Assert(storedFeedback, feedback.Replace("#", ""));
 
-            var deleted = await ArtificialInteligenceExtension.DeleteIntent(feedbackIntent);
+            var deleted = await ApiAi.DeleteIntent(feedbackIntent);
             Assert(deleted.ToString(), true.ToString());
         }
     }

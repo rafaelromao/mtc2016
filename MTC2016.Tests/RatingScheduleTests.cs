@@ -32,23 +32,23 @@ namespace MTC2016.Tests
             var ratingOptions = response.Content as Select;
             ratingOptions.ShouldNotBeNull();
             ratingOptions?.Text.ShouldStartWith(SchedulerExtensionWithSingleFakeRatingSchedule.TestScheduleText);
-            ratingOptions?.Options.Length.ShouldBe(5);
-            ratingOptions?.Options.First().Text.ShouldBe(Settings.PrettyBadRating);
-            ratingOptions?.Options.Last().Text.ShouldBe(Settings.PrettyGoodRating);
+            ratingOptions?.Options.Length.ShouldBe(3);
+            ratingOptions?.Options.First().Text.ShouldBe(Settings.BadRating);
+            ratingOptions?.Options.Last().Text.ShouldBe(Settings.GoodRating);
 
             var currentMinute = DateTime.Now;
             var rating = ((PlainText)ratingOptions?.Options.First().Value)?.Text;
             await Tester.SendMessageAsync(rating);
             response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.RatingConfirmation);
+            var answer = await ApiAi.GetAnswerAsync(Settings.RatingConfirmation);
             Assert(response, answer);
 
             var from = new Node(Tester.TesterIdentifier, "msging.net", null).ToString();
             var ratingIntent = RatingMessageReceiver.CreateRatingId(Settings, from, currentMinute).Replace("_", " ");
-            var storedRating = await ArtificialInteligenceExtension.GetAnswerAsync(ratingIntent);
+            var storedRating = await ApiAi.GetAnswerAsync(ratingIntent);
             Assert(storedRating, rating?.ToLower());
 
-            var deleted = await ArtificialInteligenceExtension.DeleteIntent(ratingIntent);
+            var deleted = await ApiAi.DeleteIntent(ratingIntent);
             Assert(deleted.ToString(), true.ToString());
         }
     }

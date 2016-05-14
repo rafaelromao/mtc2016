@@ -15,7 +15,7 @@ namespace MTC2016.Tests
     {
         protected ApplicationTester Tester { get; private set; }
 
-        protected IArtificialInteligenceExtension ArtificialInteligenceExtension { get; private set; }
+        protected IApiAI ApiAi { get; private set; }
 
         protected Settings Settings { get; private set; }
 
@@ -24,7 +24,7 @@ namespace MTC2016.Tests
         {
             Tester = CreateApplicationTester<TServiceProvider>();
             Tester.StartAsync().Wait();
-            ArtificialInteligenceExtension = Tester.GetService<IArtificialInteligenceExtension>();
+            ApiAi = Tester.GetService<IApiAI>();
             Settings = Tester.GetService<Settings>();
         }
 

@@ -16,7 +16,7 @@ namespace MTC2016.Tests
         {
             await Tester.SendMessageAsync(intent);
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(intent);
+            var answer = await ApiAi.GetAnswerAsync(intent);
             Assert(response, answer);
         }
 
@@ -26,7 +26,7 @@ namespace MTC2016.Tests
         {
             await Tester.SendMessageAsync(intent);
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(intent);
+            var answer = await ApiAi.GetAnswerAsync(intent);
             Assert(response, answer);
         }
 
@@ -45,7 +45,7 @@ namespace MTC2016.Tests
         {
             await Tester.SendMessageAsync(intent);
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(intent);
+            var answer = await ApiAi.GetAnswerAsync(intent);
             Assert(response, answer);
         }
 
@@ -57,7 +57,7 @@ namespace MTC2016.Tests
         {
             await Tester.SendMessageAsync(intent);
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(intent);
+            var answer = await ApiAi.GetAnswerAsync(intent);
             Assert(response, answer);
         }
     }

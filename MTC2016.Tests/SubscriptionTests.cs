@@ -14,7 +14,7 @@ namespace MTC2016.Tests
         {
             await Tester.SendMessageAsync("entrar");
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.AlreadySubscribed);
+            var answer = await ApiAi.GetAnswerAsync(Settings.AlreadySubscribed);
             Assert(response, answer);
         }
 
@@ -23,7 +23,7 @@ namespace MTC2016.Tests
         {
             await Tester.SendMessageAsync("Mudei de idéia, quero cancelar");
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.ConfirmSubscriptionCancellation);
+            var answer = await ApiAi.GetAnswerAsync(Settings.ConfirmSubscriptionCancellation);
             Assert(response, answer);
         }
 
@@ -37,7 +37,7 @@ namespace MTC2016.Tests
         {
             await Tester.SendMessageAsync("Gostaria de participar!");
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.ConfirmSubscription);
+            var answer = await ApiAi.GetAnswerAsync(Settings.ConfirmSubscription);
             Assert(response, answer);
         }
 
@@ -46,7 +46,7 @@ namespace MTC2016.Tests
         {
             await Tester.SendMessageAsync("desistir!");
             var response = await Tester.ReceiveMessageAsync();
-            var answer = await ArtificialInteligenceExtension.GetAnswerAsync(Settings.NotSubscribed);
+            var answer = await ApiAi.GetAnswerAsync(Settings.NotSubscribed);
             Assert(response, answer);
         }
     }
