@@ -132,76 +132,38 @@ namespace MTC2016.ArtificialInteligence
             return response.StatusCode == HttpStatusCode.OK;
         }
 
-        public async Task<bool> AddFeedbackAsync(string feedbackId, string feedback)
-        {
-            var intent = new Intent
-            {
-                Name = feedbackId,
-                Templates = new []
-                {
-                    feedbackId
-                },
-                UserSays = new []
-                {
-                    new UserSays
-                    {
-                        Data = new []
-                        {
-                            new UserSaysData
-                            {
-                                Text = feedbackId.Replace("_", " ")
-                            }
-                        },
-                        IsTemplate = false
-                    }
-                },
-                Responses = new[]
-                {
-                    new IntentResponse
-                    {
-                        Speech = feedback.Replace("#", "")
-                    }
-                }
-            };
-            return await AddIntentAsync(intent);
-        }
-
-        //public async Task<bool> AddUserAsync(Node user)
+        //public async Task<bool> AddFeedbackAsync(string feedbackId, string feedback)
         //{
-        //    var entries = new[] { Settings.EncodeIdentity(user.ToNode().ToString()) };
-
-        //    var uri = new Uri($"{Settings.ApiAiUri}/entities/{Settings.UsersEntity}/entries");
-        //    var json = JsonConvert.SerializeObject(entries, JsonSerializerSettings);
-        //    var response = await _httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, MediaType));
-        //    return response.StatusCode == HttpStatusCode.OK;
-        //}
-
-        //public async Task<IEnumerable<Node>> GetUsersAsync()
-        //{
-        //    var entries = await GetEntityEntriesAsync(Settings.UsersEntity);
-        //    var users = entries.Select(e => e.ToIdentity(Settings));
-        //    return users;
-        //}
-
-        //public async Task<bool> ContainsUserAsync(Node user)
-        //{
-        //    var users = await GetUsersAsync();
-        //    return users.Any(u => u.Equals(user));
-        //}
-
-        //public async Task<bool> RemoveUserAsync(Node user)
-        //{
-        //    var entries = new[] { Settings.EncodeIdentity(user.ToNode().ToString()) };
-
-        //    var uri = new Uri($"{Settings.ApiAiUri}/entities/{Settings.UsersEntity}/entries");
-        //    var json = JsonConvert.SerializeObject(entries, JsonSerializerSettings);
-        //    var response = await _httpClient.SendAsync(new HttpRequestMessage
+        //    var intent = new Intent
         //    {
-        //        Method = HttpMethod.Delete,
-        //        RequestUri = uri,
-        //        Content = new StringContent(json, Encoding.UTF8, MediaType)
-        //    });
-        //    return response.StatusCode == HttpStatusCode.OK;
+        //        Name = feedbackId,
+        //        Templates = new []
+        //        {
+        //            feedbackId
+        //        },
+        //        UserSays = new []
+        //        {
+        //            new UserSays
+        //            {
+        //                Data = new []
+        //                {
+        //                    new UserSaysData
+        //                    {
+        //                        Text = feedbackId.Replace("_", " ")
+        //                    }
+        //                },
+        //                IsTemplate = false
+        //            }
+        //        },
+        //        Responses = new[]
+        //        {
+        //            new IntentResponse
+        //            {
+        //                Speech = feedback.Replace("#", "")
+        //            }
+        //        }
+        //    };
+        //    return await AddIntentAsync(intent);
         //}
 
         public void Dispose()

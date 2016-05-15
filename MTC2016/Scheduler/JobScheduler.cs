@@ -1,33 +1,39 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Lime.Protocol;
+using Takenet.Iris.Application.Scheduler.Resources;
+using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.Scheduler
 {
     public class JobScheduler : IJobScheduler
     {
+        internal static Node Scheduler => Node.Parse("postmaster@scheduler.msging.net");
+
+        private readonly IMessagingHubSender _sender;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-        public Task ScheduleAsync(Action action, DateTimeOffset time, CancellationToken cancellationToken)
+        public JobScheduler(IMessagingHubSender sender)
         {
-            var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_cancellationTokenSource.Token, cancellationToken);
+            _sender = sender;
+        }
 
-            Task.Run(async () =>
+        public Task ScheduleAsync(Message message, DateTimeOffset time, CancellationToken cancellationToken)
+        {
+            var command = new Command(Guid.NewGuid().ToString())
             {
-                while (true)
+                To = Scheduler,
+                Method = CommandMethod.Set,
+                Uri = new LimeUri("/schedules"),
+                Resource = new Schedule
                 {
-                    if (cancellationTokenSource.IsCancellationRequested)
-                        break;
-                    if (DateTime.Now > time)
-                    {
-                        action();
-                        break;
-                    }
-                    await Task.Delay(TimeSpan.FromMinutes(1), cancellationTokenSource.Token);
+                    Message = message,
+                    When = time
                 }
-            }, cancellationTokenSource.Token);
+            };
+            return _sender.SendCommandAsync(command, cancellationToken);
 
-            return Task.CompletedTask;
         }
 
         public void Dispose()

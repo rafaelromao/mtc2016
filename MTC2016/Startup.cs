@@ -34,10 +34,7 @@ namespace MTC2016
 
         private async Task ScheduleScheduledMessagesAsync(CancellationToken cancellationToken)
         {
-            await _schedulerExtension.ScheduleAsync(
-                async () => await _distributionListExtension.GetRecipientsAsync(cancellationToken),
-                await _schedulerExtension.GetScheduledMessagesAsync(cancellationToken),
-                cancellationToken);
+            await _schedulerExtension.UpdateSchedulesAsync(cancellationToken);
         }
 
         public void Dispose()

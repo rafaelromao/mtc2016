@@ -13,10 +13,6 @@ namespace MTC2016.ArtificialInteligence
         Task<bool> AddIntentAsync(Intent intent);
         Task<bool> DeleteIntent(string intentQuestion);
 
-        //Task<IEnumerable<Node>> GetUsersAsync();
-        //Task<bool> ContainsUserAsync(Node user);
-        //Task<bool> RemoveUserAsync(Node user);
-        //Task<bool> AddUserAsync(Node user);
-        Task<bool> AddFeedbackAsync(string feedbackId, string feedback);
+        //Task<bool> AddFeedbackAsync(string feedbackId, string feedback);
     }
 }

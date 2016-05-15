@@ -30,7 +30,7 @@ namespace MTC2016.DistributionList
 
         public async Task<IEnumerable<Identity>> GetUsersAsync()
         {
-            var command = new Command(Guid.NewGuid())
+            var command = new Command(Guid.NewGuid().ToString())
             {
                 To = Broadcaster,
                 Uri = new LimeUri($"/lists/{Mtc2016}/recipients"),
@@ -44,7 +44,7 @@ namespace MTC2016.DistributionList
 
         public async Task<bool> ContainsUserAsync(Identity user)
         {
-            var command = new Command(Guid.NewGuid())
+            var command = new Command(Guid.NewGuid().ToString())
             {
                 To = Broadcaster,
                 Uri = new LimeUri($"/lists/{Mtc2016}/recipients/{user}"),
@@ -56,7 +56,7 @@ namespace MTC2016.DistributionList
 
         public async Task<bool> RemoveUserAsync(Identity user)
         {
-            var command = new Command(Guid.NewGuid())
+            var command = new Command(Guid.NewGuid().ToString())
             {
                 To = Broadcaster,
                 Method = CommandMethod.Delete,
@@ -68,7 +68,7 @@ namespace MTC2016.DistributionList
 
         internal static Task EnsureMtc2016IsADistributionListAsync(IMessagingHubSender sender, CancellationToken cancellationToken)
         {
-            var command = new Command(Guid.NewGuid())
+            var command = new Command(Guid.NewGuid().ToString())
             {
                 To = Broadcaster,
                 Method = CommandMethod.Set,
@@ -83,7 +83,7 @@ namespace MTC2016.DistributionList
 
         private async Task<Command> UpdateUsersAsync(IdentityDocument[] items)
         {
-            var command = new Command(Guid.NewGuid())
+            var command = new Command(Guid.NewGuid().ToString())
             {
                 To = Broadcaster,
                 Method = CommandMethod.Set,

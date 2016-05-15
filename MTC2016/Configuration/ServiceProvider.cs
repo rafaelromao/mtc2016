@@ -1,6 +1,7 @@
 using System;
 using MTC2016.ArtificialInteligence;
 using MTC2016.DistributionList;
+using MTC2016.Receivers;
 using MTC2016.Scheduler;
 using SimpleInjector;
 using Takenet.MessagingHub.Client.Host;
@@ -25,6 +26,10 @@ namespace MTC2016.Configuration
 
             Container.RegisterSingleton<IRecipientsRepository, RecipientsRepository>();
             Container.RegisterSingleton<IDistributionListExtension, DistributionListExtension>();
+
+            Container.RegisterSingleton<IFeedbackRepository, FeedbackRepository>();
+
+            Container.RegisterSingleton<IFeedbackSet, FeedbackSet>();
         }
 
         public object GetService(Type serviceType)

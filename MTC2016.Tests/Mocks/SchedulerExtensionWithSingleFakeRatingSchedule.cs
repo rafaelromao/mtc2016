@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Lime.Messaging.Contents;
 using Lime.Protocol;
-using Lime.Protocol.Serialization;
 using MTC2016.ArtificialInteligence;
 using MTC2016.Configuration;
 using MTC2016.DistributionList;
@@ -29,19 +28,18 @@ namespace MTC2016.Tests.Mocks
             _distributionListExtension = distributionListExtension;
         }
 
-        public override async Task ScheduleAsync(Func<Task<IEnumerable<Identity>>> recipients,
-            IEnumerable<ScheduledMessage> scheduledMessages, CancellationToken cancellationToken)
+        protected override async Task ScheduleAsync(IEnumerable<ScheduledMessage> messagesToBeScheduled, CancellationToken cancellationToken)
         {
             await _distributionListExtension.AddAsync(Identity.Parse("mtc2016$tester@msging.net"), cancellationToken);
 
-            await base.ScheduleAsync(recipients, scheduledMessages, cancellationToken);
+            await base.ScheduleAsync(messagesToBeScheduled, cancellationToken);
         }
 
-        public override async Task<IEnumerable<ScheduledMessage>> GetScheduledMessagesAsync(CancellationToken cancellationToken)
+        protected override async Task<IEnumerable<ScheduledMessage>> GetMessagesToBeScheduled(CancellationToken cancellationToken)
         {
             TestScheduleTime = DateTimeOffset.Now;
 
-            var result = await base.GetScheduledMessagesAsync(CancellationToken.None);
+            var result = await base.GetMessagesToBeScheduled(CancellationToken.None);
             result = result.Where(s => s.Message is Select).Take(1);
             result.ForEach(s =>
             {

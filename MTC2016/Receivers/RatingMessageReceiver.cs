@@ -1,8 +1,6 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Lime.Messaging.Contents;
 using Lime.Protocol;
 using MTC2016.ArtificialInteligence;
 using MTC2016.Configuration;
@@ -15,41 +13,47 @@ namespace MTC2016.Receivers
     public class RatingMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
-        private readonly IApiAiForStaticContent _apiAi;
+        private readonly IFeedbackRepository _feedbackRepository;
         private readonly Settings _settings;
         private readonly string _ratingConfirmation;
         private readonly string _ratingFailed;
 
-        public RatingMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, Settings settings)
+        public RatingMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, IFeedbackRepository feedbackRepository, Settings settings)
         {
             _sender = sender;
-            _apiAi = apiAi;
+            _feedbackRepository = feedbackRepository;
             _settings = settings;
-            _ratingConfirmation = _apiAi.GetAnswerAsync(_settings.RatingConfirmation).Result;
-            _ratingFailed = _apiAi.GetAnswerAsync(_settings.RatingFailed).Result;
+            try
+            {
+                _ratingConfirmation = apiAi.GetAnswerAsync(_settings.RatingConfirmation).Result;
+                _ratingFailed = apiAi.GetAnswerAsync(_settings.RatingFailed).Result;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception when querying for {_settings.FeedbackConfirmation}: {e}");
+            }
         }
 
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
         {
-            var ratting = message.Content?.ToString().ToLower() ?? string.Empty;
-            var from = message.From.ToNode().ToString();
-            var ratingId = CreateRatingId(_settings, from, DateTime.Now);
+            var text = message.Content?.ToString().ToLower() ?? string.Empty;
+            var feedback = new Feedback
+            {
+                From = message.From,
+                When = DateTimeOffset.Now,
+                Text = text,
+                Type = FeedbackType.Rating
+            };
 
-            var ok = await _apiAi.AddFeedbackAsync(ratingId, ratting);
+            var ok = await _feedbackRepository.AddFeedbackAsync(feedback);
             if (ok)
             {
                 await _sender.SendMessageAsync(_ratingConfirmation, message.From, cancellationToken);
             }
             else
             {
-                await _sender.SendMessageAsync(_settings.FeedbackFailed, message.From, cancellationToken);
+                await _sender.SendMessageAsync(_ratingFailed, message.From, cancellationToken);
             }
-        }
-
-        public static string CreateRatingId(Settings settings, string from, DateTime time)
-        {
-            from = settings.EncodeIdentity(from);
-            return $"{settings.RatingPrefix}from_{from}_at_{time.ToString("yyyyMMddhhmm")}";
         }
     }
 }

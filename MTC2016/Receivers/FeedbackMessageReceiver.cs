@@ -13,18 +13,20 @@ namespace MTC2016.Receivers
     public class FeedbackMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
-        private readonly IApiAiForStaticContent _apiAi;
+        private readonly IFeedbackRepository _feedbackRepository;
         private readonly Settings _settings;
         private readonly string _feedbackAnswer;
+        private readonly string _feedbackFailed;
 
-        public FeedbackMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, Settings settings)
+        public FeedbackMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, IFeedbackRepository feedbackRepository, Settings settings)
         {
             _sender = sender;
-            _apiAi = apiAi;
+            _feedbackRepository = feedbackRepository;
             _settings = settings;
             try
             {
-                _feedbackAnswer = _apiAi.GetAnswerAsync(_settings.FeedbackConfirmation).Result;
+                _feedbackAnswer = apiAi.GetAnswerAsync(_settings.FeedbackConfirmation).Result;
+                _feedbackFailed = apiAi.GetAnswerAsync(_settings.FeedbackFailed).Result;
             }
             catch (Exception e)
             {
@@ -35,26 +37,25 @@ namespace MTC2016.Receivers
 
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
         {
-            var feedback = message.Content?.ToString() ?? string.Empty;
+            var text = message.Content?.ToString() ?? string.Empty;
 
-            var from = message.From.ToNode().ToString();
-            var feedbackId = CreateFeedbackId(_settings, from, DateTime.Now);
+            var feedback = new Feedback
+            {
+                From = message.From,
+                When = DateTimeOffset.Now,
+                Text = text,
+                Type = FeedbackType.Comment
+            };
 
-            var ok = await _apiAi.AddFeedbackAsync(feedbackId, feedback);
+            var ok = await _feedbackRepository.AddFeedbackAsync(feedback);
             if (ok)
             {
                 await _sender.SendMessageAsync(_feedbackAnswer, message.From, cancellationToken);
             }
             else
             {
-                await _sender.SendMessageAsync(_settings.FeedbackFailed, message.From, cancellationToken);
+                await _sender.SendMessageAsync(_feedbackFailed, message.From, cancellationToken);
             }
-        }
-
-        public static string CreateFeedbackId(Settings settings, string from, DateTime time)
-        {
-            from = settings.EncodeIdentity(from);
-            return $"{settings.FeedbackPrefix}from_{from}_at_{time.ToString("yyyyMMddhhmm")}";
         }
     }
 }

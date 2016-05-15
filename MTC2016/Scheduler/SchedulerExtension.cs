@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
@@ -8,10 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Lime.Messaging.Contents;
 using Lime.Protocol;
-using Lime.Protocol.Serialization.Newtonsoft;
 using MTC2016.ArtificialInteligence;
 using MTC2016.Configuration;
-using Newtonsoft.Json;
+using MTC2016.DistributionList;
 using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.Scheduler
@@ -33,48 +31,22 @@ namespace MTC2016.Scheduler
             _settings = settings;
         }
 
-        public virtual async Task ScheduleAsync(
-            Func<Task<IEnumerable<Identity>>> recipients,
-            IEnumerable<ScheduledMessage> scheduledMessages,
-            CancellationToken cancellationToken)
+        protected virtual async Task ScheduleAsync(IEnumerable<ScheduledMessage> messagesToBeScheduled, CancellationToken cancellationToken)
         {
-            foreach (var group in scheduledMessages.GroupBy(s => s.Time))
+            foreach (var messageToBeScheduled in messagesToBeScheduled)
             {
-                var schedule = new Schedule
+                var message = new Message
                 {
-                    Recipients = recipients,
-                    ScheduledMessages = group
+                    Id = Guid.NewGuid().ToString(),
+                    Content = messageToBeScheduled.Message,
+                    To = RecipientsRepository.Mtc2016.ToNode()
                 };
 
-                await _jobScheduler.ScheduleAsync(async () => await SendScheduledMessagesAsync(schedule), group.Key, cancellationToken);
+                await _jobScheduler.ScheduleAsync(message, messageToBeScheduled.Time, cancellationToken);
             }
         }
 
-        private async Task SendScheduledMessagesAsync(Schedule schedule)
-        {
-            foreach (var recipient in await schedule.Recipients())
-            {
-                foreach (var scheduledMessage in schedule.ScheduledMessages)
-                {
-                    var message = new Message
-                    {
-                        Id = Guid.NewGuid(),
-                        Content = scheduledMessage.Message,
-                        To = recipient.ToNode()
-                    };
-
-                    // Avoid sending the same message twice within the same minute
-                    if (!_cache.Contains(message.ToKey()))
-                    {
-                        Console.WriteLine($"{message} -> {recipient}");
-                        await _sender.SendMessageAsync(message);
-                        _cache.Add(message.ToKey(), message, DateTimeOffset.Now.AddMinutes(1));
-                    }
-                }
-            }
-        }
-
-        public virtual async Task<IEnumerable<ScheduledMessage>> GetScheduledMessagesAsync(CancellationToken cancellationToken)
+        protected virtual async Task<IEnumerable<ScheduledMessage>> GetMessagesToBeScheduled(CancellationToken cancellationToken)
         {
             var result = new List<ScheduledMessage>();
             var intents = await _apiAi.GetIntentsAsync();
@@ -109,6 +81,11 @@ namespace MTC2016.Scheduler
             return result;
         }
 
+        public async Task UpdateSchedulesAsync(CancellationToken cancellationToken)
+        {
+            await ScheduleAsync(await GetMessagesToBeScheduled(cancellationToken), cancellationToken);
+        }
+
         private Select ExtractRatingFromText(string text)
         {
             var match = Regex.Match(text, "\\[(.*?)\\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -126,13 +103,11 @@ namespace MTC2016.Scheduler
             var select = new Select
             {
                 Text = text,
-                Options = new SelectOption[]
+                Options = new[]
                 {
-                    //CreateRatingOption(toBeRated, _settings.PrettyBadRating),
                     CreateRatingOption(toBeRated, _settings.BadRating),
                     CreateRatingOption(toBeRated, _settings.RegularRating),
                     CreateRatingOption(toBeRated, _settings.GoodRating),
-                    //CreateRatingOption(toBeRated, _settings.PrettyGoodRating)
                 }
             };
             return select;
@@ -142,7 +117,8 @@ namespace MTC2016.Scheduler
         {
             return new SelectOption
             {
-                Text = rating, Value = new PlainText { Text = $"{_settings.RatingPrefix}{toBeRated}:{rating}" }
+                Text = rating,
+                Value = new PlainText { Text = $"{_settings.RatingPrefix}{toBeRated}:{rating}" }
             };
         }
 

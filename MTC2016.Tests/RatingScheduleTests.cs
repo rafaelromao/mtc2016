@@ -36,20 +36,13 @@ namespace MTC2016.Tests
             ratingOptions?.Options.First().Text.ShouldBe(Settings.BadRating);
             ratingOptions?.Options.Last().Text.ShouldBe(Settings.GoodRating);
 
-            var currentMinute = DateTime.Now;
             var rating = ((PlainText)ratingOptions?.Options.First().Value)?.Text;
             await Tester.SendMessageAsync(rating);
             response = await Tester.ReceiveMessageAsync();
             var answer = await ApiAiForStaticContent.GetAnswerAsync(Settings.RatingConfirmation);
             Assert(response, answer);
 
-            var from = new Node(Tester.TesterIdentifier, "msging.net", null).ToString();
-            var ratingIntent = RatingMessageReceiver.CreateRatingId(Settings, from, currentMinute).Replace("_", " ");
-            var storedRating = await ApiAiForStaticContent.GetAnswerAsync(ratingIntent);
-            Assert(storedRating, rating?.ToLower());
-
-            var deleted = await ApiAiForStaticContent.DeleteIntent(ratingIntent);
-            Assert(deleted.ToString(), true.ToString());
+            //TODO : Assert what was stored
         }
     }
 }
