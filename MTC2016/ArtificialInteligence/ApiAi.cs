@@ -15,7 +15,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace MTC2016.ArtificialInteligence
 {
-    public abstract class ApiAi : IApiAI, IDisposable
+    public abstract class ApiAi : IApiAi, IDisposable
     {
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
         {
@@ -25,15 +25,13 @@ namespace MTC2016.ArtificialInteligence
         private readonly HttpClient _httpClient;
         private readonly ObjectCache _cache = new MemoryCache(nameof(MTC2016));
 
-        protected abstract string ApiAiDeveloperApiKey { get; }
-
         public Settings Settings { get; }
 
-        protected ApiAi(Settings settings)
+        protected ApiAi(Settings settings, string apiAiDeveloperApiKey)
         {
             Settings = settings;
             _httpClient = new HttpClient();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ApiAiDeveloperApiKey);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiAiDeveloperApiKey);
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaType));
             _httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue();
         }

@@ -18,13 +18,13 @@ namespace MTC2016.Scheduler
 {
     public class SchedulerExtension : ISchedulerExtension, IDisposable
     {
-        private readonly IApiAI _apiAi;
+        private readonly IApiAiForStaticContent _apiAi;
         private readonly IJobScheduler _jobScheduler;
         private readonly IMessagingHubSender _sender;
         private readonly Settings _settings;
         private readonly ObjectCache _cache;
 
-        public SchedulerExtension(IApiAI apiAi, IJobScheduler jobScheduler, IMessagingHubSender sender, Settings settings)
+        public SchedulerExtension(IApiAiForStaticContent apiAi, IJobScheduler jobScheduler, IMessagingHubSender sender, Settings settings)
         {
             _cache = new MemoryCache(nameof(MTC2016));
             _apiAi = apiAi;

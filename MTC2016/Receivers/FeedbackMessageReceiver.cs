@@ -13,11 +13,11 @@ namespace MTC2016.Receivers
     public class FeedbackMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
-        private readonly IApiAI _apiAi;
+        private readonly IApiAiForStaticContent _apiAi;
         private readonly Settings _settings;
         private readonly string _feedbackAnswer;
 
-        public FeedbackMessageReceiver(IMessagingHubSender sender, IApiAI apiAi, Settings settings)
+        public FeedbackMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, Settings settings)
         {
             _sender = sender;
             _apiAi = apiAi;

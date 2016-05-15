@@ -13,11 +13,11 @@ namespace MTC2016.Receivers
     public class ImageJpgMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
-        private readonly IApiAI _apiAi;
+        private readonly IApiAiForStaticContent _apiAi;
         private readonly Settings _settings;
         private readonly string _imageAnswer;
 
-        public ImageJpgMessageReceiver(IMessagingHubSender sender, IApiAI apiAi, Settings settings)
+        public ImageJpgMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, Settings settings)
         {
             _sender = sender;
             _apiAi = apiAi;
@@ -39,16 +39,16 @@ namespace MTC2016.Receivers
         }
     }
 
-    internal class ImageJpgJpegMessageReceiver : ImageJpgMessageReceiver
+    public class ImageJpegMessageReceiver : ImageJpgMessageReceiver
     {
-        public ImageJpgJpegMessageReceiver(IMessagingHubSender sender, IApiAI apiAi, Settings settings) : base(sender, apiAi, settings)
+        public ImageJpegMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, Settings settings) : base(sender, apiAi, settings)
         {
         }
     }
 
-    internal class ImageJpgPngMessageReceiver : ImageJpgMessageReceiver
+    public class ImagePngMessageReceiver : ImageJpgMessageReceiver
     {
-        public ImageJpgPngMessageReceiver(IMessagingHubSender sender, IApiAI apiAi, Settings settings) : base(sender, apiAi, settings)
+        public ImagePngMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, Settings settings) : base(sender, apiAi, settings)
         {
         }
     }

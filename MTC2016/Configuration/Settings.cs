@@ -6,8 +6,7 @@ namespace MTC2016.Configuration
     {
         public string ApiAiUri { get; set; }
         public string ApiAiStaticDeveloperApiKey { get; set; }
-        public string ApiAiSpeakersDeveloperApiKey { get; set; }
-        public string ApiAiTalksDeveloperApiKey { get; set; }
+        public string ApiAiDynamicDeveloperApiKey { get; set; }
 
         public string ConnectionString { get; set; }
 

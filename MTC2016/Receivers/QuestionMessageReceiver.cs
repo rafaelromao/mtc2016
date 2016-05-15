@@ -15,11 +15,11 @@ namespace MTC2016.Receivers
     public class QuestionMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
-        private readonly IApiAI _apiAi;
+        private readonly IApiAiForDynamicContent _apiAi;
         private readonly Settings _settings;
         private readonly string _defaultAnswer;
 
-        public QuestionMessageReceiver(IMessagingHubSender sender, IApiAI apiAi, Settings settings)
+        public QuestionMessageReceiver(IMessagingHubSender sender, IApiAiForDynamicContent apiAi, Settings settings)
         {
             _sender = sender;
             _apiAi = apiAi;

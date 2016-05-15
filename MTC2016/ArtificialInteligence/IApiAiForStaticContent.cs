@@ -1,4 +1,4 @@
 namespace MTC2016.ArtificialInteligence
 {
-    public interface IApiAiForStaticContent { }
+    public interface IApiAiForStaticContent : IApiAi { }
 }

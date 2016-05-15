@@ -14,7 +14,7 @@ namespace MTC2016.Receivers
     public class UnsubscribeMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
-        private readonly IApiAI _apiAi;
+        private readonly IApiAiForStaticContent _apiAi;
         private readonly IDistributionListExtension _distributionListExtension;
         private readonly Settings _settings;
         private string _defaultAnswer;
@@ -22,7 +22,7 @@ namespace MTC2016.Receivers
         private string _notSubscribed;
         private string _unsubscriptionFailed;
 
-        public UnsubscribeMessageReceiver(IMessagingHubSender sender, IApiAI apiAi,
+        public UnsubscribeMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi,
             IDistributionListExtension distributionListExtension, Settings settings)
         {
             _sender = sender;

@@ -10,7 +10,7 @@ namespace MTC2016.Tests.Mocks
 {
     class QuestionMessageReceiverThatDoesNotParseImages : QuestionMessageReceiver
     {
-        public QuestionMessageReceiverThatDoesNotParseImages(IMessagingHubSender sender, IApiAI apiAi, Settings settings) 
+        public QuestionMessageReceiverThatDoesNotParseImages(IMessagingHubSender sender, IApiAiForDynamicContent apiAi, Settings settings) 
             : base(sender, apiAi, settings)
         {
         }

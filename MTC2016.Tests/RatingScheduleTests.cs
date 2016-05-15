@@ -40,15 +40,15 @@ namespace MTC2016.Tests
             var rating = ((PlainText)ratingOptions?.Options.First().Value)?.Text;
             await Tester.SendMessageAsync(rating);
             response = await Tester.ReceiveMessageAsync();
-            var answer = await ApiAi.GetAnswerAsync(Settings.RatingConfirmation);
+            var answer = await ApiAiForStaticContent.GetAnswerAsync(Settings.RatingConfirmation);
             Assert(response, answer);
 
             var from = new Node(Tester.TesterIdentifier, "msging.net", null).ToString();
             var ratingIntent = RatingMessageReceiver.CreateRatingId(Settings, from, currentMinute).Replace("_", " ");
-            var storedRating = await ApiAi.GetAnswerAsync(ratingIntent);
+            var storedRating = await ApiAiForStaticContent.GetAnswerAsync(ratingIntent);
             Assert(storedRating, rating?.ToLower());
 
-            var deleted = await ApiAi.DeleteIntent(ratingIntent);
+            var deleted = await ApiAiForStaticContent.DeleteIntent(ratingIntent);
             Assert(deleted.ToString(), true.ToString());
         }
     }

@@ -4,7 +4,7 @@ using Lime.Protocol;
 
 namespace MTC2016.DistributionList
 {
-    internal interface IUsersRepository
+    internal interface IRecipientsRepository
     {
         Task<bool> AddUserAsync(Identity user);
         Task<IEnumerable<Identity>> GetUsersAsync();

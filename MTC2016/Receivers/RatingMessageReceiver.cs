@@ -15,12 +15,12 @@ namespace MTC2016.Receivers
     public class RatingMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
-        private readonly IApiAI _apiAi;
+        private readonly IApiAiForStaticContent _apiAi;
         private readonly Settings _settings;
         private readonly string _ratingConfirmation;
         private readonly string _ratingFailed;
 
-        public RatingMessageReceiver(IMessagingHubSender sender, IApiAI apiAi, Settings settings)
+        public RatingMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, Settings settings)
         {
             _sender = sender;
             _apiAi = apiAi;

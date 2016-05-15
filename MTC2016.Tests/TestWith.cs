@@ -15,7 +15,8 @@ namespace MTC2016.Tests
     {
         protected ApplicationTester Tester { get; private set; }
 
-        protected IApiAI ApiAi { get; private set; }
+        protected IApiAiForStaticContent ApiAiForStaticContent { get; private set; }
+        protected IApiAiForDynamicContent ApiAiForDynamicContent { get; private set; }
 
         protected Settings Settings { get; private set; }
 
@@ -24,7 +25,8 @@ namespace MTC2016.Tests
         {
             Tester = CreateApplicationTester<TServiceProvider>();
             Tester.StartAsync().Wait();
-            ApiAi = Tester.GetService<IApiAI>();
+            ApiAiForStaticContent = Tester.GetService<IApiAiForStaticContent>();
+            ApiAiForDynamicContent = Tester.GetService<IApiAiForDynamicContent>();
             Settings = Tester.GetService<Settings>();
         }
 

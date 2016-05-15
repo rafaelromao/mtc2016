@@ -83,15 +83,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArtificialInteligence\ApiAi.cs" />
-    <Compile Include="ArtificialInteligence\ApiAiForSpeakersContent.cs" />
+    <Compile Include="ArtificialInteligence\ApiAiForDynamicContent.cs" />
     <Compile Include="ArtificialInteligence\ApiAIForStaticContent.cs" />
-    <Compile Include="ArtificialInteligence\ApiAiForTalksContent.cs" />
     <Compile Include="ArtificialInteligence\Entity.cs" />
     <Compile Include="ArtificialInteligence\Entry.cs" />
     <Compile Include="ArtificialInteligence\IApiAI.cs" />
-    <Compile Include="ArtificialInteligence\IApiAiForSpeakersContent.cs" />
+    <Compile Include="ArtificialInteligence\IApiAiForDynamicContent.cs" />
     <Compile Include="ArtificialInteligence\IApiAiForStaticContent.cs" />
-    <Compile Include="ArtificialInteligence\IApiAiForTalksContent.cs" />
     <Compile Include="ArtificialInteligence\Intent.cs" />
     <Compile Include="ArtificialInteligence\IntentResponse.cs" />
     <Compile Include="ArtificialInteligence\QueryMetadata.cs" />
@@ -100,8 +98,8 @@
     <Compile Include="ArtificialInteligence\QueryResultFulfillment.cs" />
     <Compile Include="ArtificialInteligence\UserSays.cs" />
     <Compile Include="ArtificialInteligence\UserSaysData.cs" />
-    <Compile Include="DistributionList\IUsersRepository.cs" />
-    <Compile Include="DistributionList\UsersRepository.cs" />
+    <Compile Include="DistributionList\IRecipientsRepository.cs" />
+    <Compile Include="DistributionList\RecipientsRepository.cs" />
     <Compile Include="Receivers\ImageJpgMessageReceiver.cs" />
     <Compile Include="Receivers\RatingMessageReceiver.cs" />
     <Compile Include="Receivers\FeedbackMessageReceiver.cs" />

@@ -18,11 +18,12 @@ namespace MTC2016.Configuration
             Container.Options.AllowOverridingRegistrations = true;
 
             Container.RegisterSingleton<IApiAiForStaticContent, ApiAiForStaticContent>();
-            Container.RegisterSingleton<IApiAiForSpeakersContent, ApiAiForSpeakersContent>();
-            Container.RegisterSingleton<IApiAiForTalksContent, ApiAiForTalksContent>();
+            Container.RegisterSingleton<IApiAiForDynamicContent, ApiAiForDynamicContent>();
 
             Container.RegisterSingleton<IJobScheduler, JobScheduler>();
             Container.RegisterSingleton<ISchedulerExtension, SchedulerExtension>();
+
+            Container.RegisterSingleton<IRecipientsRepository, RecipientsRepository>();
             Container.RegisterSingleton<IDistributionListExtension, DistributionListExtension>();
         }
 

@@ -8,7 +8,7 @@ using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.DistributionList
 {
-    internal class UsersRepository : IUsersRepository
+    internal class RecipientsRepository : IRecipientsRepository
     {
         internal static Node Broadcaster => Node.Parse("postmaster@broadcast.msging.net");
         internal static Identity Mtc2016 => Identity.Parse("mtc2016@broadcast.msging.net");
@@ -16,18 +16,14 @@ namespace MTC2016.DistributionList
         private readonly IMessagingHubSender _sender;
 
 
-        public UsersRepository(IMessagingHubSender sender)
+        public RecipientsRepository(IMessagingHubSender sender)
         {
             _sender = sender;
         }
 
         public async Task<bool> AddUserAsync(Identity user)
         {
-            var users = await GetUsersAsync();
-            users = new List<Identity>(users);
-            ((List<Identity>)users).Add(user);
-
-            var items = users.Select(u => new IdentityDocument {Value = u}).ToArray();
+            var items = new[] { new IdentityDocument { Value = user } };
             var response = await UpdateUsersAsync(items);
             return response.Status == CommandStatus.Success;
         }
@@ -37,7 +33,7 @@ namespace MTC2016.DistributionList
             var command = new Command(Guid.NewGuid())
             {
                 To = Broadcaster,
-                Uri = new LimeUri($"/lists/{Mtc2016}"),
+                Uri = new LimeUri($"/lists/{Mtc2016}/recipients"),
                 Method = CommandMethod.Get
             };
             var response = await _sender.SendCommandAsync(command);
@@ -48,20 +44,26 @@ namespace MTC2016.DistributionList
 
         public async Task<bool> ContainsUserAsync(Identity user)
         {
-            var users = await GetUsersAsync();
-            return users.Any(u => u.Equals(user));
+            var command = new Command(Guid.NewGuid())
+            {
+                To = Broadcaster,
+                Uri = new LimeUri($"/lists/{Mtc2016}/recipients/{user}"),
+                Method = CommandMethod.Get
+            };
+            var response = await _sender.SendCommandAsync(command);
+            return response.Status == CommandStatus.Success;
         }
 
         public async Task<bool> RemoveUserAsync(Identity user)
         {
-            var users = await GetUsersAsync();
-            users = new List<Identity>(users);
-            user = users.FirstOrDefault(u => u.Equals(user));
-
-            if (user == null) return false;
-
-            ((List<Identity>) users).Remove(user);
-            return true;
+            var command = new Command(Guid.NewGuid())
+            {
+                To = Broadcaster,
+                Method = CommandMethod.Delete,
+                Uri = new LimeUri("/lists/{Mtc2016}/recipients/{user}")
+            };
+            var response = await _sender.SendCommandAsync(command);
+            return response.Status == CommandStatus.Success;
         }
 
         internal static Task EnsureMtc2016IsADistributionListAsync(IMessagingHubSender sender, CancellationToken cancellationToken)
@@ -70,14 +72,14 @@ namespace MTC2016.DistributionList
             {
                 To = Broadcaster,
                 Method = CommandMethod.Set,
-                Uri = new LimeUri($"/lists/{Mtc2016}"),
+                Uri = new LimeUri($"/lists/{Mtc2016}/recipients"),
                 Resource = new IdentityDocument
                 {
                     Value = Mtc2016
                 }
             };
             return sender.SendCommandAsync(command, cancellationToken);
-         }
+        }
 
         private async Task<Command> UpdateUsersAsync(IdentityDocument[] items)
         {
@@ -85,7 +87,7 @@ namespace MTC2016.DistributionList
             {
                 To = Broadcaster,
                 Method = CommandMethod.Set,
-                Uri = new LimeUri("/lists"),
+                Uri = new LimeUri("/lists/{Mtc2016}/recipients"),
                 Resource = new DocumentCollection
                 {
                     ItemType = IdentityDocument.MediaType,

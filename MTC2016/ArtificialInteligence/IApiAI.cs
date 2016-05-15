@@ -5,7 +5,7 @@ using MTC2016.Scheduler;
 
 namespace MTC2016.ArtificialInteligence
 {
-    public interface IApiAI
+    public interface IApiAi
     {
         Task<string> GetAnswerAsync(string question);
         Task<IEnumerable<Intent>> GetIntentsAsync();
