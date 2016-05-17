@@ -1,4 +1,4 @@
-namespace MTC2016.Receivers
+namespace MTC2016.FeedbackAndRating
 {
     public enum FeedbackType
     {

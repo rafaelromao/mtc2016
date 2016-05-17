@@ -1,7 +1,7 @@
 using System;
 using Lime.Protocol;
 
-namespace MTC2016.Receivers
+namespace MTC2016.FeedbackAndRating
 {
     public class Feedback
     {

@@ -8,7 +8,7 @@ using Takenet.MessagingHub.Client;
 using Takenet.MessagingHub.Client.Listener;
 using Takenet.MessagingHub.Client.Sender;
 
-namespace MTC2016.Receivers
+namespace MTC2016.FeedbackAndRating
 {
     public class FeedbackMessageReceiver : IMessageReceiver
     {

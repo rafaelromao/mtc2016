@@ -1,11 +1,10 @@
 using System;
-using System.Threading.Tasks;
 using Lime.Protocol;
 using MTC2016.Configuration;
 using Takenet.Elephant.Sql;
 using Takenet.Elephant.Sql.Mapping;
 
-namespace MTC2016.Receivers
+namespace MTC2016.FeedbackAndRating
 {
     public class FeedbackRepository : SqlSet<Feedback>, IFeedbackRepository
     {

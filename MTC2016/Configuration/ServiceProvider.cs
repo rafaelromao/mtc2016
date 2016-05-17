@@ -1,6 +1,7 @@
 using System;
 using MTC2016.ArtificialInteligence;
 using MTC2016.DistributionList;
+using MTC2016.FeedbackAndRating;
 using MTC2016.Receivers;
 using MTC2016.Scheduler;
 using SimpleInjector;
