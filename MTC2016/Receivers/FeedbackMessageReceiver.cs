@@ -14,7 +14,6 @@ namespace MTC2016.Receivers
     {
         private readonly IMessagingHubSender _sender;
         private readonly IFeedbackRepository _feedbackRepository;
-        private readonly Settings _settings;
         private readonly string _feedbackAnswer;
         private readonly string _feedbackFailed;
 
@@ -22,16 +21,15 @@ namespace MTC2016.Receivers
         {
             _sender = sender;
             _feedbackRepository = feedbackRepository;
-            _settings = settings;
             try
             {
-                _feedbackAnswer = apiAi.GetAnswerAsync(_settings.FeedbackConfirmation).Result;
-                _feedbackFailed = apiAi.GetAnswerAsync(_settings.FeedbackFailed).Result;
+                _feedbackAnswer = apiAi.GetAnswerAsync(settings.FeedbackConfirmation).Result;
+                _feedbackFailed = apiAi.GetAnswerAsync(settings.FeedbackFailed).Result;
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Exception when querying for {_settings.FeedbackConfirmation}: {e}");
-                _feedbackAnswer = _settings.GeneralError;
+                Console.WriteLine($"Exception when querying for {settings.FeedbackConfirmation}: {e}");
+                _feedbackAnswer = settings.GeneralError;
             }
         }
 
@@ -47,12 +45,13 @@ namespace MTC2016.Receivers
                 Type = FeedbackType.Comment
             };
 
-            var ok = await _feedbackRepository.AddFeedbackAsync(feedback);
-            if (ok)
+            try
             {
+                await _feedbackRepository.AddAsync(feedback);
+
                 await _sender.SendMessageAsync(_feedbackAnswer, message.From, cancellationToken);
             }
-            else
+            catch
             {
                 await _sender.SendMessageAsync(_feedbackFailed, message.From, cancellationToken);
             }

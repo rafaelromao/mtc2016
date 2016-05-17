@@ -28,7 +28,6 @@ namespace MTC2016
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await RecipientsRepository.EnsureMtc2016IsADistributionListAsync(_sender, cancellationToken);
             await ScheduleScheduledMessagesAsync(cancellationToken);
         }
 

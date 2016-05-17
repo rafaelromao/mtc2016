@@ -28,8 +28,6 @@ namespace MTC2016.Configuration
             Container.RegisterSingleton<IDistributionListExtension, DistributionListExtension>();
 
             Container.RegisterSingleton<IFeedbackRepository, FeedbackRepository>();
-
-            Container.RegisterSingleton<IFeedbackSet, FeedbackSet>();
         }
 
         public object GetService(Type serviceType)

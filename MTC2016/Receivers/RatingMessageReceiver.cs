@@ -14,7 +14,6 @@ namespace MTC2016.Receivers
     {
         private readonly IMessagingHubSender _sender;
         private readonly IFeedbackRepository _feedbackRepository;
-        private readonly Settings _settings;
         private readonly string _ratingConfirmation;
         private readonly string _ratingFailed;
 
@@ -22,15 +21,14 @@ namespace MTC2016.Receivers
         {
             _sender = sender;
             _feedbackRepository = feedbackRepository;
-            _settings = settings;
             try
             {
-                _ratingConfirmation = apiAi.GetAnswerAsync(_settings.RatingConfirmation).Result;
-                _ratingFailed = apiAi.GetAnswerAsync(_settings.RatingFailed).Result;
+                _ratingConfirmation = apiAi.GetAnswerAsync(settings.RatingConfirmation).Result;
+                _ratingFailed = apiAi.GetAnswerAsync(settings.RatingFailed).Result;
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Exception when querying for {_settings.FeedbackConfirmation}: {e}");
+                Console.WriteLine($"Exception when querying for {settings.FeedbackConfirmation}: {e}");
             }
         }
 
@@ -45,12 +43,13 @@ namespace MTC2016.Receivers
                 Type = FeedbackType.Rating
             };
 
-            var ok = await _feedbackRepository.AddFeedbackAsync(feedback);
-            if (ok)
+            try
             {
+                await _feedbackRepository.AddAsync(feedback);
+
                 await _sender.SendMessageAsync(_ratingConfirmation, message.From, cancellationToken);
             }
-            else
+            catch
             {
                 await _sender.SendMessageAsync(_ratingFailed, message.From, cancellationToken);
             }

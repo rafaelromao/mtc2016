@@ -99,10 +99,10 @@
     <Compile Include="ArtificialInteligence\QueryResultFulfillment.cs" />
     <Compile Include="ArtificialInteligence\UserSays.cs" />
     <Compile Include="ArtificialInteligence\UserSaysData.cs" />
+    <Compile Include="DistributionList\IrisRecipientsRepository.cs" />
     <Compile Include="Receivers\Feedback.cs" />
     <Compile Include="Receivers\FeedbackRepository.cs" />
     <Compile Include="Receivers\FeedbackType.cs" />
-    <Compile Include="Receivers\IFeedbackSet.cs" />
     <Compile Include="DistributionList\IRecipientsRepository.cs" />
     <Compile Include="DistributionList\RecipientsRepository.cs" />
     <Compile Include="Receivers\IFeedbackRepository.cs" />

@@ -18,31 +18,35 @@ namespace MTC2016.Scheduler
     {
         private readonly IApiAiForStaticContent _apiAi;
         private readonly IJobScheduler _jobScheduler;
-        private readonly IMessagingHubSender _sender;
+        private readonly IRecipientsRepository _recipientsRepository;
         private readonly Settings _settings;
-        private readonly ObjectCache _cache;
 
-        public SchedulerExtension(IApiAiForStaticContent apiAi, IJobScheduler jobScheduler, IMessagingHubSender sender, Settings settings)
+        public SchedulerExtension(
+            IApiAiForStaticContent apiAi, IJobScheduler jobScheduler, 
+            IRecipientsRepository recipientsRepository, Settings settings)
         {
-            _cache = new MemoryCache(nameof(MTC2016));
             _apiAi = apiAi;
             _jobScheduler = jobScheduler;
-            _sender = sender;
+            _recipientsRepository = recipientsRepository;
             _settings = settings;
         }
 
         protected virtual async Task ScheduleAsync(IEnumerable<ScheduledMessage> messagesToBeScheduled, CancellationToken cancellationToken)
         {
+            var recipients = await _recipientsRepository.AsEnumerableAsync();
             foreach (var messageToBeScheduled in messagesToBeScheduled)
             {
-                var message = new Message
+                foreach (var recipient in recipients)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    Content = messageToBeScheduled.Message,
-                    To = RecipientsRepository.Mtc2016.ToNode()
-                };
+                    var message = new Message
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Content = messageToBeScheduled.Message,
+                        To = recipient.ToNode()
+                    };
 
-                await _jobScheduler.ScheduleAsync(message, messageToBeScheduled.Time, cancellationToken);
+                    await _jobScheduler.ScheduleAsync(message, messageToBeScheduled.Time, cancellationToken);
+                }
             }
         }
 

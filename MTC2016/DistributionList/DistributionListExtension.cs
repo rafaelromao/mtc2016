@@ -20,7 +20,8 @@ namespace MTC2016.DistributionList
         {
             try
             {
-                return await _recipients.AddUserAsync(recipient.ToNode());
+                await _recipients.AddAsync(recipient.ToNode());
+                return true;
             }
             catch (Exception)
             {
@@ -30,17 +31,17 @@ namespace MTC2016.DistributionList
 
         public async Task<IEnumerable<Identity>> GetRecipientsAsync(CancellationToken cancellationToken)
         {
-            return await _recipients.GetUsersAsync();
+            return await _recipients.AsEnumerableAsync();
         }
 
         public async Task<bool> ContainsAsync(Identity recipient, CancellationToken cancellationToken)
         {
-            return await _recipients.ContainsUserAsync(recipient.ToNode());
+            return await _recipients.ContainsAsync(recipient.ToNode());
         }
 
         public async Task<bool> RemoveAsync(Identity recipient, CancellationToken cancellationToken)
         {
-            return await _recipients.RemoveUserAsync(recipient.ToNode());
+            return await _recipients.TryRemoveAsync(recipient.ToNode());
         }
     }
 }

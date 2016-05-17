@@ -1,14 +1,14 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Lime.Protocol;
+using Takenet.Elephant;
 
 namespace MTC2016.DistributionList
 {
-    internal interface IRecipientsRepository
+    public interface IRecipientsRepository
     {
-        Task<bool> AddUserAsync(Identity user);
-        Task<IEnumerable<Identity>> GetUsersAsync();
-        Task<bool> ContainsUserAsync(Identity user);
-        Task<bool> RemoveUserAsync(Identity user);
+        Task AddAsync(Identity value);
+        Task<bool> ContainsAsync(Identity value);
+        Task<bool> TryRemoveAsync(Identity value);
+        Task<IAsyncEnumerable<Identity>> AsEnumerableAsync();
     }
 }
