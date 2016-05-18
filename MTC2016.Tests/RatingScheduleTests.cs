@@ -1,9 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Lime.Messaging.Contents;
-using Lime.Protocol;
-using MTC2016.Receivers;
 using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 using Shouldly;

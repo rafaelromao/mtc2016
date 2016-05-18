@@ -1,20 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Caching;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using Lime.Messaging.Contents;
 using Lime.Protocol;
 using MTC2016.ArtificialInteligence;
 using MTC2016.Configuration;
 using MTC2016.DistributionList;
-using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.Scheduler
 {
-    public class SchedulerExtension : ISchedulerExtension, IDisposable
+    public class SchedulerExtension : ISchedulerExtension
     {
         private readonly IApiAiForStaticContent _apiAi;
         private readonly IJobScheduler _jobScheduler;
@@ -31,7 +28,7 @@ namespace MTC2016.Scheduler
             _settings = settings;
         }
 
-        protected virtual async Task ScheduleAsync(IEnumerable<ScheduledMessage> messagesToBeScheduled, CancellationToken cancellationToken)
+        protected virtual async Task ScheduleAsync(IEnumerable<ScheduledMessage> messagesToBeScheduled)
         {
             var recipients = await _recipientsRepository.AsEnumerableAsync();
             foreach (var messageToBeScheduled in messagesToBeScheduled)
@@ -45,12 +42,12 @@ namespace MTC2016.Scheduler
                         To = recipient.ToNode()
                     };
 
-                    await _jobScheduler.ScheduleAsync(message, messageToBeScheduled.Time, cancellationToken);
+                    await _jobScheduler.ScheduleAsync(message, messageToBeScheduled.Time);
                 }
             }
         }
 
-        protected virtual async Task<IEnumerable<ScheduledMessage>> GetMessagesToBeScheduled(CancellationToken cancellationToken)
+        protected virtual async Task<IEnumerable<ScheduledMessage>> GetMessagesToBeScheduled()
         {
             var result = new List<ScheduledMessage>();
             var intents = await _apiAi.GetIntentsAsync();
@@ -85,9 +82,9 @@ namespace MTC2016.Scheduler
             return result;
         }
 
-        public async Task UpdateSchedulesAsync(CancellationToken cancellationToken)
+        public async Task UpdateSchedulesAsync()
         {
-            await ScheduleAsync(await GetMessagesToBeScheduled(cancellationToken), cancellationToken);
+            await ScheduleAsync(await GetMessagesToBeScheduled());
         }
 
         private Select ExtractRatingFromText(string text)
@@ -124,11 +121,6 @@ namespace MTC2016.Scheduler
                 Text = rating,
                 Value = new PlainText { Text = $"{_settings.RatingPrefix}{toBeRated}:{rating}" }
             };
-        }
-
-        public void Dispose()
-        {
-            _jobScheduler.Dispose();
         }
     }
 }

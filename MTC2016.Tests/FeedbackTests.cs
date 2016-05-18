@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Lime.Protocol;
-using MTC2016.Receivers;
+﻿using System.Threading.Tasks;
 using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 
@@ -15,6 +12,7 @@ namespace MTC2016.Tests
         [TestCase("#feedback Foi legal")]
         [TestCase("feedback: Muito bacana")]
         [TestCase("#feedback:É isso ai")]
+        [TestCase("#feedback:012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789")]
         public async Task SendFeedback(string feedback)
         {
             await Tester.SendMessageAsync(feedback);

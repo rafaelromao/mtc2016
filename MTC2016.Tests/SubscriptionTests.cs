@@ -12,12 +12,15 @@ namespace MTC2016.Tests
         [Test]
         public async Task SubscribeUnsubscribeAndSubscribeTwiceAgain()
         {
+            await Tester.SendMessageAsync("cancelar");
+            await Tester.IgnoreMessageAsync();
+
             await Tester.SendMessageAsync("Gostaria de participar!");
             var response = await Tester.ReceiveMessageAsync();
             var answer = await ApiAiForStaticContent.GetAnswerAsync(Settings.ConfirmSubscription);
             Assert(response, answer);
 
-            await Tester.SendMessageAsync("Mudei de idéia, quero cancelar");
+            await Tester.SendMessageAsync("Mudei de ideia, quero cancelar");
             response = await Tester.ReceiveMessageAsync();
             answer = await ApiAiForStaticContent.GetAnswerAsync(Settings.ConfirmSubscriptionCancellation);
             Assert(response, answer);

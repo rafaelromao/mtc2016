@@ -2,38 +2,31 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Lime.Protocol;
-using MTC2016.DistributionList;
 using MTC2016.Scheduler;
 using Takenet.MessagingHub.Client.Listener;
-using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016
 {
     public sealed class Startup : IStartable, IDisposable
     {
-        private readonly IMessagingHubSender _sender;
         private readonly ISchedulerExtension _schedulerExtension;
-        private readonly IDistributionListExtension _distributionListExtension;
         private readonly ConsoleTraceListener _listener;
 
-        public Startup(IMessagingHubSender sender, ISchedulerExtension schedulerExtension, IDistributionListExtension distributionListExtension)
+        public Startup(ISchedulerExtension schedulerExtension)
         {
-            _sender = sender;
             _schedulerExtension = schedulerExtension;
-            _distributionListExtension = distributionListExtension;
             _listener = new ConsoleTraceListener(false);
             Trace.Listeners.Add(_listener);
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await ScheduleScheduledMessagesAsync(cancellationToken);
+            await ScheduleScheduledMessagesAsync();
         }
 
-        private async Task ScheduleScheduledMessagesAsync(CancellationToken cancellationToken)
+        private async Task ScheduleScheduledMessagesAsync()
         {
-            await _schedulerExtension.UpdateSchedulesAsync(cancellationToken);
+            await _schedulerExtension.UpdateSchedulesAsync();
         }
 
         public void Dispose()

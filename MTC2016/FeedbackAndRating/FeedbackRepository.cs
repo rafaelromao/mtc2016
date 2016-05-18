@@ -8,6 +8,8 @@ namespace MTC2016.FeedbackAndRating
 {
     public class FeedbackRepository : SqlSet<Feedback>, IFeedbackRepository
     {
+        internal const int MaxTextSize = 100;
+
         private new static readonly ITable Table = TableBuilder
             .WithName(nameof(Feedback))
             .WithKeyColumnFromType<Identity>(nameof(Feedback.From))

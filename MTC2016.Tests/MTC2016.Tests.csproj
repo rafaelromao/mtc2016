@@ -70,6 +70,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="Takenet.MessagingHub.Client, Version=0.3.63.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\MTC2016\packages\Takenet.MessagingHub.Client.0.3.63\lib\net461\Takenet.MessagingHub.Client.dll</HintPath>
       <Private>True</Private>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Linq;
 using MTC2016.Configuration;
 using MTC2016.Tests.Mocks;
@@ -28,6 +29,23 @@ namespace MTC2016.Tests
             ApiAiForStaticContent = Tester.GetService<IApiAiForStaticContent>();
             ApiAiForDynamicContent = Tester.GetService<IApiAiForDynamicContent>();
             Settings = Tester.GetService<Settings>();
+            ClearTestDataFromDatabase();
+        }
+
+        private void ClearTestDataFromDatabase()
+        {
+            using (var connection = new SqlConnection(Settings.ConnectionString))
+            {
+                connection.Open();
+                using (var command = new SqlCommand("DELETE FROM [FEEDBACK] WHERE [FROM] LIKE '%$tester%'", connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+                using (var command = new SqlCommand("DELETE FROM [IDENTITY] WHERE [FROM] Name '%$tester%'", connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
         protected ApplicationTester CreateApplicationTester<TTestServiceProvider>()

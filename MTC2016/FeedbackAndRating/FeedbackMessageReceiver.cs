@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Lime.Protocol;
@@ -35,23 +36,39 @@ namespace MTC2016.FeedbackAndRating
 
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
         {
-            var text = message.Content?.ToString() ?? string.Empty;
 
-            var feedback = new Feedback
+            var text = message.Content?.ToString() ?? string.Empty;
+            var parts = new List<string>();
+            if (text.Length > FeedbackRepository.MaxTextSize)
             {
-                From = message.From,
-                When = DateTimeOffset.Now,
-                Text = text,
-                Type = FeedbackType.Comment
-            };
+                while (text.Length > FeedbackRepository.MaxTextSize)
+                {
+                    parts.Add(text.Substring(0, Math.Min(FeedbackRepository.MaxTextSize, text.Length)));
+                    text = text.Substring(FeedbackRepository.MaxTextSize);
+                }
+            }
+            else
+            {
+                parts.Add(text);
+            }
 
             try
             {
-                await _feedbackRepository.AddAsync(feedback);
+                foreach (var part in parts)
+                {
+                    var feedback = new Feedback
+                    {
+                        From = message.From,
+                        When = DateTimeOffset.Now,
+                        Text = part,
+                        Type = FeedbackType.Comment
+                    };
 
+                    await _feedbackRepository.AddAsync(feedback);
+                }
                 await _sender.SendMessageAsync(_feedbackAnswer, message.From, cancellationToken);
             }
-            catch
+            catch (Exception ex)
             {
                 await _sender.SendMessageAsync(_feedbackFailed, message.From, cancellationToken);
             }

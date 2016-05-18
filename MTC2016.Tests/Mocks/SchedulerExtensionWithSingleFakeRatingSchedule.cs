@@ -28,18 +28,18 @@ namespace MTC2016.Tests.Mocks
             _distributionListExtension = distributionListExtension;
         }
 
-        protected override async Task ScheduleAsync(IEnumerable<ScheduledMessage> messagesToBeScheduled, CancellationToken cancellationToken)
+        protected override async Task ScheduleAsync(IEnumerable<ScheduledMessage> messagesToBeScheduled)
         {
-            await _distributionListExtension.AddAsync(Identity.Parse("mtc2016$tester@msging.net"), cancellationToken);
+            await _distributionListExtension.AddAsync(Identity.Parse("mtc2016$tester@msging.net"), CancellationToken.None);
 
-            await base.ScheduleAsync(messagesToBeScheduled, cancellationToken);
+            await base.ScheduleAsync(messagesToBeScheduled);
         }
 
-        protected override async Task<IEnumerable<ScheduledMessage>> GetMessagesToBeScheduled(CancellationToken cancellationToken)
+        protected override async Task<IEnumerable<ScheduledMessage>> GetMessagesToBeScheduled()
         {
             TestScheduleTime = DateTimeOffset.Now;
 
-            var result = await base.GetMessagesToBeScheduled(CancellationToken.None);
+            var result = await base.GetMessagesToBeScheduled();
             result = result.Where(s => s.Message is Select).Take(1);
             result.ForEach(s =>
             {
