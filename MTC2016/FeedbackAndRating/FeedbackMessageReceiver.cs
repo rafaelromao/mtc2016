@@ -41,10 +41,11 @@ namespace MTC2016.FeedbackAndRating
             var parts = new List<string>();
             if (text.Length > FeedbackRepository.MaxTextSize)
             {
-                while (text.Length > FeedbackRepository.MaxTextSize)
+                while (text.Length > 0)
                 {
-                    parts.Add(text.Substring(0, Math.Min(FeedbackRepository.MaxTextSize, text.Length)));
-                    text = text.Substring(FeedbackRepository.MaxTextSize);
+                    var length = Math.Min(FeedbackRepository.MaxTextSize, text.Length);
+                    parts.Add(text.Substring(0, length));
+                    text = text.Substring(length);
                 }
             }
             else

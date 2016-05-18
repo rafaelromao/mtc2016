@@ -91,7 +91,6 @@ namespace MTC2016.ArtificialInteligence
             }
         }
 
-
         private void AddToCache(string key, object value)
         {
             _cache.Add(new CacheItem(key, value), new CacheItemPolicy
@@ -99,72 +98,6 @@ namespace MTC2016.ArtificialInteligence
                 AbsoluteExpiration = DateTimeOffset.Now.AddDays(1)
             });
         }
-
-
-
-
-
-        private async Task<IEnumerable<Entry>> GetEntityEntriesAsync(string entity)
-        {
-            var uri = new Uri($"{Settings.ApiAiUri}/entities/{entity}");
-            var response = await _httpClient.GetAsync(uri);
-            var json = await response.Content.ReadAsStringAsync();
-            var entryResponse = JsonConvert.DeserializeObject<Entity>(json, JsonSerializerSettings);
-            return entryResponse.Entries;
-        }
-
-        public async Task<bool> AddIntentAsync(Intent intent)
-        {
-            var uri = new Uri($"{Settings.ApiAiUri}/intents");
-            var json = JsonConvert.SerializeObject(intent, JsonSerializerSettings);
-            var response = await _httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, MediaType));
-            return response.StatusCode == HttpStatusCode.OK;
-        }
-
-        public async Task<bool> DeleteIntent(string intentQuestion)
-        {
-            var queryResponse = await GetQueryAsync(intentQuestion);
-            if (queryResponse?.Result?.Metadata?.IntentId == null)
-                return false;
-
-            var uri = new Uri($"{Settings.ApiAiUri}/intents/{queryResponse.Result.Metadata.IntentId}");
-            var response = await _httpClient.DeleteAsync(uri);
-            return response.StatusCode == HttpStatusCode.OK;
-        }
-
-        //public async Task<bool> AddFeedbackAsync(string feedbackId, string feedback)
-        //{
-        //    var intent = new Intent
-        //    {
-        //        Name = feedbackId,
-        //        Templates = new []
-        //        {
-        //            feedbackId
-        //        },
-        //        UserSays = new []
-        //        {
-        //            new UserSays
-        //            {
-        //                Data = new []
-        //                {
-        //                    new UserSaysData
-        //                    {
-        //                        Text = feedbackId.Replace("_", " ")
-        //                    }
-        //                },
-        //                IsTemplate = false
-        //            }
-        //        },
-        //        Responses = new[]
-        //        {
-        //            new IntentResponse
-        //            {
-        //                Speech = feedback.Replace("#", "")
-        //            }
-        //        }
-        //    };
-        //    return await AddIntentAsync(intent);
-        //}
 
         public void Dispose()
         {

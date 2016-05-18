@@ -10,9 +10,5 @@ namespace MTC2016.ArtificialInteligence
         Task<string> GetAnswerAsync(string question);
         Task<IEnumerable<Intent>> GetIntentsAsync();
         Task<Intent> GetIntentAsync(string intentId);
-        Task<bool> AddIntentAsync(Intent intent);
-        Task<bool> DeleteIntent(string intentQuestion);
-
-        //Task<bool> AddFeedbackAsync(string feedbackId, string feedback);
     }
 }
