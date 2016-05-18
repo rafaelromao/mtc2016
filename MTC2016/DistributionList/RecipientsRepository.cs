@@ -9,7 +9,8 @@ namespace MTC2016.DistributionList
     {
         private new static readonly ITable Table = TableBuilder
             .WithName(nameof(Identity))
-            .WithKeyColumnFromType<Identity>(nameof(Identity))
+            .WithKeyColumnFromType<string>(nameof(Identity.Name))
+            .WithKeyColumnFromType<string>(nameof(Identity.Domain))
             .Build();
 
         public RecipientsRepository(Settings settings) 
