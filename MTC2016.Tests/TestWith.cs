@@ -41,7 +41,7 @@ namespace MTC2016.Tests
                 {
                     command.ExecuteNonQuery();
                 }
-                using (var command = new SqlCommand("DELETE FROM [IDENTITY] WHERE [FROM] Name '%$tester%'", connection))
+                using (var command = new SqlCommand("DELETE FROM [IDENTITY] WHERE [NAME] LIKE '%$tester%'", connection))
                 {
                     command.ExecuteNonQuery();
                 }
