@@ -1,8 +1,5 @@
-﻿using System;
-using System.Data.SqlClient;
-using System.Linq;
+﻿using System.Data.SqlClient;
 using MTC2016.Configuration;
-using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 using Takenet.MessagingHub.Client.Tester;
 using Lime.Protocol;
@@ -60,6 +57,7 @@ namespace MTC2016.Tests
         [OneTimeTearDown]
         public void TearDown()
         {
+            ClearTestDataFromDatabase();
             Tester.StopAsync().Wait();
             Tester.Dispose();
         }

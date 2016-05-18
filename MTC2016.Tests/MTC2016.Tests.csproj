@@ -94,7 +94,7 @@
     <Compile Include="Mocks\TestServiceProvider.cs" />
     <Compile Include="FeedbackTests.cs" />
     <Compile Include="QuestionsTests.cs" />
-    <Compile Include="RatingScheduleTests.cs" />
+    <Compile Include="ScheduleTests.cs" />
     <Compile Include="SubscriptionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestWith.cs" />

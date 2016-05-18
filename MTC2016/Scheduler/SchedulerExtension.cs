@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Lime.Messaging.Contents;
 using Lime.Protocol;
@@ -15,22 +16,22 @@ namespace MTC2016.Scheduler
     {
         private readonly IApiAiForStaticContent _apiAi;
         private readonly IJobScheduler _jobScheduler;
-        private readonly IRecipientsRepository _recipientsRepository;
+        private readonly IDistributionListExtension _distributionListExtension;
         private readonly Settings _settings;
 
         public SchedulerExtension(
-            IApiAiForStaticContent apiAi, IJobScheduler jobScheduler, 
-            IRecipientsRepository recipientsRepository, Settings settings)
+            IApiAiForStaticContent apiAi, IJobScheduler jobScheduler,
+            IDistributionListExtension distributionListExtension, Settings settings)
         {
             _apiAi = apiAi;
             _jobScheduler = jobScheduler;
-            _recipientsRepository = recipientsRepository;
+            _distributionListExtension = distributionListExtension;
             _settings = settings;
         }
 
         protected virtual async Task ScheduleAsync(IEnumerable<ScheduledMessage> messagesToBeScheduled)
         {
-            var recipients = await _recipientsRepository.AsEnumerableAsync();
+            var recipients = (await _distributionListExtension.GetRecipientsAsync(CancellationToken.None)).ToArray();
             foreach (var messageToBeScheduled in messagesToBeScheduled)
             {
                 foreach (var recipient in recipients)
