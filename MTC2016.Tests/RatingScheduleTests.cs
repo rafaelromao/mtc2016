@@ -29,7 +29,7 @@ namespace MTC2016.Tests
         public async Task ReveiveScheduledRatingRequestAndAnswerIt()
         {
             var response = await Tester.ReceiveMessageAsync();
-            var ratingOptions = response.Content as Select;
+            var ratingOptions = response?.Content as Select;
             ratingOptions.ShouldNotBeNull();
             ratingOptions?.Text.ShouldStartWith(SchedulerExtensionWithSingleFakeRatingSchedule.TestScheduleText);
             ratingOptions?.Options.Length.ShouldBe(3);
