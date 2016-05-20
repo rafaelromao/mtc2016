@@ -95,32 +95,34 @@ namespace MTC2016.Scheduler
             {
                 var capture = match.Captures[0];
                 text = text.Replace(capture.Value, string.Empty).Trim();
-                return CreateRatingOptions(text, capture.Value.Replace("[", "").Replace("]", ""));
+                var order = int.Parse(capture.Value.Replace("[", "").Replace("]", ""));
+                return CreateRatingOptions(text, order);
             }
             return null;
         }
 
-        private Select CreateRatingOptions(string text, string toBeRated)
+        private Select CreateRatingOptions(string text, int order)
         {
             var select = new Select
             {
                 Text = text,
                 Options = new[]
                 {
-                    CreateRatingOption(toBeRated, _settings.BadRating),
-                    CreateRatingOption(toBeRated, _settings.RegularRating),
-                    CreateRatingOption(toBeRated, _settings.GoodRating),
+                    CreateRatingOption(int.Parse($"{order}1"), _settings.BadRating),
+                    CreateRatingOption(int.Parse($"{order}2"), _settings.RegularRating),
+                    CreateRatingOption(int.Parse($"{order}3"), _settings.GoodRating),
                 }
             };
             return select;
         }
 
-        private SelectOption CreateRatingOption(string toBeRated, string rating)
+        private SelectOption CreateRatingOption(int order, string rating)
         {
             return new SelectOption
             {
+                Order = order,
                 Text = rating,
-                Value = new PlainText { Text = $"{_settings.RatingPrefix}{toBeRated}:{rating}" }
+                Value = new PlainText { Text = $"{order}" }
             };
         }
     }

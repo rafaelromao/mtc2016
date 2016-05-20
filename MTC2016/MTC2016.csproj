@@ -108,7 +108,7 @@
     <Compile Include="FeedbackAndRating\IFeedbackRepository.cs" />
     <Compile Include="Receivers\ImageJpgMessageReceiver.cs" />
     <Compile Include="Receivers\RatingMessageReceiver.cs" />
-    <Compile Include="FeedbackAndRating\FeedbackMessageReceiver.cs" />
+    <Compile Include="Receivers\FeedbackMessageReceiver.cs" />
     <Compile Include="Receivers\QuestionMessageReceiver.cs" />
     <Compile Include="Scheduler\IJobScheduler.cs" />
     <Compile Include="Scheduler\JobScheduler.cs" />

@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using Lime.Protocol;
 using MTC2016.ArtificialInteligence;
 using MTC2016.Configuration;
+using MTC2016.FeedbackAndRating;
 using Takenet.MessagingHub.Client;
 using Takenet.MessagingHub.Client.Listener;
 using Takenet.MessagingHub.Client.Sender;
 
-namespace MTC2016.FeedbackAndRating
+namespace MTC2016.Receivers
 {
     public class FeedbackMessageReceiver : IMessageReceiver
     {

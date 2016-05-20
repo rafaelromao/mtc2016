@@ -36,6 +36,7 @@ namespace MTC2016.Receivers
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
         {
             var text = message.Content?.ToString().ToLower() ?? string.Empty;
+
             var feedback = new Feedback
             {
                 From = message.From,
