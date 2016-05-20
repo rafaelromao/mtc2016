@@ -22,7 +22,6 @@ namespace MTC2016.Tests
         public void SetUp()
         {
             Tester = CreateApplicationTester<TServiceProvider>();
-            Tester.StartAsync().Wait();
             ApiAiForStaticContent = Tester.GetService<IApiAiForStaticContent>();
             ApiAiForDynamicContent = Tester.GetService<IApiAiForDynamicContent>();
             Settings = Tester.GetService<Settings>();
@@ -58,7 +57,6 @@ namespace MTC2016.Tests
         public void TearDown()
         {
             ClearTestDataFromDatabase();
-            Tester.StopAsync().Wait();
             Tester.Dispose();
         }
 

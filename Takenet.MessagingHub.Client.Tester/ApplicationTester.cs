@@ -14,7 +14,7 @@ using Takenet.MessagingHub.Client.Listener;
 
 namespace Takenet.MessagingHub.Client.Tester
 {
-    public class ApplicationTester : IDisposable
+    public sealed class ApplicationTester : IDisposable
     {
         private readonly ApplicationTesterOptions _options;
         private static ConsoleTraceListener _listener;
@@ -48,10 +48,11 @@ namespace Takenet.MessagingHub.Client.Tester
         {
             Current = this;
             _options = options;
+            StartAsync().Wait();
         }
 
 
-        public async Task StartAsync()
+        private async Task StartAsync()
         {
             ApplyOptions();
             LoadApplicationSettings();
@@ -87,6 +88,10 @@ namespace Takenet.MessagingHub.Client.Tester
                 TestingAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TestingIdentifier, testingPassword);
 
                 TesterIdentifier = Application.Identifier + "$tester";
+                if (_options.TesterAccountIndex > 0)
+                {
+                    TesterIdentifier = $"{TesterIdentifier}{_options.TesterAccountIndex}";
+                }
                 TesterAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TesterIdentifier, testingPassword);
             }
             else
@@ -240,12 +245,13 @@ namespace Takenet.MessagingHub.Client.Tester
             await Task.Delay(TimeSpan.FromSeconds(seconds));
         }
 
-        public virtual void Dispose()
+        public void Dispose()
         {
+            StopAsync().Wait();
             _listener?.Dispose();
         }
 
-        public virtual void LoadApplicationJson(string appJson)
+        public void LoadApplicationJson(string appJson)
         {
             var appJsonContent = File.ReadAllText(appJson);
             Application = JsonConvert.DeserializeObject<Application>(appJsonContent);
@@ -311,16 +317,10 @@ namespace Takenet.MessagingHub.Client.Tester
             return (T)ApplicationServiceProvider.GetService(typeof(T));
         }
 
-        public async Task StopAsync()
+        private async Task StopAsync()
         {
             await StopSmartContactAsync();
             await StopTestClientAsync();
-        }
-
-        public async Task RestartAsync()
-        {
-            await StopAsync();
-            await StartAsync();
         }
     }
 }
