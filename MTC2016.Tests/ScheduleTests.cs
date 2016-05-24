@@ -8,7 +8,7 @@ using Shouldly;
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class MessageScheduleTests : TestWith<InMemorySubscriptionAndSingleFakeScheduleServiceProvider>
+    public class MessageScheduleTests : TestClass<InMemorySubscriptionAndSingleFakeScheduleServiceProvider>
     {
         [Test]
         public async Task ReceiveScheduledMessage()
@@ -20,7 +20,7 @@ namespace MTC2016.Tests
     }
 
     [TestFixture]
-    public class RatingScheduleTests : TestWith<InMemorySubscriptionAndSingleFakeRatingScheduleServiceProvider>
+    public class RatingScheduleTests : TestClass<InMemorySubscriptionAndSingleFakeRatingScheduleServiceProvider>
     {
         [Test]
         public async Task ReveiveScheduledRatingRequestAndAnswerIt()
@@ -36,9 +36,8 @@ namespace MTC2016.Tests
             var rating = ((PlainText)ratingOptions?.Options.First().Value)?.Text;
             await Tester.SendMessageAsync(rating);
             response = await Tester.ReceiveMessageAsync();
-            var intent = await ApiAiForStaticContent.GetIntentAsync(Settings.RatingConfirmation);
-            var answers = intent.Responses.SelectMany(r => r.Speech);
-            Assert(response, answers);
+            var answer = await ApiAiForStaticContent.GetAnswerAsync(Settings.RatingConfirmation);
+            Assert(response, answer);
 
             //TODO : Assert what was stored
         }

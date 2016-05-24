@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class FeedbackTests : TestWith<TestServiceProvider>
+    public class FeedbackTests : TestClass<TestServiceProvider>
     {
         [Test]
         [TestCase("feedback Gostei do Evento")]

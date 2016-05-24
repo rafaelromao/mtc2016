@@ -1,13 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using MTC2016.Receivers;
+﻿using System.Threading.Tasks;
 using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 
 namespace MTC2016.Tests
 {
     [TestFixture]
-    public class RealSubscribeTests : TestWith<TestServiceProvider>
+    public class RealSubscribeTests : TestClass<TestServiceProvider>
     {
         [Test]
         public async Task SubscribeUnsubscribeAndSubscribeTwiceAgain()
@@ -35,7 +33,7 @@ namespace MTC2016.Tests
     }
 
     [TestFixture]
-    public class EveryoneIsAlreadySubscribedSubscribeTests : TestWith<EveryoneIsSubscribedSubscriptionServiceProvider>
+    public class EveryoneIsAlreadySubscribedSubscribeTests : TestClass<EveryoneIsSubscribedSubscriptionServiceProvider>
     {
         [Test]
         public async Task SubscribeWhenAlreadySubscribed()
@@ -58,7 +56,7 @@ namespace MTC2016.Tests
     }
 
     [TestFixture]
-    public class NoOneIsAlreadySubscribedSubscriptionTests : TestWith<NoSubscriptionAndSingleFakeScheduleServiceProvider>
+    public class NoOneIsAlreadySubscribedSubscriptionTests : TestClass<NoSubscriptionAndSingleFakeScheduleServiceProvider>
     {
         [Test]
         public async Task Subscribe()
@@ -78,19 +76,4 @@ namespace MTC2016.Tests
             Assert(response, answer);
         }
     }
-
-    [TestFixture]
-    public class HundredOfSubscriptionsTests : TestWith<NoSubscriptionAndSingleFakeScheduleServiceProvider>
-    {
-        [Test]
-        public async Task FiveHundredSubscriptions()
-        {
-
-            await Tester.SendMessageAsync("Gostaria de participar!");
-            var response = await Tester.ReceiveMessageAsync();
-            var answer = await ApiAiForStaticContent.GetAnswerAsync(Settings.ConfirmSubscription);
-            Assert(response, answer);
-        }
-    }
-
 }
