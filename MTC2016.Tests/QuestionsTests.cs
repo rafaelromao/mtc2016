@@ -52,7 +52,7 @@ namespace MTC2016.Tests
 
         [Test]
         [TestCase("MobileApps?")]
-        [TestCase("Palestra MobileApps?")]
+        [TestCase("Palestra sobre MobileApps?")]
         public async Task AskAboutTalk(string intent)
         {
             await Tester.SendMessageAsync(intent);

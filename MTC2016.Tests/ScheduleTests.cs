@@ -36,8 +36,9 @@ namespace MTC2016.Tests
             var rating = ((PlainText)ratingOptions?.Options.First().Value)?.Text;
             await Tester.SendMessageAsync(rating);
             response = await Tester.ReceiveMessageAsync();
-            var answer = await ApiAiForStaticContent.GetAnswerAsync(Settings.RatingConfirmation);
-            Assert(response, answer);
+            var intent = await ApiAiForStaticContent.GetIntentAsync(Settings.RatingConfirmation);
+            var answers = intent.Responses.SelectMany(r => r.Speech);
+            Assert(response, answers);
 
             //TODO : Assert what was stored
         }

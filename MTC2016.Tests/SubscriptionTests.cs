@@ -78,4 +78,19 @@ namespace MTC2016.Tests
             Assert(response, answer);
         }
     }
+
+    [TestFixture]
+    public class HundredOfSubscriptionsTests : TestWith<NoSubscriptionAndSingleFakeScheduleServiceProvider>
+    {
+        [Test]
+        public async Task FiveHundredSubscriptions()
+        {
+
+            await Tester.SendMessageAsync("Gostaria de participar!");
+            var response = await Tester.ReceiveMessageAsync();
+            var answer = await ApiAiForStaticContent.GetAnswerAsync(Settings.ConfirmSubscription);
+            Assert(response, answer);
+        }
+    }
+
 }

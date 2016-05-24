@@ -10,26 +10,22 @@ using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.Receivers
 {
-    public class ImageJpgMessageReceiver : IMessageReceiver
+    public class ImageMessageReceiver : IMessageReceiver
     {
         private readonly IMessagingHubSender _sender;
-        private readonly IApiAiForStaticContent _apiAi;
-        private readonly Settings _settings;
         private readonly string _imageAnswer;
 
-        public ImageJpgMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, Settings settings)
+        public ImageMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, Settings settings)
         {
             _sender = sender;
-            _apiAi = apiAi;
-            _settings = settings;
             try
             {
-                _imageAnswer = _apiAi.GetAnswerAsync(_settings.ImageConfirmation).Result;
+                _imageAnswer = apiAi.GetAnswerAsync(settings.ImageConfirmation).Result;
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Exception when querying for {_settings.FeedbackConfirmation}: {e}");
-                _imageAnswer = _settings.GeneralError;
+                Console.WriteLine($"Exception when querying for {settings.FeedbackConfirmation}: {e}");
+                _imageAnswer = settings.GeneralError;
             }
         }
 
@@ -39,14 +35,14 @@ namespace MTC2016.Receivers
         }
     }
 
-    public class ImageJpegMessageReceiver : ImageJpgMessageReceiver
+    public class ImageJpegMessageReceiver : ImageMessageReceiver
     {
         public ImageJpegMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, Settings settings) : base(sender, apiAi, settings)
         {
         }
     }
 
-    public class ImagePngMessageReceiver : ImageJpgMessageReceiver
+    public class ImagePngMessageReceiver : ImageMessageReceiver
     {
         public ImagePngMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, Settings settings) : base(sender, apiAi, settings)
         {

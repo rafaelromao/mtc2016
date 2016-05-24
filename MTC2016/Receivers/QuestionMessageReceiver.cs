@@ -46,7 +46,7 @@ namespace MTC2016.Receivers
 
                 if (string.IsNullOrWhiteSpace(answer))
                 {
-                    answer = await _apiAi.GetAnswerAsync(_settings.Quote);
+                    answer = _defaultAnswer;
                 }
 
                 if (string.IsNullOrWhiteSpace(answer))

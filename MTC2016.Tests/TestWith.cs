@@ -1,4 +1,6 @@
-﻿using System.Data.SqlClient;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
 using MTC2016.Configuration;
 using NUnit.Framework;
 using Takenet.MessagingHub.Client.Tester;
@@ -11,6 +13,7 @@ namespace MTC2016.Tests
     public class TestWith<TServiceProvider>
         where TServiceProvider : ApplicationTesterServiceProvider
     {
+        protected ApplicationLoadTester ApplicationLoadTester { get; private set; }
         protected ApplicationTester Tester { get; private set; }
 
         protected IApiAiForStaticContent ApiAiForStaticContent { get; private set; }
@@ -21,6 +24,7 @@ namespace MTC2016.Tests
         [OneTimeSetUp]
         public void SetUp()
         {
+            ApplicationLoadTester = new ApplicationLoadTester(Options<TServiceProvider>());
             Tester = CreateApplicationTester<TServiceProvider>();
             ApiAiForStaticContent = Tester.GetService<IApiAiForStaticContent>();
             ApiAiForDynamicContent = Tester.GetService<IApiAiForDynamicContent>();
@@ -47,10 +51,15 @@ namespace MTC2016.Tests
         protected ApplicationTester CreateApplicationTester<TTestServiceProvider>()
             where TTestServiceProvider : ApplicationTesterServiceProvider
         {
-            return new ApplicationTester(new ApplicationTesterOptions
+            return new ApplicationTester(Options<TTestServiceProvider>());
+        }
+
+        private static ApplicationTesterOptions Options<TTestServiceProvider>() where TTestServiceProvider : ApplicationTesterServiceProvider
+        {
+            return new ApplicationTesterOptions
             {
                 TestServiceProviderType = typeof(TTestServiceProvider)
-            });
+            };
         }
 
         [OneTimeTearDown]
@@ -66,6 +75,14 @@ namespace MTC2016.Tests
             response.Content.ShouldNotBeNull();
             response.Content.ToString().ShouldNotBeNull();
             response.Content.ToString().ShouldBe(expected);
+        }
+
+        public void Assert(Message response, IEnumerable<string> expected)
+        {
+            response.ShouldNotBeNull();
+            response.Content.ShouldNotBeNull();
+            response.Content.ToString().ShouldNotBeNull();
+            expected.ShouldContain(response.Content.ToString());
         }
 
         public static void Assert(string actual, string expected)

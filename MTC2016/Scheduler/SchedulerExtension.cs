@@ -18,6 +18,9 @@ namespace MTC2016.Scheduler
         private readonly IJobScheduler _jobScheduler;
         private readonly IDistributionListExtension _distributionListExtension;
         private readonly Settings _settings;
+        private string _badRating;
+        private string _regularRating;
+        private string _goodRating;
 
         public SchedulerExtension(
             IApiAiForStaticContent apiAi, IJobScheduler jobScheduler,
@@ -27,6 +30,23 @@ namespace MTC2016.Scheduler
             _jobScheduler = jobScheduler;
             _distributionListExtension = distributionListExtension;
             _settings = settings;
+        }
+
+        private async Task SortRatingOptionsAsync()
+        {
+            try
+            {
+                _badRating = await _apiAi.GetAnswerAsync(_settings.BadRating);
+                _regularRating = await _apiAi.GetAnswerAsync(_settings.RegularRating);
+                _goodRating = await _apiAi.GetAnswerAsync(_settings.GoodRating);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception when querying for {_settings.CouldNotUnderstand}: {e}");
+                _badRating = "Ruim";
+                _regularRating = "Regular";
+                _goodRating = "Bom";
+            }
         }
 
         protected virtual async Task ScheduleAsync(IEnumerable<ScheduledMessage> messagesToBeScheduled)
@@ -59,7 +79,10 @@ namespace MTC2016.Scheduler
                 schedules.Where(s => DateTimeOffset.Parse(s.Name.Substring(schedulePrefix.Length)) >= DateTime.Now);
             foreach (var schedule in schedules)
             {
-                var text = (await _apiAi.GetIntentAsync(schedule.Id)).Responses.First().Speech;
+                var text = (await _apiAi.GetIntentAsync(schedule.Id)).Responses.First().Speech.FirstOrDefault();
+
+                await SortRatingOptionsAsync();
+
                 var ratingOptions = ExtractRatingFromText(text);
                 if (ratingOptions != null)
                 {

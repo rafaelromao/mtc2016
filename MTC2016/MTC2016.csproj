@@ -56,8 +56,8 @@
       <HintPath>packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SimpleInjector, Version=3.1.4.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
-      <HintPath>packages\SimpleInjector.3.1.4\lib\net45\SimpleInjector.dll</HintPath>
+    <Reference Include="SimpleInjector, Version=3.1.5.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>packages\SimpleInjector.3.1.5\lib\net45\SimpleInjector.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -65,12 +65,12 @@
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="Takenet.Elephant, Version=0.4.58.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Takenet.Elephant.0.4.58\lib\net461\Takenet.Elephant.dll</HintPath>
+    <Reference Include="Takenet.Elephant, Version=0.4.60.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Takenet.Elephant.0.4.60\lib\net461\Takenet.Elephant.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Takenet.Elephant.Sql, Version=0.4.58.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Takenet.Elephant.Sql.0.4.58\lib\net461\Takenet.Elephant.Sql.dll</HintPath>
+    <Reference Include="Takenet.Elephant.Sql, Version=0.4.60.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Takenet.Elephant.Sql.0.4.60\lib\net461\Takenet.Elephant.Sql.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Takenet.MessagingHub.Client, Version=0.3.63.0, Culture=neutral, processorArchitecture=MSIL">
@@ -97,6 +97,7 @@
     <Compile Include="ArtificialInteligence\QueryResponse.cs" />
     <Compile Include="ArtificialInteligence\QueryResult.cs" />
     <Compile Include="ArtificialInteligence\QueryResultFulfillment.cs" />
+    <Compile Include="ArtificialInteligence\SingleOrArrayConverter.cs" />
     <Compile Include="ArtificialInteligence\UserSays.cs" />
     <Compile Include="ArtificialInteligence\UserSaysData.cs" />
     <Compile Include="DistributionList\IrisRecipientsRepository.cs" />
@@ -106,7 +107,7 @@
     <Compile Include="DistributionList\IRecipientsRepository.cs" />
     <Compile Include="DistributionList\RecipientsRepository.cs" />
     <Compile Include="FeedbackAndRating\IFeedbackRepository.cs" />
-    <Compile Include="Receivers\ImageJpgMessageReceiver.cs" />
+    <Compile Include="Receivers\ImageMessageReceiver.cs" />
     <Compile Include="Receivers\RatingMessageReceiver.cs" />
     <Compile Include="Receivers\FeedbackMessageReceiver.cs" />
     <Compile Include="Receivers\QuestionMessageReceiver.cs" />

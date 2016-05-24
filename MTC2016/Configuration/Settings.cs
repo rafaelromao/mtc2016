@@ -22,7 +22,6 @@ namespace MTC2016.Configuration
         public string NotSubscribed { get; set; }
         public string ConfirmSubscriptionCancellation { get; set; }
         public string UnsubscriptionFailed { get; set; }
-        public string Quote { get; set; }
         public string FeedbackConfirmation { get; set; }
         public string FeedbackPrefix { get; set; }
         public string FeedbackFailed { get; set; }
