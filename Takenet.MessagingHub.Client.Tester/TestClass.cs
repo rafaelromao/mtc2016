@@ -30,7 +30,7 @@ namespace Takenet.MessagingHub.Client.Tester
             return new ApplicationTester(Options<TTestServiceProvider>());
         }
 
-        private static ApplicationTesterOptions Options<TTestServiceProvider>()
+        protected virtual ApplicationTesterOptions Options<TTestServiceProvider>()
             where TTestServiceProvider : ApplicationTesterServiceProvider
         {
             return new ApplicationTesterOptions
@@ -49,6 +49,17 @@ namespace Takenet.MessagingHub.Client.Tester
             response.ShouldNotBeNull();
             response.Content.ShouldNotBeNull();
             expected.ShouldContain(response.Content.ToString());
+        }
+
+        public static void Assert(string response, string expected)
+        {
+            Assert(response, new[] { expected });
+        }
+
+        public static void Assert(string response, IEnumerable<string> expected)
+        {
+            response.ShouldNotBeNull();
+            expected.ShouldContain(response);
         }
 
         public static void Assert(IEnumerable<Message> responses, IEnumerable<string> expected, int messageCount, int testerCount)

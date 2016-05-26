@@ -88,6 +88,7 @@
     <Compile Include="LoadTests.cs" />
     <Compile Include="Mocks\EveryoneIsSubscribedDistributionListExtension.cs" />
     <Compile Include="Mocks\NoPersistenceDistributionListExtension.cs" />
+    <Compile Include="Mocks\QuestionMessageReceiverForCustomDomains.cs" />
     <Compile Include="Mocks\SchedulerExtensionWithSingleFakeRatingSchedule.cs" />
     <Compile Include="Mocks\QuestionMessageReceiverThatDoesNotParseImages.cs" />
     <Compile Include="Mocks\SchedulerExtensionWithSingleFakeSchedule.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Mocks\TestServiceProvider.cs" />
     <Compile Include="FeedbackTests.cs" />
     <Compile Include="QuestionsTests.cs" />
+    <Compile Include="RatingTests.cs" />
     <Compile Include="ScheduleTests.cs" />
     <Compile Include="SubscriptionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

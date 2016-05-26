@@ -60,6 +60,26 @@ namespace MTC2016.Tests.Mocks
         }
     }
 
+    public class InMemorySubscriptionAndSingleFakeOmniRatingScheduleServiceProvider : TestServiceProvider
+    {
+        static InMemorySubscriptionAndSingleFakeOmniRatingScheduleServiceProvider()
+        {
+            RegisterTestService<IDistributionListExtension, InMemoryDistributionListExtension>();
+            RegisterTestService<ISchedulerExtension, SchedulerExtensionWithSingleFakeOmniRatingSchedule>();
+            RegisterTestService<QuestionMessageReceiver, QuestionMessageReceiverForOmni>();
+        }
+    }
+
+    public class InMemorySubscriptionAndSingleFakeTangramRatingScheduleServiceProvider : TestServiceProvider
+    {
+        static InMemorySubscriptionAndSingleFakeTangramRatingScheduleServiceProvider()
+        {
+            RegisterTestService<IDistributionListExtension, InMemoryDistributionListExtension>();
+            RegisterTestService<ISchedulerExtension, SchedulerExtensionWithSingleFakeTangramRatingSchedule>();
+            RegisterTestService<QuestionMessageReceiver, QuestionMessageReceiverForTangram>();
+        }
+    }
+
     public class QuestionMessageReceiverThatDoesNotParseImagesServiceProvider : TestServiceProvider
     {
         static QuestionMessageReceiverThatDoesNotParseImagesServiceProvider()

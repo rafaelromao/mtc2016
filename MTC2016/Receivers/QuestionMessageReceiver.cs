@@ -93,11 +93,11 @@ namespace MTC2016.Receivers
 
         private async Task SendImagesAsync(string uri, Node from, CancellationToken cancellationToken)
         {
-            var domain = from.Domain;
+            var domain = GetDomain(@from);
             Document document;
             switch (domain)
             {
-                case "0mn.io":
+                case Domains.Omni:
                     var jsondocument = new JsonDocument(new MediaType("application", "vnd.omni.text", "json"));
                     var attachments = new List<IDictionary<string, object>>();
                     var attachment = new Dictionary<string, object>
@@ -122,6 +122,11 @@ namespace MTC2016.Receivers
             }
 
             await _sender.SendMessageAsync(document, from, cancellationToken);
+        }
+
+        protected virtual string GetDomain(Identity from)
+        {
+            return from.Domain;
         }
 
         private bool IsValidQuestion(string question)

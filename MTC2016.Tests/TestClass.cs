@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System;
+using System.Data.SqlClient;
 using MTC2016.Configuration;
 using NUnit.Framework;
 using Takenet.MessagingHub.Client.Tester;

@@ -66,6 +66,13 @@ namespace MTC2016.ArtificialInteligence
 
         public async Task<Intent> GetIntentAsync(string intentId)
         {
+            Guid guid;
+            if (!Guid.TryParse(intentId, out guid))
+            {
+                var queryResponse = await GetQueryAsync(intentId);
+                intentId = queryResponse.Result.Metadata.IntentId;
+            }
+
             if (_cache.Contains(intentId))
                 return _cache[intentId] as Intent;
 
@@ -95,7 +102,7 @@ namespace MTC2016.ArtificialInteligence
         {
             _cache.Add(new CacheItem(key, value), new CacheItemPolicy
             {
-                AbsoluteExpiration = DateTimeOffset.Now.AddDays(1)
+                AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(Settings.CacheExpirationInMinutes)
             });
         }
 

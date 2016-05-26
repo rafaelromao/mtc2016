@@ -8,7 +8,7 @@ namespace MTC2016.Tests
     [TestFixture]
     public class LoadTests : TestClass<NoSubscriptionAndSingleFakeScheduleServiceProvider>
     {
-        [Test]
+        [Test][Ignore("")]
         public async Task FiveHundredSubscriptions()
         {
             const int messageCount = 500;

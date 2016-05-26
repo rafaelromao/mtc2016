@@ -68,17 +68,23 @@ namespace MTC2016.Scheduler
             }
         }
 
-        private static Document GetMessageToBeScheduledAccordingToDestinationDomain(ScheduledMessage messageToBeScheduled, Identity recipient)
+        private Document GetMessageToBeScheduledAccordingToDestinationDomain(ScheduledMessage messageToBeScheduled, Identity recipient)
         {
-            switch (recipient.Domain)
+            var domain = GetDomain(recipient);
+            switch (domain)
             {
-                case "0mni.io":
+                case Domains.Omni:
                     return messageToBeScheduled.OmniMessage;
-                case "tangram.com.br":
+                case Domains.Tangram:
                     return messageToBeScheduled.TangramMessage;
                 default:
                     return messageToBeScheduled.DefaultMessage;
             }
+        }
+
+        protected virtual string GetDomain(Identity domain)
+        {
+            return domain.Domain;
         }
 
         protected virtual async Task<IEnumerable<ScheduledMessage>> GetMessagesToBeScheduled()
@@ -140,10 +146,10 @@ namespace MTC2016.Scheduler
                 int order;
                 switch (domain)
                 {
-                    case "0mn.io":
+                    case Domains.Omni:
                         order = int.Parse(capture.Value.Replace("[", "").Replace("]", ""));
                         return CreateOmniRatingOptions(text, order);
-                    case "tangram.com.br":
+                    case Domains.Tangram:
                         order = int.Parse(capture.Value.Replace("[", "").Replace("]", ""));
                         return CreateTangramRatingOptions(text, order);
                     default:
@@ -161,9 +167,9 @@ namespace MTC2016.Scheduler
                 Text = text,
                 Options = new[]
                 {
-                    CreateRatingOption(null, _settings.BadRating, int.Parse($"{order}1")),
-                    CreateRatingOption(null, _settings.RegularRating, int.Parse($"{order}2")),
-                    CreateRatingOption(null, _settings.GoodRating, int.Parse($"{order}3")),
+                    CreateRatingOption(null, _badRating, int.Parse($"{order}1")),
+                    CreateRatingOption(null, _regularRating, int.Parse($"{order}2")),
+                    CreateRatingOption(null, _goodRating, int.Parse($"{order}3")),
                 }
             };
             return select;
@@ -176,9 +182,9 @@ namespace MTC2016.Scheduler
                 Text = text,
                 Options = new[]
                 {
-                    CreateRatingOption(int.Parse($"{order}1"), _settings.BadRating),
-                    CreateRatingOption(int.Parse($"{order}2"), _settings.RegularRating),
-                    CreateRatingOption(int.Parse($"{order}3"), _settings.GoodRating),
+                    CreateRatingOption(int.Parse($"{order}1"), _badRating),
+                    CreateRatingOption(int.Parse($"{order}2"), _regularRating),
+                    CreateRatingOption(int.Parse($"{order}3"), _goodRating),
                 }
             };
             return select;
@@ -197,12 +203,12 @@ namespace MTC2016.Scheduler
 
         private Document CreateOmniRatingOptions(string text, int order)
         {
-            var bad = $"{int.Parse($"{order}1")}.{_settings.BadRating}";
-            var regular = $"{int.Parse($"{order}2")}.{_settings.RegularRating}";
-            var good = $"{int.Parse($"{order}3")}.{_settings.GoodRating}";
+            var bad = $"{int.Parse($"{order}1")}.{_badRating}";
+            var regular = $"{int.Parse($"{order}2")}.{_regularRating}";
+            var good = $"{int.Parse($"{order}3")}.{_goodRating}";
             var select = new PlainText
             {
-                Text = $"{text}. Envie: {bad}; {regular}; {good}"
+                Text = $"{text} Envie: {bad}; {regular}; {good}"
             };
             return select;
         }

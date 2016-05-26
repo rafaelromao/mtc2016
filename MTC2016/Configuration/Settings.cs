@@ -33,6 +33,7 @@ namespace MTC2016.Configuration
         public string RegularRating { get; set; }
         public string GoodRating { get; set; }
         public string ImageConfirmation { get; set; }
+        public double CacheExpirationInMinutes { get; set; }
 
         public string EncodeIdentity(string text)
         {
