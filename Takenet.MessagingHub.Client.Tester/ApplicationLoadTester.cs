@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Lime.Messaging.Contents;
@@ -17,6 +18,23 @@ namespace Takenet.MessagingHub.Client.Tester
             _options = options;
         }
 
+        public async Task PrepareTestersAsync(int testerCount)
+        {
+            const int testerGroupSize = 10;
+            var testerGroupCount = testerCount / testerGroupSize + 1;
+
+            for (var testerGroupCounter = 0; testerGroupCounter < testerGroupCount; testerGroupCounter++)
+            {
+                var testerCounterStart = testerGroupCounter * testerGroupSize;
+                var testerCounterEnd = testerCounterStart + testerGroupSize;
+                for (var testerCounter = testerCounterStart; testerCounter < testerCounterEnd && testerCounter < testerCount; testerCounter++)
+                {
+                    GetTester(testerCounter);
+                    await Task.Delay(TimeSpan.FromMilliseconds(150));
+                }
+            }
+        }
+
         public async Task SendMessagesAsync(Document message, int messageCount, int testerCount)
         {
             int rem;
@@ -24,19 +42,29 @@ namespace Takenet.MessagingHub.Client.Tester
             if (rem != 0) throw new ArithmeticException($"{messageCount} is not divisible by {testerCount}");
 
             var share = messageCount / testerCount;
-            for (var testerCounter = 0; testerCounter < testerCount; testerCounter++)
+            const int testerGroupSize = 10;
+            var testerGroupCount = testerCount / testerGroupSize + 1;
+
+            for (var testerGroupCounter = 0; testerGroupCounter < testerGroupCount; testerGroupCounter++)
             {
-                var tester = GetTester(testerCounter);
-                for (var messageCounter = 0; messageCounter < share; messageCounter++)
+                var testerCounterStart = testerGroupCounter * testerGroupSize;
+                var testerCounterEnd = testerCounterStart + testerGroupSize;
+                for (var testerCounter = testerCounterStart; testerCounter < testerCounterEnd && testerCounter < testerCount; testerCounter++)
                 {
-                    await tester.SendMessageAsync(message);
+                    var tester = GetTester(testerCounter);
+                    await Task.Delay(TimeSpan.FromMilliseconds(150));
+                    for (var messageCounter = 0; messageCounter < share; messageCounter++)
+                    {
+                        await tester.SendMessageAsync(message);
+                        await Task.Delay(TimeSpan.FromMilliseconds(150));
+                    }
                 }
             }
         }
 
         public Task SendMessagesAsync(string message, int messageCount, int testerCount)
         {
-            return SendMessagesAsync(new PlainText { Text = message}, messageCount, testerCount);
+            return SendMessagesAsync(new PlainText { Text = message }, messageCount, testerCount);
         }
 
         public Task<Message> ReceiveMessageAsync(int testerIndex, TimeSpan timeout)

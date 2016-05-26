@@ -9,6 +9,8 @@ namespace MTC2016.Scheduler
     {
         [JsonConverter(typeof(IsoDateTimeConverter))]
         public DateTimeOffset Time { get; set; }
-        public Document Message { get; set; }
+        public Document DefaultMessage { get; set; }
+        public Document TangramMessage { get; set; }
+        public Document OmniMessage { get; set; }
     }
 }

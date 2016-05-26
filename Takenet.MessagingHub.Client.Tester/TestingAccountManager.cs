@@ -27,13 +27,13 @@ namespace Takenet.MessagingHub.Client.Tester
             Domain = Application.Domain ?? "msging.net";
         }
 
-        public async Task<string> CreateAccountWithAccessKeyAsync(string name, string password)
+        public async Task<string> CreateAccountWithAccessKeyAsync(string name, string password, string customDomain = null)
         {
-            await CreateAccountAsync(name, password);
+            await CreateAccountAsync(name, password, customDomain);
             return await CreateAccessKeyAsync(name, password);
         }
 
-        public async Task CreateAccountAsync(string name, string password)
+        public async Task CreateAccountAsync(string name, string password, string customDomain = null)
         {
             IClientChannel clientChannel = null;
             try
@@ -46,7 +46,7 @@ namespace Takenet.MessagingHub.Client.Tester
                     From = new Node
                     {
                         Name = name,
-                        Domain = Domain
+                        Domain = customDomain ?? Domain
                     },
                     Pp = clientChannel.LocalNode,
                     Method = CommandMethod.Set,

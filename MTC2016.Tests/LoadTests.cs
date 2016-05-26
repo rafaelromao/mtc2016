@@ -13,8 +13,10 @@ namespace MTC2016.Tests
         {
             const int messageCount = 500;
             const int testerCount = 500;
+            await LoadTester.PrepareTestersAsync(testerCount);
+            Console.WriteLine($"ALL {testerCount} TESTERS REGISTERED!");
             await LoadTester.SendMessagesAsync("Gostaria de participar!", messageCount, testerCount);
-            var responses = await LoadTester.ReceiveMessagesAsync(TimeSpan.FromMinutes(5));
+            var responses = await LoadTester.ReceiveMessagesAsync(TimeSpan.FromMinutes(16));
             var answer = await ApiAiForStaticContent.GetAnswerAsync(Settings.ConfirmSubscription);
             Assert(responses, answer, messageCount, testerCount);
         }

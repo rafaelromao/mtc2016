@@ -92,7 +92,7 @@ namespace Takenet.MessagingHub.Client.Tester
                 {
                     TesterIdentifier = $"{TesterIdentifier}{_options.TesterAccountIndex}";
                 }
-                TesterAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TesterIdentifier, testingPassword);
+                TesterAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TesterIdentifier, testingPassword, _options.CustomDomain);
             }
             else
             {

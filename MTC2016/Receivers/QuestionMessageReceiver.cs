@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -92,19 +93,42 @@ namespace MTC2016.Receivers
 
         private async Task SendImagesAsync(string uri, Node from, CancellationToken cancellationToken)
         {
-            var mediaLink = new MediaLink
+            var domain = from.Domain;
+            Document document;
+            switch (domain)
             {
-                Type = MediaType.Parse("image/jpg"),
-                Uri = new Uri(uri)
-            };
-            await _sender.SendMessageAsync(mediaLink, from, cancellationToken);
+                case "0mn.io":
+                    var jsondocument = new JsonDocument(new MediaType("application", "vnd.omni.text", "json"));
+                    var attachments = new List<IDictionary<string, object>>();
+                    var attachment = new Dictionary<string, object>
+                    {
+                        {"mimeType", "image/jpeg"},
+                        {"mediaType", "image"},
+                        {"size", 100},
+                        {"remoteUri", uri},
+                        {"thumbnailUri", uri}
+                    };
+                    attachments.Add(attachment);
+                    jsondocument.Add(nameof(attachments), attachments);
+                    document = jsondocument;
+                    break;
+                default:
+                    document = new MediaLink
+                    {
+                        Type = MediaType.Parse("image/jpg"),
+                        Uri = new Uri(uri)
+                    };
+                    break;
+            }
+
+            await _sender.SendMessageAsync(document, from, cancellationToken);
         }
 
         private bool IsValidQuestion(string question)
         {
             // Does not allow questions starting with $ or %
-            return !question.StartsWith("$") && 
-                   !question.StartsWith(_settings.SchedulePrefix) && 
+            return !question.StartsWith("$") &&
+                   !question.StartsWith(_settings.SchedulePrefix) &&
                    !question.StartsWith(_settings.FeedbackPrefix) &&
                    !question.StartsWith(_settings.RatingPrefix);
         }

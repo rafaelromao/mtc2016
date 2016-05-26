@@ -35,10 +35,10 @@ namespace MTC2016.Tests.Mocks
         protected override async Task<IEnumerable<ScheduledMessage>> GetMessagesToBeScheduled()
         {
             var result = await base.GetMessagesToBeScheduled();
-            result = result.Where(s => s.Message is Select).Take(1);
+            result = result.Where(s => s.DefaultMessage is Select).Take(1);
             result.ForEach(s =>
             {
-                TestScheduleText = ((Select) s.Message).Text;
+                TestScheduleText = ((Select) s.DefaultMessage).Text;
                 s.Time = DateTimeOffset.Now;
             });
             return result;

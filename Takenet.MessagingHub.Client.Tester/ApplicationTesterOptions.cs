@@ -9,6 +9,7 @@ namespace Takenet.MessagingHub.Client.Tester
         public bool UseSeparateTestingAccount = true;
         public int TesterAccountIndex;
         public bool UseErrorStream;
+        public string CustomDomain;
         public Type TestServiceProviderType;
 
         public ApplicationTesterOptions Clone()
@@ -20,6 +21,7 @@ namespace Takenet.MessagingHub.Client.Tester
                 TestServiceProviderType = TestServiceProviderType,
                 UseErrorStream = UseErrorStream,
                 UseSeparateTestingAccount = UseSeparateTestingAccount,
+                CustomDomain = CustomDomain,
                 TesterAccountIndex = TesterAccountIndex
             };
         }

@@ -39,7 +39,7 @@ namespace MTC2016.Tests.Mocks
             result.ForEach(s =>
             {
                 s.Time = DateTimeOffset.Now;
-                s.Message = new PlainText { Text = TestScheduleText };
+                s.DefaultMessage = new PlainText { Text = TestScheduleText };
             });
             return result;
         }
