@@ -47,7 +47,7 @@ namespace MTC2016.Tests
             var ratingOptions = response?.Content as PlainText;
             ratingOptions.ShouldNotBeNull();
             ratingOptions?.Text.ShouldStartWith(SchedulerExtensionWithSingleFakeRatingSchedule.TestScheduleText);
-            ratingOptions?.Text.ShouldContain("Envie:");
+            ratingOptions?.Text.ShouldContain("Escolha:");
         }
     }
 

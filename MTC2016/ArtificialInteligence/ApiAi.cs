@@ -1,14 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Caching;
-using System.Text;
 using System.Threading.Tasks;
-using Lime.Protocol;
 using MTC2016.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -24,12 +19,11 @@ namespace MTC2016.ArtificialInteligence
         const string MediaType = "application/json";
         private readonly HttpClient _httpClient;
         private readonly ObjectCache _cache = new MemoryCache(nameof(MTC2016));
-
-        public Settings Settings { get; }
+        private readonly Settings _settings;
 
         protected ApiAi(Settings settings, string apiAiDeveloperApiKey)
         {
-            Settings = settings;
+            _settings = settings;
             _httpClient = new HttpClient();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiAiDeveloperApiKey);
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaType));
@@ -38,10 +32,10 @@ namespace MTC2016.ArtificialInteligence
 
         private async Task<QueryResponse> GetQueryAsync(string question)
         {
-            if (_cache.Contains(question))
+            if (_cache.Contains(question) && question != _settings.CouldNotUnderstand)
                 return _cache[question] as QueryResponse;
 
-            var uri = new Uri($"{Settings.ApiAiUri}/query?v=20150910&query={question}&lang=pt-br");
+            var uri = new Uri($"{_settings.ApiAiUri}/query?v=20150910&query={question}&lang=pt-br");
             var response = await _httpClient.GetAsync(uri);
             var json = await response.Content.ReadAsStringAsync();
 
@@ -52,16 +46,11 @@ namespace MTC2016.ArtificialInteligence
 
         public async Task<IEnumerable<Intent>> GetIntentsAsync()
         {
-            if (_cache.Contains(typeof(IEnumerable<Intent>).Name))
-                return _cache[typeof(IEnumerable<Intent>).Name] as IEnumerable<Intent>;
-
-            var uri = new Uri($"{Settings.ApiAiUri}/intents");
+            var uri = new Uri($"{_settings.ApiAiUri}/intents");
             var response = await _httpClient.GetAsync(uri);
             var json = await response.Content.ReadAsStringAsync();
 
-            var intentsResponse = JsonConvert.DeserializeObject<Intent[]>(json, JsonSerializerSettings);
-            AddToCache(typeof(Intent[]).Name, intentsResponse);
-            return intentsResponse;
+            return JsonConvert.DeserializeObject<Intent[]>(json, JsonSerializerSettings);
         }
 
         public async Task<Intent> GetIntentAsync(string intentId)
@@ -76,7 +65,7 @@ namespace MTC2016.ArtificialInteligence
             if (_cache.Contains(intentId))
                 return _cache[intentId] as Intent;
 
-            var uri = new Uri($"{Settings.ApiAiUri}/intents/{intentId}");
+            var uri = new Uri($"{_settings.ApiAiUri}/intents/{intentId}");
             var response = await _httpClient.GetAsync(uri);
             var json = await response.Content.ReadAsStringAsync();
 
@@ -94,7 +83,7 @@ namespace MTC2016.ArtificialInteligence
             }
             catch
             {
-                return Settings.GeneralError;
+                return _settings.GeneralError;
             }
         }
 
@@ -102,7 +91,7 @@ namespace MTC2016.ArtificialInteligence
         {
             _cache.Add(new CacheItem(key, value), new CacheItemPolicy
             {
-                AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(Settings.CacheExpirationInMinutes)
+                AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(_settings.CacheExpirationInMinutes)
             });
         }
 

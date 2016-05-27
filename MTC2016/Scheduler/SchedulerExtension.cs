@@ -52,9 +52,9 @@ namespace MTC2016.Scheduler
         protected virtual async Task ScheduleAsync(IEnumerable<ScheduledMessage> messagesToBeScheduled)
         {
             var recipients = (await _distributionListExtension.GetRecipientsAsync(CancellationToken.None)).ToArray();
-            foreach (var messageToBeScheduled in messagesToBeScheduled)
+            foreach (var messageToBeScheduled in messagesToBeScheduled.AsParallel())
             {
-                foreach (var recipient in recipients)
+                foreach (var recipient in recipients.AsParallel())
                 {
                     var message = new Message
                     {
@@ -96,15 +96,15 @@ namespace MTC2016.Scheduler
             // Ignore expired schedules
             schedules =
                 schedules.Where(s => DateTimeOffset.Parse(s.Name.Substring(schedulePrefix.Length)) >= DateTime.Now);
-            foreach (var schedule in schedules)
+            foreach (var schedule in schedules.AsParallel())
             {
                 var text = (await _apiAi.GetIntentAsync(schedule.Id)).Responses.First().Speech.FirstOrDefault();
 
                 await SortRatingOptionsAsync();
 
                 var defaultRatingOptions = ExtractRatingFromText(text);
-                var tangramRatingOptions = ExtractRatingFromText(text, "tangram.com.br");
-                var omniRatingOptions = ExtractRatingFromText(text, "0mn.io");
+                var tangramRatingOptions = ExtractRatingFromText(text, Domains.Tangram);
+                var omniRatingOptions = ExtractRatingFromText(text, Domains.Omni);
                 if (defaultRatingOptions != null)
                 {
                     // Rating request
@@ -147,11 +147,9 @@ namespace MTC2016.Scheduler
                 switch (domain)
                 {
                     case Domains.Omni:
-                        order = int.Parse(capture.Value.Replace("[", "").Replace("]", ""));
-                        return CreateOmniRatingOptions(text, order);
                     case Domains.Tangram:
                         order = int.Parse(capture.Value.Replace("[", "").Replace("]", ""));
-                        return CreateTangramRatingOptions(text, order);
+                        return CreateOmniAndTangramRatingOptions(text, order);
                     default:
                         order = int.Parse(capture.Value.Replace("[", "").Replace("]", ""));
                         return CreateDefaultRatingOptions(text, order);
@@ -175,21 +173,6 @@ namespace MTC2016.Scheduler
             return select;
         }
 
-        private Document CreateTangramRatingOptions(string text, int order)
-        {
-            var select = new Select
-            {
-                Text = text,
-                Options = new[]
-                {
-                    CreateRatingOption(int.Parse($"{order}1"), _badRating),
-                    CreateRatingOption(int.Parse($"{order}2"), _regularRating),
-                    CreateRatingOption(int.Parse($"{order}3"), _goodRating),
-                }
-            };
-            return select;
-        }
-
         private static SelectOption CreateRatingOption(int? order, string rating, object value = null)
         {
             value = value ?? order;
@@ -201,14 +184,14 @@ namespace MTC2016.Scheduler
             };
         }
 
-        private Document CreateOmniRatingOptions(string text, int order)
+        private Document CreateOmniAndTangramRatingOptions(string text, int order)
         {
-            var bad = $"{int.Parse($"{order}1")}.{_badRating}";
-            var regular = $"{int.Parse($"{order}2")}.{_regularRating}";
-            var good = $"{int.Parse($"{order}3")}.{_goodRating}";
+            var bad = $"{int.Parse($"{order}1")} {_badRating}";
+            var regular = $"{int.Parse($"{order}2")} {_regularRating}";
+            var good = $"{int.Parse($"{order}3")} {_goodRating}";
             var select = new PlainText
             {
-                Text = $"{text} Envie: {bad}; {regular}; {good}"
+                Text = $"{text} Escolha:{bad};{regular};{good}"
             };
             return select;
         }

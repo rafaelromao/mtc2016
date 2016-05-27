@@ -18,22 +18,12 @@ namespace MTC2016.Receivers
         private readonly IMessagingHubSender _sender;
         private readonly IApiAiForDynamicContent _apiAi;
         private readonly Settings _settings;
-        private readonly string _defaultAnswer;
 
         public QuestionMessageReceiver(IMessagingHubSender sender, IApiAiForDynamicContent apiAi, Settings settings)
         {
             _sender = sender;
             _apiAi = apiAi;
             _settings = settings;
-            try
-            {
-                _defaultAnswer = _apiAi.GetAnswerAsync(_settings.CouldNotUnderstand).Result;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Exception when querying for {_settings.CouldNotUnderstand}: {e}");
-                _defaultAnswer = _settings.GeneralError;
-            }
         }
 
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
@@ -42,17 +32,17 @@ namespace MTC2016.Receivers
             {
                 var question = message.Content?.ToString() ?? string.Empty;
                 var answer = !IsValidQuestion(question)
-                    ? _defaultAnswer
+                    ? await GetDefaultAnswerAsync()
                     : await _apiAi.GetAnswerAsync(question);
 
                 if (string.IsNullOrWhiteSpace(answer))
                 {
-                    answer = _defaultAnswer;
+                    answer = await GetDefaultAnswerAsync();
                 }
 
                 if (string.IsNullOrWhiteSpace(answer))
                 {
-                    await _sender.SendMessageAsync(_defaultAnswer, message.From, cancellationToken);
+                    await _sender.SendMessageAsync(await GetDefaultAnswerAsync(), message.From, cancellationToken);
                 }
                 else
                 {
@@ -66,7 +56,7 @@ namespace MTC2016.Receivers
                 Console.WriteLine($"Exception when querying for {message.Content}: {e}");
                 try
                 {
-                    await _sender.SendMessageAsync(_defaultAnswer, message.From, cancellationToken);
+                    await _sender.SendMessageAsync(await GetDefaultAnswerAsync(), message.From, cancellationToken);
                 }
 #pragma warning disable CC0004 // Catch block cannot be empty
                 catch
@@ -74,6 +64,19 @@ namespace MTC2016.Receivers
                     // ignored
                 }
 #pragma warning restore CC0004 // Catch block cannot be empty
+            }
+        }
+
+        private async Task<string> GetDefaultAnswerAsync()
+        {
+            try
+            {
+                return await _apiAi.GetAnswerAsync(_settings.CouldNotUnderstand);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception when querying for {_settings.CouldNotUnderstand}: {e}");
+                return _settings.GeneralError;
             }
         }
 
