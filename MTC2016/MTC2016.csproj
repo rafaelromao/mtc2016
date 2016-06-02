@@ -95,6 +95,7 @@
     <Compile Include="ArtificialInteligence\IntentResponse.cs" />
     <Compile Include="ArtificialInteligence\QueryMetadata.cs" />
     <Compile Include="ArtificialInteligence\QueryResponse.cs" />
+    <Compile Include="ArtificialInteligence\QueryRequest.cs" />
     <Compile Include="ArtificialInteligence\QueryResult.cs" />
     <Compile Include="ArtificialInteligence\QueryResultFulfillment.cs" />
     <Compile Include="ArtificialInteligence\SingleOrArrayConverter.cs" />

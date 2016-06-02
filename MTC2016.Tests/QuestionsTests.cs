@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 using Shouldly;
@@ -59,6 +60,37 @@ namespace MTC2016.Tests
             var response = await Tester.ReceiveMessageAsync();
             var answer = await ApiAiForStaticContent.GetAnswerAsync(intent);
             Assert(response, answer);
+        }
+
+        [Test]
+        [TestCase("#")]
+        [TestCase("#asdasda")]
+        [TestCase("#asdasd#")]
+        [TestCase("asdasdasd#")]
+        [TestCase("asdasdasd#asdasdasd")]
+        [TestCase("%")]
+        [TestCase("?")]
+        [TestCase("$")]
+        [TestCase("¨")]
+        [TestCase("(")]
+        [TestCase(")")]
+        [TestCase("{")]
+        [TestCase("}")]
+        [TestCase("[")]
+        [TestCase("]")]
+        [TestCase("+")]
+        [TestCase("\\")]
+        [TestCase("/")]
+        [TestCase("\"")]
+        [TestCase("")]
+        [TestCase(" ")]
+        public async Task AskStrangeCharactersTalk(string query)
+        {
+            await Tester.SendMessageAsync(query);
+            var response = await Tester.ReceiveMessageAsync();
+            var intent = await ApiAiForStaticContent.GetIntentAsync(Settings.CouldNotUnderstand);
+            var speechs = intent.Responses.SelectMany(r => r.Speech);
+            Assert(response, speechs);
         }
     }
 }

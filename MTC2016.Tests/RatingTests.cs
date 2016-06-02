@@ -47,7 +47,7 @@ namespace MTC2016.Tests
             var ratingOptions = response?.Content as PlainText;
             ratingOptions.ShouldNotBeNull();
             ratingOptions?.Text.ShouldStartWith(SchedulerExtensionWithSingleFakeRatingSchedule.TestScheduleText);
-            ratingOptions?.Text.ShouldContain("Escolha:");
+            ratingOptions?.Text.ShouldContain("?: ");
         }
     }
 
@@ -58,17 +58,10 @@ namespace MTC2016.Tests
         public async Task ReveiveScheduledRatingRequestAndAnswerIt()
         {
             var response = await Tester.ReceiveMessageAsync();
-            var ratingOptions = response?.Content as Select;
+            var ratingOptions = response?.Content as PlainText;
             ratingOptions.ShouldNotBeNull();
             ratingOptions?.Text.ShouldStartWith(SchedulerExtensionWithSingleFakeRatingSchedule.TestScheduleText);
-
-            var badRatingsIntent = await ApiAiForStaticContent.GetIntentAsync(Settings.BadRating);
-            var badRatings = badRatingsIntent.Responses.First().Speech;
-            Assert(ratingOptions?.Options.First().Text, badRatings);
-
-            var goodRatingsIntent = await ApiAiForStaticContent.GetIntentAsync(Settings.GoodRating);
-            var goodRatings = goodRatingsIntent.Responses.First().Speech;
-            Assert(ratingOptions?.Options.Last().Text, goodRatings);
+            ratingOptions?.Text.ShouldContain("?: ");
         }
     }
 }

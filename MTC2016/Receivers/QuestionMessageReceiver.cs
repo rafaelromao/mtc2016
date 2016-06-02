@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -135,10 +136,11 @@ namespace MTC2016.Receivers
         private bool IsValidQuestion(string question)
         {
             // Does not allow questions starting with $ or %
-            return !question.StartsWith("$") &&
-                   !question.StartsWith(_settings.SchedulePrefix) &&
-                   !question.StartsWith(_settings.FeedbackPrefix) &&
-                   !question.StartsWith(_settings.RatingPrefix);
+            return question?.Trim().Length > 0 &&
+                !question.StartsWith("$") &&
+                !question.StartsWith(_settings.SchedulePrefix) &&
+                !question.StartsWith(_settings.FeedbackPrefix) &&
+                !question.StartsWith(_settings.RatingPrefix);
         }
     }
 }

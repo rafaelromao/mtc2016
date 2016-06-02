@@ -93,7 +93,7 @@ namespace MTC2016.Tests.Mocks
             result = result.Where(s => s.DefaultMessage is Select && s.TangramMessage != s.DefaultMessage).Take(1);
             result.ForEach(s =>
             {
-                TestScheduleText = ((Select)s.TangramMessage).Text;
+                TestScheduleText = ((PlainText)s.TangramMessage).Text;
                 s.Time = DateTimeOffset.Now;
             });
             return result;

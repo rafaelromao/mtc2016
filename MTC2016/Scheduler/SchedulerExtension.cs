@@ -191,7 +191,7 @@ namespace MTC2016.Scheduler
             var good = $"{int.Parse($"{order}3")} {_goodRating}";
             var select = new PlainText
             {
-                Text = $"{text} Escolha:{bad};{regular};{good}"
+                Text = $"{text} {bad};{regular};{good}"
             };
             return select;
         }

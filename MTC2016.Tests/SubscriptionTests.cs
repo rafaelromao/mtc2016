@@ -56,7 +56,8 @@ namespace MTC2016.Tests
     }
 
     [TestFixture]
-    public class NoOneIsAlreadySubscribedSubscriptionTests : TestClass<NoSubscriptionAndSingleFakeScheduleServiceProvider>
+    public class NoOneIsAlreadySubscribedSubscribeTests :
+        TestClass<NoSubscriptionAndSingleFakeScheduleServiceProvider>
     {
         [Test]
         public async Task Subscribe()
@@ -66,7 +67,11 @@ namespace MTC2016.Tests
             var answer = await ApiAiForStaticContent.GetAnswerAsync(Settings.ConfirmSubscription);
             Assert(response, answer);
         }
+    }
 
+    [TestFixture]
+    public class NoOneIsAlreadySubscribedUnsubscribeTests : TestClass<NoSubscriptionAndSingleFakeScheduleServiceProvider>
+    {
         [Test]
         public async Task UnsubscribeWhenNotSubscribed()
         {

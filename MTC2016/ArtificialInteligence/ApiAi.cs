@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Caching;
+using System.Text;
 using System.Threading.Tasks;
 using MTC2016.Configuration;
 using Newtonsoft.Json;
@@ -35,11 +36,18 @@ namespace MTC2016.ArtificialInteligence
             if (_cache.Contains(question) && question != _settings.CouldNotUnderstand)
                 return _cache[question] as QueryResponse;
 
-            var uri = new Uri($"{_settings.ApiAiUri}/query?v=20150910&query={question}&lang=pt-br");
-            var response = await _httpClient.GetAsync(uri);
-            var json = await response.Content.ReadAsStringAsync();
+            var query = new QueryRequest()
+            {
+                Query = question
+            };
 
-            var queryResponse = JsonConvert.DeserializeObject<QueryResponse>(json, JsonSerializerSettings);
+            var requestJson = JsonConvert.SerializeObject(query, JsonSerializerSettings);
+
+            var uri = new Uri($"{_settings.ApiAiUri}/query?v=20150910");
+            var response = await _httpClient.PostAsync(uri, new StringContent(requestJson, Encoding.UTF8, MediaType));
+            var responseJson = await response.Content.ReadAsStringAsync();
+
+            var queryResponse = JsonConvert.DeserializeObject<QueryResponse>(responseJson, JsonSerializerSettings);
             AddToCache(question, queryResponse);
             return queryResponse;
         }
