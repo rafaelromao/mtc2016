@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System.ComponentModel.Design;
+using System.Linq;
 using System.Threading.Tasks;
+using MTC2016.Receivers;
 using MTC2016.Tests.Mocks;
 using NUnit.Framework;
 using Shouldly;
@@ -59,6 +61,17 @@ namespace MTC2016.Tests
             await Tester.SendMessageAsync(intent);
             var response = await Tester.ReceiveMessageAsync();
             var answer = await ApiAiForStaticContent.GetAnswerAsync(intent);
+            Assert(response, answer);
+        }
+
+        [Test]
+        public async Task AskMenuTalk()
+        {
+            var intent = "Menu";
+            await Tester.SendMessageAsync(intent);
+            var response = await Tester.ReceiveMessageAsync();
+            var answer = await ApiAiForStaticContent.GetAnswerAsync(intent);
+            answer = QuestionMessageReceiver.FixOMNISelectMessageForOtherDomains(answer);
             Assert(response, answer);
         }
 

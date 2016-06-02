@@ -47,6 +47,12 @@ namespace MTC2016.Receivers
                 }
                 else
                 {
+                    // Remove OMNI select separators. Select in this format will be ignored in other channels
+                    if (message.From.Domain != Domains.Omni)
+                    {
+                        answer = FixOMNISelectMessageForOtherDomains(answer);
+                    }
+
                     answer = await ExtractAndSendImagesAsync(answer, message.From, cancellationToken);
 
                     await _sender.SendMessageAsync(answer, message.From, cancellationToken);
@@ -66,6 +72,16 @@ namespace MTC2016.Receivers
                 }
 #pragma warning restore CC0004 // Catch block cannot be empty
             }
+        }
+
+        public static string FixOMNISelectMessageForOtherDomains(string answer)
+        {
+            answer = answer.Replace(", ;", ", ").Trim();
+            if (answer.Last() == ',')
+            {
+                answer = answer.Substring(0, answer.Length - 1);
+            }
+            return answer;
         }
 
         private async Task<string> GetDefaultAnswerAsync()
