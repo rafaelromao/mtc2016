@@ -42,22 +42,13 @@ namespace Takenet.MessagingHub.Client.Tester
             if (rem != 0) throw new ArithmeticException($"{messageCount} is not divisible by {testerCount}");
 
             var share = messageCount / testerCount;
-            const int testerGroupSize = 10;
-            var testerGroupCount = testerCount / testerGroupSize + 1;
-
-            for (var testerGroupCounter = 0; testerGroupCounter < testerGroupCount; testerGroupCounter++)
+            for (var testerCounter = 0; testerCounter < testerCount; testerCounter++)
             {
-                var testerCounterStart = testerGroupCounter * testerGroupSize;
-                var testerCounterEnd = testerCounterStart + testerGroupSize;
-                for (var testerCounter = testerCounterStart; testerCounter < testerCounterEnd && testerCounter < testerCount; testerCounter++)
+                var tester = GetTester(testerCounter);
+                for (var messageCounter = 0; messageCounter < share; messageCounter++)
                 {
-                    var tester = GetTester(testerCounter);
+                    await tester.SendMessageAsync(message);
                     await Task.Delay(TimeSpan.FromMilliseconds(150));
-                    for (var messageCounter = 0; messageCounter < share; messageCounter++)
-                    {
-                        await tester.SendMessageAsync(message);
-                        await Task.Delay(TimeSpan.FromMilliseconds(150));
-                    }
                 }
             }
         }
@@ -84,16 +75,19 @@ namespace Takenet.MessagingHub.Client.Tester
             return result;
         }
 
-        public async Task<IEnumerable<Message>> ReceiveMessagesAsync(TimeSpan timeout)
+        public async Task<IEnumerable<Message>> ReceiveMessagesAsync(TimeSpan allMessagesTimeout, TimeSpan singleMessagesTimeout)
         {
             var result = new List<Message>();
-            var cts = new CancellationTokenSource(timeout);
+            var cts = new CancellationTokenSource(allMessagesTimeout);
             while (!cts.IsCancellationRequested)
             {
                 foreach (var tester in _testers.Values)
                 {
-                    var message = await tester.ReceiveMessageAsync(timeout);
-                    result.Add(message);
+                    var message = await tester.ReceiveMessageAsync(singleMessagesTimeout);
+                    if (message != null)
+                    {
+                        result.Add(message);
+                    }
                 }
             }
             return result;
@@ -110,8 +104,8 @@ namespace Takenet.MessagingHub.Client.Tester
                 return _testers[testerIndex];
 
             var options = _options.Clone();
-            options.TesterAccountIndex = testerIndex;
-            var result = new ApplicationTester(_options);
+            options.TesterAccountIndex = testerIndex + 1;
+            var result = new ApplicationTester(options);
             _testers[testerIndex] = result;
             return result;
         }

@@ -70,8 +70,12 @@ namespace Takenet.MessagingHub.Client.Tester
 
             var share = messageCount / testerCount;
 
+            responses = responses.ToArray();
+
             responses.ShouldNotBeNull();
-            responses.GroupBy(m => m.From).Count().ShouldBe(share);
+            var groups = responses.GroupBy(m => m.To.Name);
+            groups.Count().ShouldBe(testerCount);
+            groups.All(g => g.Count() == share).ShouldBeTrue();
             responses.Count(m => m.Content != null).ShouldBe(messageCount);
             responses.All(m => expected.Contains(m.Content.ToString())).ShouldBeTrue();
         }
