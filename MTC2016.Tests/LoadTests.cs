@@ -11,12 +11,18 @@ namespace MTC2016.Tests
         [Test]
         public async Task FiveHundredSubscriptions()
         {
-            const int messageCount = 60;
-            const int testerCount = 60;
-            await LoadTester.PrepareTestersAsync(testerCount);
-            Console.WriteLine($"ALL {testerCount} TESTERS REGISTERED!");
-            await LoadTester.SendMessagesAsync("Gostaria de participar!", messageCount, testerCount);
-            var responses = await LoadTester.ReceiveMessagesAsync(TimeSpan.FromSeconds(testerCount / 2), TimeSpan.FromSeconds(0.5));
+            const int messageCount = 600;
+            const int testerCount = 600;
+
+            Console.WriteLine($"{DateTime.Now} -> START REGISTERING {testerCount} TESTERS!");
+            await LoadTester.PrepareTestersAsync(testerCount, Tester.SmartContact);
+            Console.WriteLine($"{DateTime.Now} -> ALL {testerCount} TESTERS REGISTERED!");
+
+            Console.WriteLine($"{DateTime.Now} -> START SENDING {messageCount} MESSAGES!");
+            await LoadTester.SendMessagesAsync("Gostaria de participar!", messageCount, testerCount, Tester.SmartContact);
+            Console.WriteLine($"{DateTime.Now} -> ALL {testerCount} MESSAGES SENT!");
+
+            var responses = await LoadTester.ReceiveMessagesAsync(TimeSpan.FromSeconds(testerCount / 10 + 1), TimeSpan.FromMilliseconds(100));
             var answer = await ApiAiForStaticContent.GetAnswerAsync(Settings.ConfirmSubscription);
             Assert(responses, answer, messageCount, testerCount);
         }

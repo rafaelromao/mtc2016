@@ -20,13 +20,16 @@ namespace Takenet.MessagingHub.Client.Tester
         private static ConsoleTraceListener _listener;
         public IServiceProvider ApplicationServiceProvider { get; private set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static ApplicationTester Current { get; private set; }
 
         private ConcurrentQueue<Message> _lattestMessages;
         private TimeSpan DefaultTimeout { get; set; }
 
         private IMessagingHubClient TestClient { get; set; }
-        private IStoppable SmartContact { get; set; }
+        public IStoppable SmartContact { get; private set; }
 
         private ConcurrentQueue<Message> LattestMessages
         {
@@ -38,16 +41,24 @@ namespace Takenet.MessagingHub.Client.Tester
         private string TestingIdentifier { get; set; }
         private string TestingPassword { get; set; }
 
-        public string TesterIdentifier { get; set; }
+        private string TesterIdentifier { get; set; }
         private string TesterPassword { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public Application Application { get; private set; }
 
-
-        public ApplicationTester(ApplicationTesterOptions options)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="smartContact"></param>
+        public ApplicationTester(ApplicationTesterOptions options, IStoppable smartContact = null)
         {
             Current = this;
             _options = options;
+            SmartContact = smartContact;
             StartAsync().Wait();
         }
 
@@ -63,7 +74,6 @@ namespace Takenet.MessagingHub.Client.Tester
             InstantiateTestClient();
             RegisterTestClientMessageReceivers();
             await StartTestClientAsync();
-            await SleepAsync();
         }
 
         private void ApplyOptions()
@@ -103,6 +113,7 @@ namespace Takenet.MessagingHub.Client.Tester
 
         private void PatchApplication()
         {
+            Application.Instance = Guid.NewGuid().ToString();
             Application.Identifier = TestingIdentifier;
             Application.Password = TestingPassword;
             Application.AccessKey = null;
@@ -176,7 +187,7 @@ namespace Takenet.MessagingHub.Client.Tester
 
         private async Task StartSmartContactAsync()
         {
-            SmartContact = await Bootstrapper.StartAsync(Application);
+            SmartContact = SmartContact ?? await Bootstrapper.StartAsync(Application);
         }
 
         private void LoadApplicationSettings()
@@ -240,10 +251,16 @@ namespace Takenet.MessagingHub.Client.Tester
             });
         }
 
-
-        public static async Task SleepAsync(int seconds = 1)
+        private void LoadApplicationJson(string appJson)
         {
-            await Task.Delay(TimeSpan.FromSeconds(seconds));
+            var appJsonContent = File.ReadAllText(appJson);
+            Application = JsonConvert.DeserializeObject<Application>(appJsonContent);
+        }
+
+        private async Task StopAsync()
+        {
+            await StopSmartContactAsync();
+            await StopTestClientAsync();
         }
 
         public void Dispose()
@@ -252,22 +269,42 @@ namespace Takenet.MessagingHub.Client.Tester
             _listener?.Dispose();
         }
 
-        public void LoadApplicationJson(string appJson)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="seconds"></param>
+        /// <returns></returns>
+        public static async Task SleepAsync(int seconds = 1)
         {
-            var appJsonContent = File.ReadAllText(appJson);
-            Application = JsonConvert.DeserializeObject<Application>(appJsonContent);
+            await Task.Delay(TimeSpan.FromSeconds(seconds));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task SendMessageAsync(string message)
         {
             await TestClient.SendMessageAsync(message, Application.Identifier);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task SendMessageAsync(Document message)
         {
             await TestClient.SendMessageAsync(message, Application.Identifier);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
         public async Task<Message> ReceiveMessageAsync(TimeSpan timeout = default(TimeSpan))
         {
             try
@@ -291,6 +328,11 @@ namespace Takenet.MessagingHub.Client.Tester
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
         public async Task IgnoreMessageAsync(TimeSpan timeout = default(TimeSpan))
         {
             try
@@ -313,15 +355,14 @@ namespace Takenet.MessagingHub.Client.Tester
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public T GetService<T>()
         {
             return (T)ApplicationServiceProvider.GetService(typeof(T));
-        }
-
-        private async Task StopAsync()
-        {
-            await StopSmartContactAsync();
-            await StopTestClientAsync();
         }
     }
 }
