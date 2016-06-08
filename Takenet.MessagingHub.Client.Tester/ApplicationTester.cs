@@ -36,10 +36,10 @@ namespace Takenet.MessagingHub.Client.Tester
 
 
         private string TestingIdentifier { get; set; }
-        private string TestingAccessKey { get; set; }
+        private string TestingPassword { get; set; }
 
         public string TesterIdentifier { get; set; }
-        private string TesterAccessKey { get; set; }
+        private string TesterPassword { get; set; }
 
         public Application Application { get; private set; }
 
@@ -82,29 +82,30 @@ namespace Takenet.MessagingHub.Client.Tester
 
                 var testingAccountManager = new TestingAccountManager(Application, DefaultTimeout);
 
-                var testingPassword = (Application.AccessKey ?? Application.Password).FromBase64();
+                TesterPassword = TestingPassword = (Application.AccessKey ?? Application.Password).FromBase64();
 
                 TestingIdentifier = Application.Identifier + "$testing";
-                TestingAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TestingIdentifier, testingPassword);
+                await testingAccountManager.CreateAccountAsync(TestingIdentifier, TestingPassword);
 
                 TesterIdentifier = Application.Identifier + "$tester";
                 if (_options.TesterAccountIndex > 0)
                 {
                     TesterIdentifier = $"{TesterIdentifier}{_options.TesterAccountIndex}";
                 }
-                TesterAccessKey = await testingAccountManager.CreateAccountWithAccessKeyAsync(TesterIdentifier, testingPassword);
+                await testingAccountManager.CreateAccountAsync(TesterIdentifier, TestingPassword);
             }
             else
             {
                 TesterIdentifier = Application.Identifier;
-                TesterAccessKey = Application.AccessKey;
+                TesterPassword = Application.AccessKey;
             }
         }
 
         private void PatchApplication()
         {
             Application.Identifier = TestingIdentifier;
-            Application.AccessKey = TestingAccessKey;
+            Application.Password = TestingPassword;
+            Application.AccessKey = null;
 
             if (Application.ServiceProviderType != null)
             {
@@ -211,7 +212,7 @@ namespace Takenet.MessagingHub.Client.Tester
         private void InstantiateTestClient()
         {
             var builder = new MessagingHubClientBuilder()
-                .UsingAccessKey(TesterIdentifier, TesterAccessKey)
+                .UsingPassword(TesterIdentifier, TesterPassword)
                 .WithSendTimeout(DefaultTimeout)
                 .WithMaxConnectionRetries(1);
 

@@ -26,37 +26,11 @@ namespace Takenet.MessagingHub.Client.Tester
             Domain = Application.Domain ?? "msging.net";
         }
 
-        public async Task<string> CreateAccountWithAccessKeyAsync(string name, string password)
-        {
-            var accountExists = await AccountExistsAsync(name, password);
-            if (!accountExists)
-            {
-                await CreateAccountAsync(name, password);
-            }
-            return await CreateAccessKeyAsync(name, password);
-        }
-
-        public async Task<bool> AccountExistsAsync(string name, string password)
-        {
-            IClientChannel clientChannel = null;
-            try
-            {
-                var clientNode = CreateNode(name);
-                clientChannel = await EstablishSessionAsync(new PlainAuthentication { Password = password.ToBase64() }, clientNode);
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            finally
-            {
-                await EndSession(clientChannel);
-            }
-        }
-
         public async Task CreateAccountAsync(string name, string password)
         {
+            var accountExists = await AccountExistsAsync(name, password);
+            if (accountExists) return;
+
             IClientChannel clientChannel = null;
             try
             {
@@ -91,43 +65,18 @@ namespace Takenet.MessagingHub.Client.Tester
             }
         }
 
-        public async Task<string> CreateAccessKeyAsync(string name, string password)
+        private async Task<bool> AccountExistsAsync(string name, string password)
         {
             IClientChannel clientChannel = null;
-
             try
             {
-                using (var authentication = new PlainAuthentication())
-                {
-                    authentication.SetToBase64Password(password);
-                    var clientNode = CreateNode(name);
-                    clientChannel = await EstablishSessionAsync(authentication, clientNode);
-                }
-
-                using (var cts = CreateCancellationTokenSource())
-                {
-                    var setAccessKeyCommandResponse = await clientChannel.ProcessCommandAsync(
-                        new Command
-                        {
-                            Resource = new AccountKeyRequest(),
-                            Uri = LimeUri.Parse("/account/keys"),
-                            Method = CommandMethod.Set
-                        },
-                        cts.Token);
-
-                    ThrowIfFailed(setAccessKeyCommandResponse);
-                }
-
-                using (var cts = CreateCancellationTokenSource())
-                {
-                    var message = await clientChannel.ReceiveMessageAsync(cts.Token);
-                    var accessKey = message.Content as AccessKey;
-                    if (accessKey == null)
-                    {
-                        throw new Exception("Access key was not received");
-                    }
-                    return accessKey.Key;
-                }
+                var clientNode = CreateNode(name);
+                clientChannel = await EstablishSessionAsync(new PlainAuthentication { Password = password.ToBase64() }, clientNode);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
             }
             finally
             {
