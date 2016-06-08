@@ -6,7 +6,6 @@ using Lime.Protocol;
 using Lime.Protocol.Client;
 using Lime.Protocol.Network;
 using Lime.Protocol.Security;
-using Lime.Protocol.Serialization;
 using Lime.Transport.Tcp;
 using Takenet.MessagingHub.Client.Host;
 
@@ -29,8 +28,31 @@ namespace Takenet.MessagingHub.Client.Tester
 
         public async Task<string> CreateAccountWithAccessKeyAsync(string name, string password)
         {
-            await CreateAccountAsync(name, password);
+            var accountExists = await AccountExistsAsync(name, password);
+            if (!accountExists)
+            {
+                await CreateAccountAsync(name, password);
+            }
             return await CreateAccessKeyAsync(name, password);
+        }
+
+        public async Task<bool> AccountExistsAsync(string name, string password)
+        {
+            IClientChannel clientChannel = null;
+            try
+            {
+                var clientNode = CreateNode(name);
+                clientChannel = await EstablishSessionAsync(new PlainAuthentication { Password = password.ToBase64() }, clientNode);
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            finally
+            {
+                await EndSession(clientChannel);
+            }
         }
 
         public async Task CreateAccountAsync(string name, string password)
@@ -120,7 +142,6 @@ namespace Takenet.MessagingHub.Client.Tester
                 throw new LimeException(commandResponse.Reason);
             }
         }
-
 
         private Node CreateNode(string name) => new Node
         {

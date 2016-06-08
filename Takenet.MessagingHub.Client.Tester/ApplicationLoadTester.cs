@@ -20,18 +20,10 @@ namespace Takenet.MessagingHub.Client.Tester
 
         public async Task PrepareTestersAsync(int testerCount)
         {
-            const int testerGroupSize = 10;
-            var testerGroupCount = testerCount / testerGroupSize + 1;
-
-            for (var testerGroupCounter = 0; testerGroupCounter < testerGroupCount; testerGroupCounter++)
+            for (var testerCounter = 0; testerCounter < testerCount; testerCounter++)
             {
-                var testerCounterStart = testerGroupCounter * testerGroupSize;
-                var testerCounterEnd = testerCounterStart + testerGroupSize;
-                for (var testerCounter = testerCounterStart; testerCounter < testerCounterEnd && testerCounter < testerCount; testerCounter++)
-                {
-                    GetTester(testerCounter);
-                    await Task.Delay(TimeSpan.FromMilliseconds(150));
-                }
+                GetTester(testerCounter);
+                await Task.Delay(TimeSpan.FromMilliseconds(150));
             }
         }
 
@@ -48,7 +40,7 @@ namespace Takenet.MessagingHub.Client.Tester
                 for (var messageCounter = 0; messageCounter < share; messageCounter++)
                 {
                     await tester.SendMessageAsync(message);
-                    await Task.Delay(TimeSpan.FromMilliseconds(150));
+                    await Task.Delay(TimeSpan.FromSeconds(2));
                 }
             }
         }
