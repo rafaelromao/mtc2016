@@ -53,8 +53,8 @@
       <HintPath>..\MTC2016\packages\Lime.Transport.Tcp.0.5.15\lib\net461\Lime.Transport.Tcp.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="mhh, Version=0.3.75.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\MTC2016\packages\Takenet.MessagingHub.Client.Host.0.3.75\lib\net461\mhh.exe</HintPath>
+    <Reference Include="mhh, Version=0.3.79.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\MTC2016\packages\Takenet.MessagingHub.Client.Host.0.3.79\lib\net461\mhh.exe</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
@@ -71,8 +71,12 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="Takenet.MessagingHub.Client, Version=0.3.75.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\MTC2016\packages\Takenet.MessagingHub.Client.0.3.75\lib\net461\Takenet.MessagingHub.Client.dll</HintPath>
+    <Reference Include="Takenet.MessagingHub.Client, Version=0.3.79.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\MTC2016\packages\Takenet.MessagingHub.Client.0.3.79\lib\net461\Takenet.MessagingHub.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Takenet.MessagingHub.Client.Tester, Version=0.3.79.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\MTC2016\packages\Takenet.MessagingHub.Client.Tester.0.3.79\lib\net461\Takenet.MessagingHub.Client.Tester.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -110,10 +114,6 @@
     <ProjectReference Include="..\MTC2016\MTC2016.csproj">
       <Project>{ae4e3778-1ab5-4e79-8268-e1c0e7996554}</Project>
       <Name>MTC2016</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Takenet.MessagingHub.Client.Tester\Takenet.MessagingHub.Client.Tester.csproj">
-      <Project>{f62d83c4-b65a-4961-8054-342a1f1db9c2}</Project>
-      <Name>Takenet.MessagingHub.Client.Tester</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

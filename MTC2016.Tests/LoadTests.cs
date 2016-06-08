@@ -22,7 +22,7 @@ namespace MTC2016.Tests
             await LoadTester.SendMessagesAsync("Gostaria de participar!", messageCount, testerCount, Tester.SmartContact);
             Console.WriteLine($"{DateTime.Now} -> ALL {testerCount} MESSAGES SENT!");
 
-            var responses = await LoadTester.ReceiveMessagesAsync(TimeSpan.FromSeconds(testerCount / 10 + 1), TimeSpan.FromMilliseconds(100));
+            var responses = await LoadTester.ReceiveMessagesAsync(TimeSpan.FromSeconds(testerCount), TimeSpan.FromSeconds(1));
             var answer = await ApiAiForStaticContent.GetAnswerAsync(Settings.ConfirmSubscription);
             Assert(responses, answer, messageCount, testerCount);
         }
