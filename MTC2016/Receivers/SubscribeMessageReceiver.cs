@@ -48,6 +48,8 @@ namespace MTC2016.Receivers
             _subscriptionFailed = await _apiAi.GetAnswerAsync(_settings.SubscriptionFailed);
         }
 
+        private static int counter = 0;
+
         public async Task ReceiveAsync(Message message, CancellationToken cancellationToken)
         {
             try
@@ -70,6 +72,8 @@ namespace MTC2016.Receivers
                 Console.WriteLine($"Exception when trying to subscribe: {e}");
                 try
                 {
+                    Console.WriteLine($"Default error # {counter++}");
+
                     await _sender.SendMessageAsync(_defaultAnswer, message.From, cancellationToken);
                 }
 #pragma warning disable CC0004 // Catch block cannot be empty

@@ -12,7 +12,7 @@ namespace MTC2016.Tests.Mocks
             where TInterface : class
             where TClass : class, TInterface
         {
-            ((ServiceProvider)ApplicationTester.Current.ApplicationServiceProvider).Container.RegisterSingleton<TInterface, TClass>();
+            ((ServiceProvider)ApplicationTester.ApplicationServiceProvider).Container.RegisterSingleton<TInterface, TClass>();
         }
     }
 
