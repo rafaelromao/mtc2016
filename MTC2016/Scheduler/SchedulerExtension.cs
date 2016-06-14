@@ -136,9 +136,11 @@ namespace MTC2016.Scheduler
 
         public async Task UpdateSchedulesAsync()
         {
+            Console.WriteLine("Starting UpdateSchedulesAsync...");
             _jobScheduler?.Dispose();
             _jobScheduler = new JobScheduler(_sender);
             await ScheduleAsync(await GetMessagesToBeScheduled());
+            Console.WriteLine("Finished UpdateSchedulesAsync!");
         }
 
         private Document ExtractRatingFromText(string text, string domain = null)

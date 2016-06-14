@@ -21,6 +21,7 @@ namespace MTC2016
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            Console.WriteLine("Connected!");
             await ScheduleScheduledMessagesAsync();
         }
 
