@@ -9,6 +9,7 @@ using MTC2016.ArtificialInteligence;
 using MTC2016.Configuration;
 using MTC2016.DistributionList;
 using MTC2016.Scheduler;
+using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.Tests.Mocks
 {
@@ -19,8 +20,8 @@ namespace MTC2016.Tests.Mocks
         private readonly IDistributionListExtension _distributionListExtension;
 
         public SchedulerExtensionWithSingleFakeRatingSchedule(IApiAiForStaticContent apiAi,
-            IDistributionListExtension distributionListExtension, IJobScheduler jobScheduler, Settings settings)
-            : base(apiAi, jobScheduler, distributionListExtension, settings)
+            IMessagingHubSender sender, IDistributionListExtension distributionListExtension, Settings settings)
+            : base(apiAi, sender, distributionListExtension, settings)
         {
             _distributionListExtension = distributionListExtension;
         }
@@ -49,9 +50,9 @@ namespace MTC2016.Tests.Mocks
     internal class SchedulerExtensionWithSingleFakeOmniRatingSchedule : SchedulerExtensionWithSingleFakeRatingSchedule
     {
         public SchedulerExtensionWithSingleFakeOmniRatingSchedule(
-            IApiAiForStaticContent apiAi, IDistributionListExtension distributionListExtension, 
-            IJobScheduler jobScheduler, Settings settings) 
-            : base(apiAi, distributionListExtension, jobScheduler, settings)
+            IApiAiForStaticContent apiAi, IMessagingHubSender sender, 
+            IDistributionListExtension distributionListExtension, Settings settings) 
+            : base(apiAi, sender, distributionListExtension, settings)
         {
         }
 
@@ -76,9 +77,9 @@ namespace MTC2016.Tests.Mocks
     internal class SchedulerExtensionWithSingleFakeTangramRatingSchedule : SchedulerExtensionWithSingleFakeRatingSchedule
     {
         public SchedulerExtensionWithSingleFakeTangramRatingSchedule(
-            IApiAiForStaticContent apiAi, IDistributionListExtension distributionListExtension,
-            IJobScheduler jobScheduler, Settings settings)
-            : base(apiAi, distributionListExtension, jobScheduler, settings)
+            IApiAiForStaticContent apiAi, IMessagingHubSender sender, 
+            IDistributionListExtension distributionListExtension, Settings settings)
+            : base(apiAi, sender, distributionListExtension, settings)
         {
         }
 

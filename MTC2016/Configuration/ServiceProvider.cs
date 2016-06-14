@@ -21,7 +21,6 @@ namespace MTC2016.Configuration
             Container.RegisterSingleton<IApiAiForStaticContent, ApiAiForStaticContent>();
             Container.RegisterSingleton<IApiAiForDynamicContent, ApiAiForDynamicContent>();
 
-            Container.RegisterSingleton<IJobScheduler, JobScheduler>();
             Container.RegisterSingleton<ISchedulerExtension, SchedulerExtension>();
 
             Container.RegisterSingleton<IRecipientsRepository, RecipientsRepository>();

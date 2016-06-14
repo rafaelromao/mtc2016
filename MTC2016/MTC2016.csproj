@@ -32,20 +32,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Lime.Messaging, Version=0.5.15.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Lime.Messaging.0.5.15\lib\net461\Lime.Messaging.dll</HintPath>
+    <Reference Include="Lime.Messaging, Version=0.5.20.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Lime.Messaging.0.5.20\lib\net461\Lime.Messaging.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Lime.Protocol, Version=0.5.15.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Lime.Protocol.0.5.15\lib\net461\Lime.Protocol.dll</HintPath>
+    <Reference Include="Lime.Protocol, Version=0.5.20.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Lime.Protocol.0.5.20\lib\net461\Lime.Protocol.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Lime.Protocol.Serialization.Newtonsoft, Version=0.5.15.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Lime.Protocol.Serialization.Newtonsoft.0.5.15\lib\net461\Lime.Protocol.Serialization.Newtonsoft.dll</HintPath>
+    <Reference Include="Lime.Protocol.Serialization.Newtonsoft, Version=0.5.20.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Lime.Protocol.Serialization.Newtonsoft.0.5.20\lib\net461\Lime.Protocol.Serialization.Newtonsoft.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Lime.Transport.Tcp, Version=0.5.15.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Lime.Transport.Tcp.0.5.15\lib\net461\Lime.Transport.Tcp.dll</HintPath>
+    <Reference Include="Lime.Transport.Tcp, Version=0.5.20.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Lime.Transport.Tcp.0.5.20\lib\net461\Lime.Transport.Tcp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="mhh, Version=0.3.86.0, Culture=neutral, processorArchitecture=MSIL">
@@ -110,6 +110,7 @@
     <Compile Include="DistributionList\RecipientsRepository.cs" />
     <Compile Include="FeedbackAndRating\IFeedbackRepository.cs" />
     <Compile Include="PlainTextMessageReceiver.cs" />
+    <Compile Include="Receivers\UpdateSchedulesMessageReceiver.cs" />
     <Compile Include="Receivers\ImageMessageReceiver.cs" />
     <Compile Include="Receivers\RatingMessageReceiver.cs" />
     <Compile Include="Receivers\FeedbackMessageReceiver.cs" />

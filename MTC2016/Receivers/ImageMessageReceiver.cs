@@ -34,18 +34,4 @@ namespace MTC2016.Receivers
              await _sender.SendMessageAsync(_imageAnswer, message.From, cancellationToken);
         }
     }
-
-    public class ImageJpegMessageReceiver : ImageMessageReceiver
-    {
-        public ImageJpegMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, Settings settings) : base(sender, apiAi, settings)
-        {
-        }
-    }
-
-    public class ImagePngMessageReceiver : ImageMessageReceiver
-    {
-        public ImagePngMessageReceiver(IMessagingHubSender sender, IApiAiForStaticContent apiAi, Settings settings) : base(sender, apiAi, settings)
-        {
-        }
-    }
 }

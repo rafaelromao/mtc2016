@@ -4,7 +4,7 @@ using Lime.Protocol;
 
 namespace MTC2016.Scheduler
 {
-    public interface IJobScheduler
+    public interface IJobScheduler : IDisposable
     {
         Task ScheduleAsync(Message message, DateTimeOffset time);
     }

@@ -9,25 +9,28 @@ using Lime.Protocol;
 using MTC2016.ArtificialInteligence;
 using MTC2016.Configuration;
 using MTC2016.DistributionList;
+using Takenet.MessagingHub.Client.Sender;
 
 namespace MTC2016.Scheduler
 {
     public class SchedulerExtension : ISchedulerExtension
     {
         private readonly IApiAiForStaticContent _apiAi;
-        private readonly IJobScheduler _jobScheduler;
+        private readonly IMessagingHubSender _sender;
         private readonly IDistributionListExtension _distributionListExtension;
         private readonly Settings _settings;
+        private IJobScheduler _jobScheduler;
         private string _badRating;
         private string _regularRating;
         private string _goodRating;
 
         public SchedulerExtension(
-            IApiAiForStaticContent apiAi, IJobScheduler jobScheduler,
+            IApiAiForStaticContent apiAi,
+            IMessagingHubSender sender,
             IDistributionListExtension distributionListExtension, Settings settings)
         {
             _apiAi = apiAi;
-            _jobScheduler = jobScheduler;
+            _sender = sender;
             _distributionListExtension = distributionListExtension;
             _settings = settings;
         }
@@ -133,6 +136,8 @@ namespace MTC2016.Scheduler
 
         public async Task UpdateSchedulesAsync()
         {
+            _jobScheduler?.Dispose();
+            _jobScheduler = new JobScheduler(_sender);
             await ScheduleAsync(await GetMessagesToBeScheduled());
         }
 
