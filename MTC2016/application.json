@@ -1,0 +1,76 @@
+﻿{
+  "identifier": "mtc2016",
+  "accessKey": "",
+
+  "messageReceivers": [
+    {
+      "type": "ImageMessageReceiver",
+      "mediaType": "image.*"
+    },
+    {
+      "type": "SubscribeMessageReceiver",
+      "mediaType": "text/plain",
+      "content": ".*(inscrever|inscrição|inscricao|entrar|participar|assinar).*"
+    },
+    {
+      "type": "UnsubscribeMessageReceiver",
+      "mediaType": "text/plain",
+      "content": ".*(cancelar|sair|desistir).*"
+    },
+    {
+      "type": "FeedbackMessageReceiver",
+      "mediaType": "text/plain",
+      "content": ".*(feedback).*"
+    },
+    {
+      "type": "RatingMessageReceiver",
+      "mediaType": "text/plain",
+      "content": "^([0-9][0-9][0-9])$"
+    },
+    {
+      "type": "UpdateSchedulesMessageReceiver",
+      "mediaType": "text/plain",
+      "content": "^(update_1620_schedules)$"
+    },
+    {
+      "type": "QuestionMessageReceiver",
+      "mediaType": "text/plain",
+      "content": "^((?!([0-9][0-9][0-9])|feedback|inscrever|inscrição|inscricao|entrar|participar|assinar|cancelar|sair|desistir|update_1620_schedules).)*$"
+    }
+  ],
+  "sessionEncryption": "none",
+  "settingsType": "Settings",
+  "settings": {
+    "connectionString": "Data Source=rafaelromao.database.windows.net;Initial Catalog=MTC2016;Integrated Security=False;User ID=samantha;Password=!MTCZolG!;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False",
+    "apiAiUri": "https://api.api.ai/v1/",
+    "apiAiStaticDeveloperApiKey": "0a8a2cb13c174344917e95af949c4572",
+    "apiAiDynamicDeveloperApiKey": "0a8a2cb13c174344917e95af949c4572",
+    "schedulePrefix": "Schedule_",
+    "UsersEntity": "Users",
+    "atReplacement": "_at_",
+    "dolarReplacement": "_dolar_",
+    "generalError": "Parabéns! Você descobriu um bug não tratado neste Smart Contact. Está satisfeito agora?",
+    "couldNotUnderstand": "$couldNotUnderstand",
+    "subscriptionFailed": "$subscriptionFailed",
+    "confirmSubscription": "$confirmSubscription",
+    "alreadySubscribed": "$alreadySubscribed",
+    "notSubscribed": "$notSubscribed",
+    "confirmSubscriptionCancellation": "$confirmSubscriptionCancellation",
+    "unsubscriptionFailed": "$unsubscriptionFailed",
+    "cacheExpirationInMinutes": 1,
+    "feedbackConfirmation": "$feedbackConfirmation",
+    "feedbackFailed": "$feedbackFailed",
+    "imageConfirmation": "$imageConfirmation",
+    "feedbackPrefix": "Feedback_",
+    "ratingText": "$ratingText",
+    "ratingConfirmation": "$ratingConfirmation",
+    "ratingFailed": "$ratingFailed",
+    "ratingPrefix": "Rating_",
+    "badRating": "$badRating",
+    "regularRating": "$regularRating",
+    "goodRating": "$goodRating"
+  },
+  "startupType": "Startup",
+  "serviceProviderType": "ServiceProvider",
+  "schemaVersion": 2
+}
